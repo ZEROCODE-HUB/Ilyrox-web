@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Especificaciones de Diseño - Panel de Filtros</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #F5F7FA;
+      color: #333;
+      line-height: 1.6;
+      padding: 40px 20px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 60px;
+      padding: 40px;
+      background: linear-gradient(135deg, #17C3B2 0%, #4DA3D0 100%);
+      border-radius: 16px;
+      color: white;
+    }
+    
+    header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    
+    header p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+    
+    .section {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 32px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    }
+    
+    .section-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #E0E0E0;
+    }
+    
+    /* ========== PALETA DE COLORES ========== */
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    
+    .color-category {
+      margin-bottom: 32px;
+    }
+    
+    .color-category h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+    
+    .color-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #E0E0E0;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .color-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
+    
+    .color-swatch {
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 14px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    
+    .color-info {
+      padding: 16px;
+    }
+    
+    .color-name {
+      font-weight: 600;
+      font-size: 14px;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    
+    .color-hex {
+      font-family: 'Monaco', 'Consolas', monospace;
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .color-usage {
+      font-size: 11px;
+      color: #999;
+      margin-top: 8px;
+    }
+    
+    /* ========== TIPOGRAFÍA ========== */
+    .typography-showcase {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    
+    .typo-item {
+      padding: 20px;
+      background: #F9FAFB;
+      border-radius: 12px;
+      border-left: 4px solid #17C3B2;
+    }
+    
+    .typo-example {
+      margin-bottom: 12px;
+    }
+    
+    .typo-specs {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    
+    .typo-spec {
+      background: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      color: #666;
+      border: 1px solid #E0E0E0;
+    }
+    
+    .title-18 { font-size: 18px; font-weight: 600; color: #1a1a2e; }
+    .title-16 { font-size: 16px; font-weight: 600; color: #1a1a2e; }
+    .label-14 { font-size: 14px; font-weight: 500; color: #333; }
+    .label-12 { font-size: 12px; font-weight: 500; color: #666; }
+    .body-14 { font-size: 14px; font-weight: 400; color: #333; }
+    .placeholder { font-size: 14px; font-weight: 400; color: #999; }
+    
+    /* ========== COMPONENTES UI ========== */
+    .components-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 32px;
+    }
+    
+    .component-card {
+      background: #F9FAFB;
+      border-radius: 12px;
+      padding: 24px;
+    }
+    
+    .component-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 16px;
+    }
+    
+    .component-demo {
+      margin-bottom: 16px;
+    }
+    
+    .component-specs {
+      font-size: 12px;
+      color: #666;
+      background: white;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px dashed #E0E0E0;
+    }
+    
+    .component-specs code {
+      background: #F0F4F8;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Monaco', 'Consolas', monospace;
+      font-size: 11px;
+    }
+    
+    /* Input Demos */
+    .demo-input {
+      width: 100%;
+      height: 48px;
+      padding: 0 16px;
+      border: 1px solid #E0E0E0;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #333;
+      background: white;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    
+    .demo-input:focus {
+      outline: none;
+      border-color: #17C3B2;
+      box-shadow: 0 0 0 3px rgba(23, 195, 178, 0.15);
+    }
+    
+    .demo-input::placeholder {
+      color: #999;
+    }
+    
+    .demo-input.filled {
+      border-color: #17C3B2;
+    }
+    
+    /* Floating Label Input */
+    .floating-input-group {
+      position: relative;
+      margin-bottom: 8px;
+    }
+    
+    .floating-label {
+      position: absolute;
+      left: 12px;
+      top: -8px;
+      background: white;
+      padding: 0 4px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #17C3B2;
+    }
+    
+    /* Select/Dropdown Demo */
+    .demo-select {
+      width: 100%;
+      height: 48px;
+      padding: 0 40px 0 16px;
+      border: 1px solid #E0E0E0;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #333;
+      background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center;
+      background-size: 16px;
+      appearance: none;
+      cursor: pointer;
+    }
+    
+    /* Button Demos */
+    .demo-btn-primary {
+      height: 48px;
+      padding: 0 32px;
+      background: #17C3B2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    
+    .demo-btn-primary:hover {
+      background: #14a99a;
+    }
+    
+    .demo-btn-primary:active {
+      transform: scale(0.98);
+    }
+    
+    .demo-btn-secondary {
+      height: 48px;
+      padding: 0 32px;
+      background: white;
+      color: #333;
+      border: 1px solid #E0E0E0;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    
+    .demo-btn-secondary:hover {
+      background: #F9FAFB;
+      border-color: #BDBDBD;
+    }
+    
+    .demo-btn-link {
+      background: none;
+      border: none;
+      color: #4DA3D0;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    
+    .demo-btn-link:hover {
+      color: #3d8ab8;
+      text-decoration: underline;
+    }
+    
+    /* Tags/Pills */
+    .tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    .demo-tag {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .demo-tag.unselected {
+      background: white;
+      border: 1px solid #E0E0E0;
+      color: #666;
+    }
+    
+    .demo-tag.unselected:hover {
+      border-color: #17C3B2;
+      color: #17C3B2;
+    }
+    
+    .demo-tag.selected {
+      background: #17C3B2;
+      border: 1px solid #17C3B2;
+      color: white;
+    }
+    
+    /* Counter Component */
+    .counter-demo {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .counter-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid #E0E0E0;
+      background: white;
+      color: #333;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    
+    .counter-btn:hover {
+      border-color: #17C3B2;
+      color: #17C3B2;
+      background: rgba(23, 195, 178, 0.05);
+    }
+    
+    .counter-value {
+      min-width: 40px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    /* Number Pills */
+    .number-pills {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .number-pill {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      border: 1px solid #E0E0E0;
+      background: white;
+      color: #333;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    
+    .number-pill:hover {
+      border-color: #17C3B2;
+    }
+    
+    .number-pill.selected {
+      background: #17C3B2;
+      border-color: #17C3B2;
+      color: white;
+    }
+    
+    /* ========== LAYOUT Y ESPACIADO ========== */
+    .spacing-demo {
+      background: #F9FAFB;
+      border-radius: 12px;
+      padding: 32px;
+    }
+    
+    .spacing-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    
+    .spacing-visual {
+      width: 60px;
+      background: linear-gradient(135deg, #17C3B2 0%, #4DA3D0 100%);
+      border-radius: 4px;
+    }
+    
+    .spacing-label {
+      font-size: 14px;
+      color: #333;
+    }
+    
+    .spacing-value {
+      font-family: 'Monaco', 'Consolas', monospace;
+      font-size: 12px;
+      color: #666;
+      background: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+    
+    /* ========== ESTRUCTURA DEL FILTRO ========== */
+    .structure-demo {
+      background: #F9FAFB;
+      border-radius: 12px;
+      padding: 24px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    
+    .structure-section {
+      padding: 16px;
+      border: 1px dashed #BDBDBD;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      background: white;
+    }
+    
+    .structure-section-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #17C3B2;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    
+    .structure-content {
+      font-size: 13px;
+      color: #666;
+    }
+    
+    /* ========== MOCKUP COMPLETO ========== */
+    .filter-mockup {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+      max-width: 380px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    
+    .mockup-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      border-bottom: 1px solid #E0E0E0;
+    }
+    
+    .mockup-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1a1a2e;
+    }
+    
+    .mockup-clear {
+      color: #4DA3D0;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    
+    .mockup-body {
+      padding: 20px;
+    }
+    
+    .mockup-section {
+      margin-bottom: 24px;
+    }
+    
+    .mockup-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 12px;
+    }
+    
+    .mockup-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    
+    .mockup-input {
+      height: 44px;
+      padding: 0 12px;
+      border: 1px solid #E0E0E0;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #333;
+      background: white;
+    }
+    
+    .mockup-footer {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 20px;
+      border-top: 1px solid #E0E0E0;
+      background: #F9FAFB;
+    }
+    
+    /* ========== NOTAS DE IMPLEMENTACIÓN ========== */
+    .notes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .note-item {
+      display: flex;
+      gap: 12px;
+      padding: 16px;
+      background: #F9FAFB;
+      border-radius: 12px;
+      border-left: 4px solid #17C3B2;
+    }
+    
+    .note-icon {
+      width: 24px;
+      height: 24px;
+      background: #17C3B2;
+      border-radius: 50%;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+    
+    .note-content {
+      font-size: 14px;
+      color: #333;
+    }
+    
+    .note-content strong {
+      color: #1a1a2e;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      body {
+        padding: 20px 12px;
+      }
+      
+      .section {
+        padding: 20px;
+      }
+      
+      header {
+        padding: 24px;
+      }
+      
+      header h1 {
+        font-size: 24px;
+      }
+      
+      .components-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    
+    <!-- Header -->
+    <header>
+      <h1>📐 Especificaciones de Diseño UI/UX</h1>
+      <p>Panel de Filtros - Aplicación Inmobiliaria i360</p>
+    </header>
+    
+    <!-- Sección 1: Paleta de Colores -->
+    <section class="section">
+      <h2 class="section-title">🎨 Paleta de Colores</h2>
+      
+      <div class="color-category">
+        <h4>Colores Primarios</h4>
+        <div class="color-grid">
+          <div class="color-card">
+            <div class="color-swatch" style="background: #17C3B2;">Turquesa</div>
+            <div class="color-info">
+              <div class="color-name">Primary Turquoise</div>
+              <div class="color-hex">#17C3B2 · HSL(173, 86%, 41%)</div>
+              <div class="color-usage">Botones primarios, acentos, estados seleccionados</div>
+            </div>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch" style="background: #4DA3D0;">Azul</div>
+            <div class="color-info">
+              <div class="color-name">Secondary Blue</div>
+              <div class="color-hex">#4DA3D0 · HSL(201, 55%, 56%)</div>
+              <div class="color-usage">Links, textos destacados, acciones secundarias</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="color-category">
+        <h4>Colores Neutros</h4>
+        <div class="color-grid">
+          <div class="color-card">
+            <div class="color-swatch" style="background: #333; color: white;">Texto</div>
+            <div class="color-info">
+              <div class="color-name">Text Primary</div>
+              <div class="color-hex">#333333</div>
+              <div class="color-usage">Títulos y texto principal</div>
+            </div>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch" style="background: #666; color: white;">Label</div>
+            <div class="color-info">
+              <div class="color-name">Text Secondary</div>
+              <div class="color-hex">#666666</div>
+              <div class="color-usage">Labels, texto secundario</div>
+            </div>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch" style="background: #999; color: white;">Placeholder</div>
+            <div class="color-info">
+              <div class="color-name">Placeholder</div>
+              <div class="color-hex">#999999</div>
+              <div class="color-usage">Texto placeholder en inputs</div>
+            </div>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch" style="background: #E0E0E0; color: #333;">Borde</div>
+            <div class="color-info">
+              <div class="color-name">Border</div>
+              <div class="color-hex">#E0E0E0</div>
+              <div class="color-usage">Bordes de inputs y divisores</div>
+            </div>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch" style="background: #F5F7FA; color: #333;">Fondo</div>
+            <div class="color-info">
+              <div class="color-name">Background</div>
+              <div class="color-hex">#F5F7FA</div>
+              <div class="color-usage">Fondos secundarios, áreas</div>
+            </div>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch" style="background: #FFFFFF; color: #333; border: 1px solid #E0E0E0;">Blanco</div>
+            <div class="color-info">
+              <div class="color-name">White</div>
+              <div class="color-hex">#FFFFFF</div>
+              <div class="color-usage">Fondo principal, tarjetas</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Sección 2: Tipografía -->
+    <section class="section">
+      <h2 class="section-title">✏️ Tipografía</h2>
+      
+      <div class="typography-showcase">
+        <div class="typo-item">
+          <div class="typo-example title-18">Título de Sección - Filtros</div>
+          <div class="typo-specs">
+            <span class="typo-spec">Font Size: <code>18px</code></span>
+            <span class="typo-spec">Weight: <code>600 (Semibold)</code></span>
+            <span class="typo-spec">Color: <code>#1a1a2e</code></span>
+            <span class="typo-spec">Uso: Título principal del panel</span>
+          </div>
+        </div>
+        
+        <div class="typo-item">
+          <div class="typo-example title-16">Subsección - Rango de Precio</div>
+          <div class="typo-specs">
+            <span class="typo-spec">Font Size: <code>16px</code></span>
+            <span class="typo-spec">Weight: <code>600 (Semibold)</code></span>
+            <span class="typo-spec">Color: <code>#333</code></span>
+            <span class="typo-spec">Uso: Títulos de categorías de filtro</span>
+          </div>
+        </div>
+        
+        <div class="typo-item">
+          <div class="typo-example label-14">Label de Campo</div>
+          <div class="typo-specs">
+            <span class="typo-spec">Font Size: <code>14px</code></span>
+            <span class="typo-spec">Weight: <code>500 (Medium)</code></span>
+            <span class="typo-spec">Color: <code>#333</code></span>
+            <span class="typo-spec">Uso: Labels de inputs</span>
+          </div>
+        </div>
+        
+        <div class="typo-item">
+          <div class="typo-example label-12">Sublabel / Caption</div>
+          <div class="typo-specs">
+            <span class="typo-spec">Font Size: <code>12px</code></span>
+            <span class="typo-spec">Weight: <code>500 (Medium)</code></span>
+            <span class="typo-spec">Color: <code>#666</code></span>
+            <span class="typo-spec">Uso: Etiquetas secundarias, floating labels</span>
+          </div>
+        </div>
+        
+        <div class="typo-item">
+          <div class="typo-example body-14">Texto de contenido regular</div>
+          <div class="typo-specs">
+            <span class="typo-spec">Font Size: <code>14px</code></span>
+            <span class="typo-spec">Weight: <code>400 (Regular)</code></span>
+            <span class="typo-spec">Color: <code>#333</code></span>
+            <span class="typo-spec">Uso: Texto de inputs, opciones</span>
+          </div>
+        </div>
+        
+        <div class="typo-item">
+          <div class="typo-example placeholder">Placeholder text...</div>
+          <div class="typo-specs">
+            <span class="typo-spec">Font Size: <code>14px</code></span>
+            <span class="typo-spec">Weight: <code>400 (Regular)</code></span>
+            <span class="typo-spec">Color: <code>#999</code></span>
+            <span class="typo-spec">Uso: Texto placeholder en campos vacíos</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Sección 3: Componentes UI -->
+    <section class="section">
+      <h2 class="section-title">🧩 Componentes UI</h2>
+      
+      <div class="components-grid">
+        
+        <!-- Input de Texto -->
+        <div class="component-card">
+          <h3 class="component-title">Input de Texto</h3>
+          <div class="component-demo">
+            <input type="text" class="demo-input" placeholder="Placeholder text...">
+          </div>
+          <div class="component-demo">
+            <div class="floating-input-group">
+              <span class="floating-label">Ciudad</span>
+              <input type="text" class="demo-input filled" value="Monterrey">
+            </div>
+          </div>
+          <div class="component-specs">
+            <p><strong>Altura:</strong> <code>44-48px</code></p>
+            <p><strong>Border:</strong> <code>1px solid #E0E0E0</code></p>
+            <p><strong>Border Radius:</strong> <code>8px</code></p>
+            <p><strong>Padding:</strong> <code>0 16px</code></p>
+            <p><strong>Focus:</strong> Border turquesa + sombra</p>
+          </div>
+        </div>
+        
+        <!-- Select/Dropdown -->
+        <div class="component-card">
+          <h3 class="component-title">Select / Dropdown</h3>
+          <div class="component-demo">
+            <select class="demo-select">
+              <option value="">Seleccionar ciudad...</option>
+              <option value="1">Monterrey</option>
+              <option value="2">Guadalajara</option>
+              <option value="3">Ciudad de México</option>
+            </select>
+          </div>
+          <div class="component-specs">
+            <p><strong>Mismo estilo que Input</strong></p>
+            <p><strong>Icono:</strong> Chevron derecho <code>16px</code></p>
+            <p><strong>Opciones hover:</strong> Fondo gris claro</p>
+          </div>
+        </div>
+        
+        <!-- Botón Primario -->
+        <div class="component-card">
+          <h3 class="component-title">Botón Primario</h3>
+          <div class="component-demo">
+            <button class="demo-btn-primary">Aplicar Filtros</button>
+          </div>
+          <div class="component-specs">
+            <p><strong>Background:</strong> <code>#17C3B2</code></p>
+            <p><strong>Color:</strong> <code>white</code></p>
+            <p><strong>Altura:</strong> <code>48px</code></p>
+            <p><strong>Font Weight:</strong> <code>600</code></p>
+            <p><strong>Hover:</strong> Oscurecer 10%</p>
+          </div>
+        </div>
+        
+        <!-- Botón Secundario -->
+        <div class="component-card">
+          <h3 class="component-title">Botón Secundario</h3>
+          <div class="component-demo">
+            <button class="demo-btn-secondary">Cancelar</button>
+          </div>
+          <div class="component-specs">
+            <p><strong>Background:</strong> <code>white</code></p>
+            <p><strong>Border:</strong> <code>1px solid #E0E0E0</code></p>
+            <p><strong>Color:</strong> <code>#333</code></p>
+            <p><strong>Hover:</strong> Fondo gris claro</p>
+          </div>
+        </div>
+        
+        <!-- Link Button -->
+        <div class="component-card">
+          <h3 class="component-title">Botón Link</h3>
+          <div class="component-demo">
+            <button class="demo-btn-link">Limpiar todo</button>
+          </div>
+          <div class="component-specs">
+            <p><strong>Color:</strong> <code>#4DA3D0</code></p>
+            <p><strong>Background:</strong> <code>transparent</code></p>
+            <p><strong>Hover:</strong> Underline</p>
+          </div>
+        </div>
+        
+        <!-- Tags/Pills -->
+        <div class="component-card">
+          <h3 class="component-title">Tags / Pills de Características</h3>
+          <div class="component-demo">
+            <div class="tags-container">
+              <span class="demo-tag unselected">Amueblado</span>
+              <span class="demo-tag selected">Pet Friendly</span>
+              <span class="demo-tag unselected">Estacionamiento</span>
+              <span class="demo-tag unselected">Jardín</span>
+            </div>
+          </div>
+          <div class="component-specs">
+            <p><strong>Border Radius:</strong> <code>20px (pill)</code></p>
+            <p><strong>Padding:</strong> <code>8px 16px</code></p>
+            <p><strong>No Seleccionado:</strong> Borde gris, fondo blanco</p>
+            <p><strong>Seleccionado:</strong> Fondo turquesa, texto blanco</p>
+          </div>
+        </div>
+        
+        <!-- Counter -->
+        <div class="component-card">
+          <h3 class="component-title">Contador (Recámaras/Baños)</h3>
+          <div class="component-demo">
+            <div class="counter-demo">
+              <button class="counter-btn">−</button>
+              <span class="counter-value">2</span>
+              <button class="counter-btn">+</button>
+            </div>
+          </div>
+          <div class="component-specs">
+            <p><strong>Botón Size:</strong> <code>36x36px</code></p>
+            <p><strong>Border Radius:</strong> <code>8px</code></p>
+            <p><strong>Value Font:</strong> <code>18px semibold</code></p>
+          </div>
+        </div>
+        
+        <!-- Number Pills -->
+        <div class="component-card">
+          <h3 class="component-title">Pills Numéricos (Alternativo)</h3>
+          <div class="component-demo">
+            <div class="number-pills">
+              <button class="number-pill">1</button>
+              <button class="number-pill selected">2</button>
+              <button class="number-pill">3</button>
+              <button class="number-pill">4</button>
+              <button class="number-pill">5+</button>
+            </div>
+          </div>
+          <div class="component-specs">
+            <p><strong>Size:</strong> <code>40x40px</code></p>
+            <p><strong>Border Radius:</strong> <code>8px</code></p>
+            <p><strong>Seleccionado:</strong> Fondo turquesa</p>
+          </div>
+        </div>
+        
+      </div>
+    </section>
+    
+    <!-- Sección 4: Layout y Espaciado -->
+    <section class="section">
+      <h2 class="section-title">📏 Layout y Espaciado</h2>
+      
+      <div class="spacing-demo">
+        <div class="spacing-item">
+          <div class="spacing-visual" style="height: 20px;"></div>
+          <span class="spacing-label">Padding del contenedor</span>
+          <span class="spacing-value">16-20px</span>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-visual" style="height: 24px;"></div>
+          <span class="spacing-label">Espacio entre secciones</span>
+          <span class="spacing-value">20-24px</span>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-visual" style="height: 12px;"></div>
+          <span class="spacing-label">Espacio entre label e input</span>
+          <span class="spacing-value">8-12px</span>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-visual" style="height: 12px;"></div>
+          <span class="spacing-label">Gap en grids de 2 columnas</span>
+          <span class="spacing-value">12px</span>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-visual" style="height: 10px;"></div>
+          <span class="spacing-label">Gap entre tags</span>
+          <span class="spacing-value">8-10px</span>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Sección 5: Estructura del Filtro -->
+    <section class="section">
+      <h2 class="section-title">🏗️ Estructura del Panel de Filtros</h2>
+      
+      <div class="structure-demo">
+        <div class="structure-section">
+          <div class="structure-section-label">Header</div>
+          <div class="structure-content">Título "Filtros" + Link "Limpiar todo"</div>
+        </div>
+        <div class="structure-section">
+          <div class="structure-section-label">Ubicación</div>
+          <div class="structure-content">Grid 2 cols: [Ciudad ▼] [Municipio ▼]</div>
+        </div>
+        <div class="structure-section">
+          <div class="structure-section-label">Tipo de Inmueble</div>
+          <div class="structure-content">Grid 2x2: Habitacional, Comercial, Industrial, Otros</div>
+        </div>
+        <div class="structure-section">
+          <div class="structure-section-label">Rango de Precio</div>
+          <div class="structure-content">Grid 2 cols: [$ Mínimo] [$ Máximo]</div>
+        </div>
+        <div class="structure-section">
+          <div class="structure-section-label">Superficie</div>
+          <div class="structure-content">Grid 2 cols: [m² Min] [m² Max]</div>
+        </div>
+        <div class="structure-section">
+          <div class="structure-section-label">Recámaras</div>
+          <div class="structure-content">Pills: [1] [2] [3] [4] [5+]</div>
+        </div>
+        <div class="structure-section">
+          <div class="structure-section-label">Baños</div>
+          <div class="structure-content">Pills: [1] [2] [3] [4] [5+]</div>
+        </div>
+        <div class="structure-section">
+          <div class="structure-section-label">Características</div>
+          <div class="structure-content">Tags: Amueblado, Pet Friendly, Estacionamiento, Jardín</div>
+        </div>
+        <div class="structure-section">
+          <div class="structure-section-label">Footer</div>
+          <div class="structure-content">[Cancelar] [Aplicar Filtros]</div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Sección 6: Mockup Completo -->
+    <section class="section">
+      <h2 class="section-title">🎯 Mockup Visual Completo</h2>
+      
+      <div class="filter-mockup">
+        <div class="mockup-header">
+          <span class="mockup-title">Filtros</span>
+          <span class="mockup-clear">Limpiar todo</span>
+        </div>
+        
+        <div class="mockup-body">
+          <div class="mockup-section">
+            <div class="mockup-label">Ubicación</div>
+            <div class="mockup-row">
+              <select class="mockup-input" style="background: white url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\") no-repeat right 8px center; background-size: 14px; padding-right: 28px;">
+                <option>Ciudad</option>
+              </select>
+              <select class="mockup-input" style="background: white url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\") no-repeat right 8px center; background-size: 14px; padding-right: 28px;">
+                <option>Municipio</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="mockup-section">
+            <div class="mockup-label">Tipo de Inmueble</div>
+            <div class="mockup-row" style="margin-bottom: 8px;">
+              <button class="demo-btn-primary" style="height: 40px; font-size: 12px; padding: 0 12px;">🏠 Habitacional</button>
+              <button class="demo-btn-secondary" style="height: 40px; font-size: 12px; padding: 0 12px;">🏢 Comercial</button>
+            </div>
+            <div class="mockup-row">
+              <button class="demo-btn-secondary" style="height: 40px; font-size: 12px; padding: 0 12px;">🏭 Industrial</button>
+              <button class="demo-btn-secondary" style="height: 40px; font-size: 12px; padding: 0 12px;">📁 Otros</button>
+            </div>
+          </div>
+          
+          <div class="mockup-section">
+            <div class="mockup-label">Rango de precio</div>
+            <div class="mockup-row">
+              <input type="text" class="mockup-input" placeholder="$ Mínimo">
+              <input type="text" class="mockup-input" placeholder="$ Máximo">
+            </div>
+          </div>
+          
+          <div class="mockup-section">
+            <div class="mockup-label">Superficie (m²)</div>
+            <div class="mockup-row">
+              <input type="text" class="mockup-input" placeholder="m² Min">
+              <input type="text" class="mockup-input" placeholder="m² Max">
+            </div>
+          </div>
+          
+          <div class="mockup-section">
+            <div class="mockup-label">Recámaras</div>
+            <div class="number-pills">
+              <button class="number-pill">1</button>
+              <button class="number-pill selected">2</button>
+              <button class="number-pill">3</button>
+              <button class="number-pill">4</button>
+              <button class="number-pill">5+</button>
+            </div>
+          </div>
+          
+          <div class="mockup-section">
+            <div class="mockup-label">Baños</div>
+            <div class="number-pills">
+              <button class="number-pill selected">1</button>
+              <button class="number-pill">2</button>
+              <button class="number-pill">3</button>
+              <button class="number-pill">4</button>
+              <button class="number-pill">5+</button>
+            </div>
+          </div>
+          
+          <div class="mockup-section">
+            <div class="mockup-label">Características</div>
+            <div class="tags-container">
+              <span class="demo-tag unselected">Amueblado</span>
+              <span class="demo-tag selected">Pet Friendly</span>
+              <span class="demo-tag unselected">Estacionamiento</span>
+              <span class="demo-tag unselected">Jardín</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mockup-footer">
+          <button class="demo-btn-secondary">Cancelar</button>
+          <button class="demo-btn-primary">Aplicar Filtros</button>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Sección 7: Notas de Implementación -->
+    <section class="section">
+      <h2 class="section-title">📋 Notas de Implementación</h2>
+      
+      <div class="notes-list">
+        <div class="note-item">
+          <span class="note-icon">1</span>
+          <div class="note-content">
+            <strong>Usar tokens semánticos de Tailwind:</strong> Referenciar variables CSS del design system (--primary, --foreground, etc.) en lugar de colores hardcodeados.
+          </div>
+        </div>
+        <div class="note-item">
+          <span class="note-icon">2</span>
+          <div class="note-content">
+            <strong>Componentes de shadcn/ui:</strong> Aprovechar Button, Input, Select ya existentes, solo ajustando estilos según specs.
+          </div>
+        </div>
+        <div class="note-item">
+          <span class="note-icon">3</span>
+          <div class="note-content">
+            <strong>Remover Slider de precio:</strong> Reemplazar por inputs numéricos editables con formato de moneda.
+          </div>
+        </div>
+        <div class="note-item">
+          <span class="note-icon">4</span>
+          <div class="note-content">
+            <strong>Agregar sección Ubicación:</strong> Implementar selects para Ciudad y Municipio con datos mock o dinámicos.
+          </div>
+        </div>
+        <div class="note-item">
+          <span class="note-icon">5</span>
+          <div class="note-content">
+            <strong>Cambiar contadores a pills:</strong> Recámaras y Baños deben usar botones numéricos [1][2][3][4][5+] en lugar de +/-.
+          </div>
+        </div>
+        <div class="note-item">
+          <span class="note-icon">6</span>
+          <div class="note-content">
+            <strong>Agregar sección Características:</strong> Tags pill seleccionables para: Amueblado, Pet Friendly, Estacionamiento, Jardín.
+          </div>
+        </div>
+        <div class="note-item">
+          <span class="note-icon">7</span>
+          <div class="note-content">
+            <strong>Footer con dos botones:</strong> "Cancelar" (secundario) y "Aplicar Filtros" (primario) - remover botón "Notifícame".
+          </div>
+        </div>
+        <div class="note-item">
+          <span class="note-icon">8</span>
+          <div class="note-content">
+            <strong>Actualizar PropertyFilters type:</strong> Agregar campos para city, municipality, y características booleanas adicionales.
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <footer style="text-align: center; padding: 40px; color: #999; font-size: 14px;">
+      <p>Documento generado para implementación de UI/UX - i360 Inmobiliaria</p>
+      <p style="margin-top: 8px;">© 2025</p>
+    </footer>
+    
+  </div>
+</body>
+</html>
