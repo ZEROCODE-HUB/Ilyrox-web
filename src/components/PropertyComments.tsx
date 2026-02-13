@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar } from "@/components/shared/Avatar";
 import { useToast } from "@/hooks/use-toast";
 import {
   Heart,
@@ -263,12 +263,12 @@ export function PropertyComments({
     parentId?: string;
   }) => (
     <div className={`flex gap-3 ${isReply ? "ml-10 mt-3" : ""}`}>
-      <Avatar className="h-8 w-8 flex-shrink-0">
-        <AvatarImage src={comment.author.avatar} />
-        <AvatarFallback className="text-xs bg-primary/10 text-primary">
-          {comment.author.name.slice(0, 2).toUpperCase()}
-        </AvatarFallback>
-      </Avatar>
+      <Avatar
+        uri={comment.author.avatar}
+        name={comment.author.name}
+        size={32}
+        className="flex-shrink-0"
+      />
 
       <div className="flex-1 min-w-0">
         <div className="bg-muted/50 rounded-xl px-4 py-2.5">
@@ -414,11 +414,7 @@ export function PropertyComments({
 
       {/* Add comment */}
       <div className="flex gap-3">
-        <Avatar className="h-8 w-8 flex-shrink-0">
-          <AvatarFallback className="text-xs bg-primary/10 text-primary">
-            TÚ
-          </AvatarFallback>
-        </Avatar>
+        <Avatar name="TÚ" size={32} className="flex-shrink-0" />
         <div className="flex-1 flex gap-2">
           <Textarea
             value={newComment}

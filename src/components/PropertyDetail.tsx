@@ -40,6 +40,7 @@ import {
 } from "lucide-react";
 import mapReference from "@/assets/map-reference.jpg";
 import { PropertyComments } from "@/components/PropertyComments";
+import { Avatar } from "@/components/shared/Avatar";
 
 interface PropertyDetailProps {
   property: PropertyView | null;
@@ -441,13 +442,11 @@ export function PropertyDetail({
                 <Card className="sticky top-4">
                   <CardContent className="p-6">
                     <div className="text-center mb-4">
-                      <img
-                        src={
-                          property.asesor_foto ||
-                          "https://images.unsplash.com/photo-1560250097-0b93528c311a"
-                        }
-                        alt={property.asesor_nombre}
-                        className="w-20 h-20 rounded-full mx-auto mb-3 object-cover"
+                      <Avatar
+                        uri={property.asesor_foto}
+                        name={property.asesor_nombre}
+                        size={80}
+                        className="mx-auto mb-3"
                       />
                       <h3 className="font-semibold text-lg">
                         {property.asesor_nombre}
