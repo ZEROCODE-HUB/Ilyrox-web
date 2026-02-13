@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
+import { supabase } from "@/lib/supabase";
 import logo360 from "@/assets/logo-360.png";
 import { PropertyView } from "@/types/types";
 import { PropertyFilters, UserLocation } from "@/types/property";
@@ -109,13 +110,23 @@ const Index = () => {
 
   // Verificar si el usuario está logueado
   useEffect(() => {
-    const checkAuth = () => {
-      const user = localStorage.getItem("currentUser");
-      setIsLoggedIn(!!user);
+    const checkAuth = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      setIsLoggedIn(!!session);
     };
     checkAuth();
-    window.addEventListener("storage", checkAuth);
-    return () => window.removeEventListener("storage", checkAuth);
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setIsLoggedIn(!!session);
+      },
+    );
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
   }, []);
 
   // Compute Grouped Zones based on Selected State
@@ -403,7 +414,13 @@ const Index = () => {
                   </button>
 
                   {isLoggedIn ? (
-                    <UserProfile />
+                    <>
+                      {isLoading ? (
+                        <Skeleton className="h-10 w-10 rounded-full" />
+                      ) : (
+                        <UserProfile />
+                      )}
+                    </>
                   ) : (
                     <Button
                       onClick={() => navigate("/auth")}

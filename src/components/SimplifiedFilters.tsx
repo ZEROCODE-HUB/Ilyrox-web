@@ -161,10 +161,26 @@ export function SimplifiedFilters({
     : [];
 
   const propertyTypes = [
-    { value: "habitacional", label: "Habitacional", icon: Home },
-    { value: "comercial", label: "Comercial", icon: Building2 },
-    { value: "industrial", label: "Industrial", icon: Factory },
-    { value: "agricola", label: "Agrícola", icon: FolderOpen },
+    {
+      value: "habitacional",
+      label: "Habitacional",
+      icon: <Home className="w-5 h-5" />,
+    },
+    {
+      value: "comercial",
+      label: "Comercial",
+      icon: <Building2 className="w-5 h-5" />,
+    },
+    {
+      value: "industrial",
+      label: "Industrial",
+      icon: <Factory className="w-5 h-5" />,
+    },
+    {
+      value: "agricola",
+      label: "Agrícola",
+      icon: <FolderOpen className="w-5 h-5" />,
+    },
   ];
 
   const subtiposDisponibles = filters.type
@@ -419,11 +435,11 @@ export function SimplifiedFilters({
         </div>
 
         {/* Tipo de Propiedad */}
-        <div className="space-y-3">
+        <div className="space-y-3 ">
           <Label className="text-sm font-semibold text-foreground">
             Tipo de Propiedad
           </Label>
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-2 gap-3">
             {propertyTypes.map((type) => {
               const isSelected = filters.type === type.value;
               return (
@@ -437,13 +453,16 @@ export function SimplifiedFilters({
                       subtype: undefined,
                     });
                   }}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  className={`flex flex-col items-center justify-center p-3 rounded-xl text-sm font-medium transition-all border-2 ${
                     isSelected
-                      ? "border-2 border-primary text-foreground bg-background"
-                      : "border border-input text-muted-foreground bg-background hover:border-primary/50"
+                      ? "border-primary text-foreground bg-primary/5"
+                      : "border-input text-muted-foreground bg-background hover:border-primary/50"
                   }`}
                 >
-                  {type.label}
+                  <span className="text-xl mb-1">{type.icon}</span>
+                  <span className="text-center leading-tight">
+                    {type.label}
+                  </span>
                 </button>
               );
             })}

@@ -37,6 +37,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Star,
+  Home,
+  MoveDiagonal,
 } from "lucide-react";
 import mapReference from "@/assets/map-reference.jpg";
 import { PropertyComments } from "@/components/PropertyComments";
@@ -258,6 +260,7 @@ export function PropertyDetail({
                             {property.operaciones[0].tipo.toUpperCase()}
                           </p>
                           <p className="text-white text-nowrap">
+                            {property.operaciones[0].moneda}{" "}
                             {formatPrice(property.operaciones[0].precio || 0)}
                           </p>
                         </div>
@@ -266,7 +269,8 @@ export function PropertyDetail({
                             {property.operaciones[1].tipo.toUpperCase()}
                           </p>
                           <p className="text-white text-nowrap">
-                            {formatPrice(property.operaciones[0].precio || 0)}
+                            {property.operaciones[1].moneda}{" "}
+                            {formatPrice(property.operaciones[1].precio || 0)}
                           </p>
                         </div>
                       </div>
@@ -277,6 +281,7 @@ export function PropertyDetail({
                             {property.operaciones[0].tipo.toUpperCase()}
                           </p>
                           <p className="text-white text-nowrap">
+                            {property.operaciones[0].moneda}{" "}
                             {formatPrice(property.operaciones[0].precio || 0)}
                           </p>
                         </div>
@@ -297,15 +302,32 @@ export function PropertyDetail({
 
                 {/* Características principales */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="flex items-center gap-2 p-3 bg-accent rounded-lg">
-                    <Ruler className="h-5 w-5 text-primary" />
-                    <div>
-                      <div className="font-semibold">
-                        {property.metros_cuadrados_construccion}
+                  {property.metros_cuadrados_construccion && (
+                    <div className="flex items-center gap-2 p-3 bg-accent rounded-lg">
+                      <Home className="h-5 w-5 text-primary" />
+                      <div>
+                        <div className="font-semibold">
+                          {property.metros_cuadrados_construccion}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          m² Construcción
+                        </div>
                       </div>
-                      <div className="text-sm text-muted-foreground">m²</div>
                     </div>
-                  </div>
+                  )}
+                  {property.metros_cuadrados_terreno && (
+                    <div className="flex items-center gap-2 p-3 bg-accent rounded-lg">
+                      <MoveDiagonal className="h-5 w-5 text-primary" />
+                      <div>
+                        <div className="font-semibold">
+                          {property.metros_cuadrados_terreno}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          m² Terreno
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {(property.habitaciones || 0) > 0 && (
                     <div className="flex items-center gap-2 p-3 bg-accent rounded-lg">

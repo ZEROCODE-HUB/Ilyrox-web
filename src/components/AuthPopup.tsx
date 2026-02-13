@@ -1,11 +1,16 @@
-import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { MapPin } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { MapPin } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/lib/supabase";
 
 interface AuthPopupProps {
   isOpen: boolean;
@@ -14,35 +19,70 @@ interface AuthPopupProps {
 
 export function AuthPopup({ isOpen, onClose }: AuthPopupProps) {
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (isLogin) {
-      // Login
-      const user = { name: 'Usuario', email };
-      localStorage.setItem('currentUser', JSON.stringify(user));
+    setIsLoading(true);
+
+    try {
+      if (isLogin) {
+        // Login
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) throw error;
+
+        toast({
+          title: "Bienvenido",
+          description: "Has iniciado sesión correctamente",
+        });
+        onClose();
+        // Index.tsx will auto-update via onAuthStateChange
+      } else {
+        // Registro
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: name,
+            },
+          },
+        });
+
+        if (error) throw error;
+
+        if (data.session) {
+          toast({
+            title: "Cuenta creada",
+            description: "Tu cuenta ha sido creada correctamente",
+          });
+          onClose();
+        } else {
+          toast({
+            title: "Registro exitoso",
+            description:
+              "Por favor verifica tu correo para confirmar tu cuenta",
+          });
+          onClose();
+        }
+      }
+    } catch (error: any) {
       toast({
-        title: "Bienvenido",
-        description: "Has iniciado sesión correctamente"
+        title: "Error",
+        description: error.message || "Ocurrió un error inesperado",
+        variant: "destructive",
       });
-    } else {
-      // Registro
-      const user = { name, email };
-      localStorage.setItem('currentUser', JSON.stringify(user));
-      toast({
-        title: "Cuenta creada",
-        description: "Tu cuenta ha sido creada correctamente"
-      });
+    } finally {
+      setIsLoading(false);
     }
-    
-    onClose();
-    window.location.reload();
   };
 
   return (
@@ -55,12 +95,12 @@ export function AuthPopup({ isOpen, onClose }: AuthPopupProps) {
             </div>
           </div>
           <DialogTitle className="text-center text-2xl font-bold">
-            {isLogin ? 'Bienvenido a i360' : 'Únete a i360'}
+            {isLogin ? "Bienvenido a i360" : "Únete a i360"}
           </DialogTitle>
           <p className="text-center text-sm text-muted-foreground">
-            {isLogin 
-              ? 'Ingresa a tu cuenta para continuar' 
-              : 'Crea tu cuenta para guardar propiedades y recibir notificaciones'}
+            {isLogin
+              ? "Ingresa a tu cuenta para continuar"
+              : "Crea tu cuenta para guardar propiedades y recibir notificaciones"}
           </p>
         </DialogHeader>
 
@@ -75,6 +115,7 @@ export function AuthPopup({ isOpen, onClose }: AuthPopupProps) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
+                disabled={isLoading}
               />
             </div>
           )}
@@ -88,6 +129,7 @@ export function AuthPopup({ isOpen, onClose }: AuthPopupProps) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -100,11 +142,23 @@ export function AuthPopup({ isOpen, onClose }: AuthPopupProps) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              minLength={6}
+              disabled={isLoading}
             />
           </div>
 
-          <Button type="submit" className="w-full h-11 bg-primary hover:bg-primary/90 text-white font-medium shadow-md">
-            {isLogin ? 'Iniciar sesión' : 'Crear cuenta'}
+          <Button
+            type="submit"
+            className="w-full h-11 bg-primary hover:bg-primary/90 text-white font-medium shadow-md"
+            disabled={isLoading}
+          >
+            {isLoading
+              ? isLogin
+                ? "Iniciando sesión..."
+                : "Creando cuenta..."
+              : isLogin
+                ? "Iniciar sesión"
+                : "Crear cuenta"}
           </Button>
 
           <div className="text-center">
@@ -112,10 +166,11 @@ export function AuthPopup({ isOpen, onClose }: AuthPopupProps) {
               type="button"
               onClick={() => setIsLogin(!isLogin)}
               className="text-sm text-primary hover:underline"
+              disabled={isLoading}
             >
-              {isLogin 
-                ? '¿No tienes cuenta? Regístrate' 
-                : '¿Ya tienes cuenta? Inicia sesión'}
+              {isLogin
+                ? "¿No tienes cuenta? Regístrate"
+                : "¿Ya tienes cuenta? Inicia sesión"}
             </button>
           </div>
         </form>
