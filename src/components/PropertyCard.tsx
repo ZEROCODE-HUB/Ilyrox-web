@@ -1,44 +1,63 @@
-import { Property } from '@/types/property';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { MapPin, Bed, Bath, Car, Ruler, Heart, Share2 } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { PropertyView } from "@/types/types";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  MapPin,
+  Bed,
+  Bath,
+  Car,
+  Ruler,
+  Heart,
+  Share2,
+  MessageCircle,
+  Home,
+  MoveDiagonal,
+} from "lucide-react";
+import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase"; // Needed for real like toggle if implemented
+import { formatPrice } from "@/lib/utils";
 
 interface PropertyCardProps {
-  property: Property;
-  onViewDetails: (property: Property) => void;
-  isLoggedIn?: boolean;
+  property: PropertyView;
+  onViewDetails: (property: PropertyView) => void;
+  isLoggedIn?: boolean; // Can remove if we check supabase auth directly but props are fine
   onAuthRequired?: () => void;
 }
 
-export function PropertyCard({ property, onViewDetails, isLoggedIn, onAuthRequired }: PropertyCardProps) {
-  const [isSaved, setIsSaved] = useState(false);
+export function PropertyCard({
+  property,
+  onViewDetails,
+  isLoggedIn,
+  onAuthRequired,
+}: PropertyCardProps) {
+  const [isSaved, setIsSaved] = useState(property.isLiked || false);
+  const [likesCount, setLikesCount] = useState(property.likes_count || 0);
+  const [commentsCount, setCommentsCount] = useState(
+    property.comentarios_count || 0,
+  );
   const [imageError, setImageError] = useState(false);
   const { toast } = useToast();
 
-  // Check auth status from localStorage if not passed as prop
+  useEffect(() => {
+    setIsSaved(property.isLiked || false);
+    setLikesCount(property.likes_count || 0);
+    setCommentsCount(property.comentarios_count || 0);
+  }, [property.likes_count, property.comentarios_count, property.isLiked]);
+
   const checkIsLoggedIn = () => {
     if (isLoggedIn !== undefined) return isLoggedIn;
-    return !!localStorage.getItem('currentUser');
+    return !!localStorage.getItem("currentUser");
   };
 
-  // Check if property is saved on component mount
-  useEffect(() => {
-    const savedProperties = localStorage.getItem('savedProperties');
-    if (savedProperties) {
-      const saved = JSON.parse(savedProperties);
-      setIsSaved(saved.some((p: Property) => p.id === property.id));
-    }
-  }, [property.id]);
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('es-MX', {
-      style: 'currency',
-      currency: 'MXN',
+  const formatPrice = (price: number, currency: string = "MXN") => {
+    return new Intl.NumberFormat("es-MX", {
+      style: "currency",
+      currency: currency,
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(price);
   };
 
@@ -46,212 +65,290 @@ export function PropertyCard({ property, onViewDetails, isLoggedIn, onAuthRequir
     setImageError(true);
   };
 
-  const handleSaveClick = (e: React.MouseEvent) => {
+  const handleSaveClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    
-    // Check if user is logged in
+
     if (!checkIsLoggedIn()) {
       if (onAuthRequired) {
         onAuthRequired();
       }
       return;
     }
-    
-    const newSavedState = !isSaved;
-    setIsSaved(newSavedState);
-    
-    // Update localStorage
-    const savedProperties = localStorage.getItem('savedProperties');
-    let saved = savedProperties ? JSON.parse(savedProperties) : [];
-    
-    if (newSavedState) {
-      saved.push(property);
+
+    // Optimistic UI update
+    const previousState = isSaved;
+    const newState = !isSaved;
+    setIsSaved(newState);
+    setLikesCount((prev) => (newState ? prev + 1 : Math.max(0, prev - 1)));
+
+    // Call Supabase to toggle like
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user || !property.feed_item_id) {
+        // Revert if no user or feed item (shouldn't happen if validated)
+        setIsSaved(previousState);
+        setLikesCount((prev) =>
+          previousState ? prev + 1 : Math.max(0, prev - 1),
+        );
+        return;
+      }
+
+      if (newState) {
+        await supabase.from("likes_feed_items").insert({
+          feed_item_id: property.feed_item_id,
+          usuario_id: user.id,
+        });
+        toast({
+          title: "Añadido a favoritos",
+          description: "La propiedad se ha guardado en tu lista.",
+        });
+      } else {
+        await supabase
+          .from("likes_feed_items")
+          .delete()
+          .eq("feed_item_id", property.feed_item_id)
+          .eq("usuario_id", user.id);
+        toast({
+          title: "Eliminado de favoritos",
+          description: "La propiedad se ha eliminado de tu lista.",
+        });
+      }
+    } catch (error) {
+      // Revert on error
+      console.error("Error toggling like:", error);
+      setIsSaved(previousState);
+      setLikesCount((prev) =>
+        previousState ? prev + 1 : Math.max(0, prev - 1),
+      );
       toast({
-        title: "Propiedad guardada",
-        description: "Se agregó a tus favoritos"
-      });
-    } else {
-      saved = saved.filter((p: Property) => p.id !== property.id);
-      toast({
-        title: "Propiedad eliminada",
-        description: "Se eliminó de tus favoritos"
+        title: "Error",
+        description: "No se pudo actualizar favoritos.",
+        variant: "destructive",
       });
     }
-    
-    localStorage.setItem('savedProperties', JSON.stringify(saved));
   };
 
   const handleShareClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    
-    // Create property URL
     const propertyUrl = `${window.location.origin}/property/${property.id}`;
-    
-    // Copy to clipboard
-    navigator.clipboard.writeText(propertyUrl).then(() => {
-      toast({
-        title: "Enlace copiado",
-        description: "El enlace de la propiedad se ha copiado al portapapeles"
+    navigator.clipboard
+      .writeText(propertyUrl)
+      .then(() => {
+        toast({
+          title: "Enlace copiado",
+          description:
+            "El enlace de la propiedad se ha copiado al portapapeles",
+        });
+      })
+      .catch(() => {
+        toast({
+          title: "Error",
+          description: "No se pudo copiar el enlace",
+          variant: "destructive",
+        });
       });
-    }).catch(() => {
-      toast({
-        title: "Error",
-        description: "No se pudo copiar el enlace",
-        variant: "destructive"
-      });
-    });
   };
 
+  // Construct location string
+  const locationLine1 =
+    `${property.calle || ""} ${property.numero_exterior || ""}`.trim() ||
+    property.colonia;
+  const locationLine2 = `${property.municipio || ""}, ${property.estado || ""}`;
+
+  const operations = property.operaciones || [];
+  const isVenta =
+    operations.some((o) => o.tipo === "venta") ||
+    property.tipo_operacion?.includes("venta");
+  const isRenta =
+    operations.some((o) => o.tipo === "renta") ||
+    property.tipo_operacion?.includes("renta");
+
+  const badgeText =
+    isVenta && isRenta ? "Venta & Renta" : isRenta ? "Renta" : "Venta";
+
+  // Get specific prices
+  const ventaOp = operations.find((o) => o.tipo === "venta");
+  const rentaOp = operations.find((o) => o.tipo === "renta");
+
   return (
-    <Card className="group hover:shadow-lg transition-shadow duration-300 border-border bg-card flex flex-col h-full">
-      <div className="relative">
-        {imageError ? (
-          <div className="h-48 bg-muted flex items-center justify-center rounded-t-lg">
-            <div className="text-muted-foreground text-sm">Imagen no disponible</div>
-          </div>
-        ) : (
-          <img
-            src={property.images[0]}
-            alt={property.title}
-            className="w-full h-48 object-cover rounded-t-lg group-hover:scale-105 transition-transform duration-300"
-            onError={handleImageError}
-          />
-        )}
-        
-        {property.featured && (
-          <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground">
-            Destacada
-          </Badge>
-        )}
-        
-        {/* Action buttons */}
-        <div className="absolute top-2 right-2 flex gap-1.5">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="bg-white/90 hover:bg-white h-8 w-8 p-0"
-            onClick={handleShareClick}
+    <Card
+      className="group cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg border-border bg-card animate-fade-in flex flex-col h-full min-h-[440px]"
+      onClick={() => onViewDetails(property)}
+    >
+      <div className="relative h-56 flex-shrink-0 overflow-hidden bg-muted">
+        {/* Status Badge */}
+        <div className="absolute top-3 left-3 z-10 flex gap-2">
+          <Badge
+            variant={isVenta && !isRenta ? "default" : "secondary"}
+            className="backdrop-blur-md bg-white/90 text-primary shadow-sm font-semibold"
           >
-            <Share2 className="h-4 w-4 text-gray-600" />
-          </Button>
+            {badgeText}
+          </Badge>
+          {/* {property.relevancia_score && property.relevancia_score > 80 && (
+            <Badge variant="destructive" className="shadow-sm font-semibold">
+              Destacada
+            </Badge>
+          )} */}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="absolute top-3 right-3 z-10 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
           <Button
-            variant="ghost"
-            size="sm"
-            className="bg-white/90 hover:bg-white h-8 w-8 p-0"
+            size="icon"
+            variant="secondary"
+            className={cn(
+              "h-8 w-8 rounded-full shadow-md backdrop-blur-sm hover:bg-white",
+              isSaved && "text-red-500 bg-white",
+            )}
             onClick={handleSaveClick}
           >
-            <Heart className={`h-4 w-4 ${isSaved ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} />
+            <Heart className={cn("h-4 w-4", isSaved && "fill-current")} />
+          </Button>
+          <Button
+            size="icon"
+            variant="secondary"
+            className="h-8 w-8 rounded-full shadow-md backdrop-blur-sm hover:bg-white"
+            onClick={handleShareClick}
+          >
+            <Share2 className="h-4 w-4" />
           </Button>
         </div>
 
-        {property.distance && (
-          <Badge variant="secondary" className="absolute bottom-2 right-2">
-            {property.distance.toFixed(1)} km
-          </Badge>
-        )}
+        {/* Image */}
+        <img
+          src={
+            !imageError && property.fotos && property.fotos.length > 0
+              ? property.fotos[0]
+              : "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1073&q=80"
+          }
+          alt={property.tipo.charAt(0).toUpperCase() + property.tipo.slice(1)}
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+          onError={handleImageError}
+          loading="lazy"
+        />
+
+        {/* Bottom Gradient */}
+        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/70 to-transparent pointer-events-none" />
       </div>
 
-      <CardContent className="px-4 pt-4 pb-0 flex flex-col h-full">
-        <div className="flex flex-col flex-1 space-y-3">
+      <CardContent className="p-4 flex-1 flex flex-col gap-3">
+        <div className="space-y-2">
           <div>
-            <h3 className="font-semibold text-lg text-card-foreground line-clamp-2">
-              {property.title}
+            <h3 className="font-bold text-lg leading-tight text-foreground group-hover:text-primary transition-colors min-h-[3.5rem] flex items-center">
+              <span className="line-clamp-2">
+                {property.tipo.charAt(0).toUpperCase() + property.tipo.slice(1)}{" "}
+                en {property.municipio}
+              </span>
             </h3>
-            <div className="flex items-center text-muted-foreground text-sm mt-1">
-              <MapPin className="h-4 w-4 mr-1" />
-              <span className="line-clamp-1">{property.location.address}</span>
+            <div className="flex items-start text-muted-foreground mt-1">
+              <MapPin className="h-3.5 w-3.5 mr-1 mt-0.5 flex-shrink-0" />
+              <p className="text-xs line-clamp-1 flex-1">
+                {locationLine1}, {locationLine2}
+              </p>
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="text-2xl font-bold text-primary">
-              {formatPrice(property.price)}
+          {/* Price Tag Overlay */}
+          <div className="text-primary flex flex-col gap-0">
+            {ventaOp ? (
+              <p className="text-xl font-bold">
+                {ventaOp.moneda === "MXN" ? "MXN" : "USD"}{" "}
+                {formatPrice(ventaOp.precio)}
+              </p>
+            ) : rentaOp ? (
+              <p className="text-xl font-bold">
+                {rentaOp.moneda === "MXN" ? "MXN" : "USD"}{" "}
+                {formatPrice(rentaOp.precio)}
+              </p>
+            ) : (
+              <p className="text-xl font-bold">Consultar Precio</p>
+            )}
+          </div>
+
+          {/* Features Grid */}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1 border-t border-border/50">
+            <div
+              className="flex items-center gap-1.5 text-muted-foreground"
+              title={`${property.habitaciones} Recámaras`}
+            >
+              <Bed className="h-5 w-5" />
+              <span className="text-sm font-semibold">
+                {property.habitaciones || 0}
+              </span>
             </div>
-            <Badge variant="outline">
-              {property.type}
-            </Badge>
-          </div>
-
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <div className="flex items-center gap-1">
-              <Ruler className="h-4 w-4" />
-              <span>{property.area} m²</span>
+            <div
+              className="flex items-center gap-1.5 text-muted-foreground"
+              title={`${property.banos} Baños`}
+            >
+              <Bath className="h-5 w-5" />
+              <span className="text-sm font-semibold">
+                {property.banos || 0}
+              </span>
             </div>
-            {property.bedrooms > 0 && (
-              <div className="flex items-center gap-1">
-                <Bed className="h-4 w-4" />
-                <span>{property.bedrooms}</span>
-              </div>
-            )}
-            {property.bathrooms > 0 && (
-              <div className="flex items-center gap-1">
-                <Bath className="h-4 w-4" />
-                <span>{property.bathrooms}</span>
-              </div>
-            )}
-            {property.parking > 0 && (
-              <div className="flex items-center gap-1">
-                <Car className="h-4 w-4" />
-                <span>{property.parking}</span>
-              </div>
-            )}
+            <div
+              className="flex items-center gap-1.5 text-muted-foreground"
+              title={`${property.estacionamientos} Estacionamientos`}
+            >
+              <Car className="h-5 w-5" />
+              <span className="text-sm font-semibold">
+                {property.estacionamientos || 0}
+              </span>
+            </div>
+            <div
+              className="flex items-center gap-1.5 text-muted-foreground"
+              title={`${property.metros_cuadrados_construccion} m²`}
+            >
+              <Home className="h-5 w-5" />
+              <span className="text-sm font-semibold whitespace-nowrap">
+                {property.metros_cuadrados_construccion}
+                <span className="text-[10px] ml-0.5 uppercase opacity-70">
+                  m²
+                </span>
+              </span>
+            </div>
+            <div
+              className="flex items-center gap-1.5 text-muted-foreground"
+              title={`${property.metros_cuadrados_terreno} m²`}
+            >
+              <MoveDiagonal className="h-5 w-5" />
+              <span className="text-sm font-semibold whitespace-nowrap">
+                {property.metros_cuadrados_terreno}
+                <span className="text-[10px] ml-0.5 uppercase opacity-70">
+                  m²
+                </span>
+              </span>
+            </div>
           </div>
+        </div>
 
-          <div className="flex flex-wrap gap-1">
-            {property.amenities.slice(0, 3).map((amenity) => (
-              <Badge key={amenity} variant="secondary" className="text-xs">
-                {amenity}
-              </Badge>
-            ))}
-            {property.amenities.length > 3 && (
-              <Badge variant="secondary" className="text-xs">
-                +{property.amenities.length - 3} más
-              </Badge>
-            )}
-          </div>
-
-          {/* Advisor Card */}
-          <div className="flex items-center justify-between bg-muted/30 rounded-lg p-3 border border-border/50">
-            <div className="flex items-center gap-3">
-              <img 
-                src={property.advisor.photo} 
-                alt={property.advisor.name}
-                className="w-10 h-10 rounded-full object-cover border-2 border-background shadow-sm"
+        {/* Social Proof Footer */}
+        <div className="flex justify-between items-center pt-3 border-t border-border mt-auto">
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            <div
+              className="flex items-center gap-1 cursor-pointer hover:text-red-500 transition-colors"
+              onClick={handleSaveClick}
+            >
+              <Heart
+                className={cn(
+                  "h-3.5 w-3.5",
+                  isSaved ? "fill-red-500 text-red-500" : "",
+                )}
               />
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-foreground leading-tight">
-                  {property.advisor.name}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {property.advisor.title}
-                </span>
-              </div>
+              <span className="font-medium">{likesCount}</span>
             </div>
-            <button
-              className="h-9 w-9 rounded-full bg-white hover:bg-gray-50 border border-gray-200 shadow-sm flex items-center justify-center"
-              onClick={(e) => {
-                e.stopPropagation();
-                window.location.href = `mailto:${property.advisor.email}`;
-              }}
-            >
-              {/* Chat bubble icon with ellipsis */}
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M21 11.5C21 16.1944 16.9706 20 12 20C10.2303 20 8.57296 19.5185 7.14286 18.6857L3 20L4.3 16.5C3.47617 15.0356 3 13.3251 3 11.5C3 6.80558 7.02944 3 12 3C16.9706 3 21 6.80558 21 11.5Z" fill="#17C3B2"/>
-                <circle cx="8" cy="11.5" r="1.2" fill="white"/>
-                <circle cx="12" cy="11.5" r="1.2" fill="white"/>
-                <circle cx="16" cy="11.5" r="1.2" fill="white"/>
-              </svg>
-            </button>
+            <div className="flex items-center gap-1">
+              <MessageCircle className="h-3.5 w-3.5" />
+              <span className="font-medium">{commentsCount}</span>
+            </div>
           </div>
-
-          <div className="mt-auto pt-4 pb-[15px]">
-            <Button 
-              onClick={() => onViewDetails(property)}
-              className="w-full"
-            >
-              Ver más detalles
-            </Button>
-          </div>
+          <Badge
+            variant="outline"
+            className="text-[9px] uppercase font-bold tracking-wider py-0 px-2 h-5 border-muted-foreground/30 bg-muted/20"
+          >
+            {property.subtipo || property.tipo}
+          </Badge>
         </div>
       </CardContent>
     </Card>

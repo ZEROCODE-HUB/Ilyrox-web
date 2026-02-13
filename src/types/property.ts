@@ -2,8 +2,9 @@ export interface Property {
   id: string;
   title: string;
   description: string;
-  type: 'Habitacional' | 'Comercial' | 'Industrial' | 'Otros';
-  subtype: 'Casa' | 'Departamento' | 'Terreno';
+  operationType: "venta" | "renta";
+  type: "Habitacional" | "Comercial" | "Industrial" | "Otros";
+  subtype: "Casa" | "Departamento" | "Terreno";
   price: number;
   location: {
     address: string;
@@ -27,6 +28,13 @@ export interface Property {
   advisor: Advisor;
   distance?: number; // distancia del usuario en km
   featured?: boolean;
+
+  // Feed Item Data
+  feedItemId?: string;
+  likesCount?: number;
+  commentsCount?: number;
+  isLiked?: boolean; // Usuario actual dio like
+  currency?: string;
 }
 
 export interface Advisor {
@@ -68,6 +76,11 @@ export interface PropertyFilters {
   amenities?: string[];
   financing?: string[];
   lien?: boolean;
+  operationType?: "venta" | "renta" | "todas";
+  state?: string;
+  municipality?: string;
+  colony?: string;
+  currency?: "MXN" | "USD";
 }
 
 export interface UserLocation {
