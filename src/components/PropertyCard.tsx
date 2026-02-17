@@ -7,7 +7,6 @@ import {
   Bed,
   Bath,
   Car,
-  Ruler,
   Heart,
   Share2,
   MessageCircle,
@@ -17,8 +16,9 @@ import {
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { supabase } from "@/lib/supabase"; // Needed for real like toggle if implemented
-import { formatPrice } from "@/lib/utils";
+import { savePropertyService } from "@/services/savePropertyService";
+
+import { Avatar } from "@/components/shared/Avatar";
 
 interface PropertyCardProps {
   property: PropertyView;
@@ -81,50 +81,31 @@ export function PropertyCard({
     setIsSaved(newState);
     setLikesCount((prev) => (newState ? prev + 1 : Math.max(0, prev - 1)));
 
-    // Call Supabase to toggle like
+    // Call service to toggle save
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user || !property.feed_item_id) {
-        // Revert if no user or feed item (shouldn't happen if validated)
-        setIsSaved(previousState);
-        setLikesCount((prev) =>
-          previousState ? prev + 1 : Math.max(0, prev - 1),
-        );
-        return;
-      }
-
       if (newState) {
-        await supabase.from("likes_feed_items").insert({
-          feed_item_id: property.feed_item_id,
-          usuario_id: user.id,
-        });
+        await savePropertyService.saveProperty(property.id);
         toast({
-          title: "Añadido a favoritos",
+          title: "Propiedad guardada",
           description: "La propiedad se ha guardado en tu lista.",
         });
       } else {
-        await supabase
-          .from("likes_feed_items")
-          .delete()
-          .eq("feed_item_id", property.feed_item_id)
-          .eq("usuario_id", user.id);
+        await savePropertyService.removeProperty(property.id);
         toast({
-          title: "Eliminado de favoritos",
+          title: "Eliminado de guardados",
           description: "La propiedad se ha eliminado de tu lista.",
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       // Revert on error
-      console.error("Error toggling like:", error);
+      console.error("Error toggling save:", error);
       setIsSaved(previousState);
       setLikesCount((prev) =>
         previousState ? prev + 1 : Math.max(0, prev - 1),
       );
       toast({
         title: "Error",
-        description: "No se pudo actualizar favoritos.",
+        description: error.message || "No se pudo actualizar guardados.",
         variant: "destructive",
       });
     }
@@ -179,10 +160,10 @@ export function PropertyCard({
     >
       <div className="relative h-56 flex-shrink-0 overflow-hidden bg-muted">
         {/* Status Badge */}
-        <div className="absolute top-3 left-3 z-10 flex gap-2">
+        <div className="absolute top-3 left-3 z-[1] flex gap-2">
           <Badge
             variant={isVenta && !isRenta ? "default" : "secondary"}
-            className="backdrop-blur-md bg-white/90 text-primary shadow-sm font-semibold"
+            className="backdrop-blur-md bg-primary/90 text-white shadow-sm font-semibold"
           >
             {badgeText}
           </Badge>
@@ -194,7 +175,7 @@ export function PropertyCard({
         </div>
 
         {/* Action Buttons */}
-        <div className="absolute top-3 right-3 z-10 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        <div className="absolute top-3 right-3 z-[1] flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
           <Button
             size="icon"
             variant="secondary"
@@ -245,7 +226,7 @@ export function PropertyCard({
             <div className="flex items-start text-muted-foreground mt-1">
               <MapPin className="h-3.5 w-3.5 mr-1 mt-0.5 flex-shrink-0" />
               <p className="text-xs line-clamp-1 flex-1">
-                {locationLine1}, {locationLine2}
+                {locationLine1} {locationLine2}
               </p>
             </div>
           </div>
@@ -269,73 +250,117 @@ export function PropertyCard({
 
           {/* Features Grid */}
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1 border-t border-border/50">
-            <div
-              className="flex items-center gap-1.5 text-muted-foreground"
-              title={`${property.habitaciones} Recámaras`}
-            >
-              <Bed className="h-5 w-5" />
-              <span className="text-sm font-semibold">
-                {property.habitaciones || 0}
-              </span>
-            </div>
-            <div
-              className="flex items-center gap-1.5 text-muted-foreground"
-              title={`${property.banos} Baños`}
-            >
-              <Bath className="h-5 w-5" />
-              <span className="text-sm font-semibold">
-                {property.banos || 0}
-              </span>
-            </div>
-            <div
-              className="flex items-center gap-1.5 text-muted-foreground"
-              title={`${property.estacionamientos} Estacionamientos`}
-            >
-              <Car className="h-5 w-5" />
-              <span className="text-sm font-semibold">
-                {property.estacionamientos || 0}
-              </span>
-            </div>
-            <div
-              className="flex items-center gap-1.5 text-muted-foreground"
-              title={`${property.metros_cuadrados_construccion} m²`}
-            >
-              <Home className="h-5 w-5" />
-              <span className="text-sm font-semibold whitespace-nowrap">
-                {property.metros_cuadrados_construccion}
-                <span className="text-[10px] ml-0.5 uppercase opacity-70">
-                  m²
+            {property.habitaciones ? (
+              <div
+                className="flex items-center gap-1.5 text-muted-foreground"
+                title={`${property.habitaciones} Recámaras`}
+              >
+                <Bed className="h-5 w-5" />
+                <span className="text-sm font-semibold">
+                  {property.habitaciones || 0}
                 </span>
-              </span>
-            </div>
-            <div
-              className="flex items-center gap-1.5 text-muted-foreground"
-              title={`${property.metros_cuadrados_terreno} m²`}
-            >
-              <MoveDiagonal className="h-5 w-5" />
-              <span className="text-sm font-semibold whitespace-nowrap">
-                {property.metros_cuadrados_terreno}
-                <span className="text-[10px] ml-0.5 uppercase opacity-70">
-                  m²
+              </div>
+            ) : null}
+            {property.banos ? (
+              <div
+                className="flex items-center gap-1.5 text-muted-foreground"
+                title={`${property.banos} Baños`}
+              >
+                <Bath className="h-5 w-5" />
+                <span className="text-sm font-semibold">
+                  {property.banos || 0}
                 </span>
-              </span>
+              </div>
+            ) : null}
+            {property.estacionamientos ? (
+              <div
+                className="flex items-center gap-1.5 text-muted-foreground"
+                title={`${property.estacionamientos} Estacionamientos`}
+              >
+                <Car className="h-5 w-5" />
+                <span className="text-sm font-semibold">
+                  {property.estacionamientos || 0}
+                </span>
+              </div>
+            ) : null}
+            {property.metros_cuadrados_construccion ? (
+              <div
+                className="flex items-center gap-1.5 text-muted-foreground"
+                title={`${property.metros_cuadrados_construccion} m²`}
+              >
+                <Home className="h-5 w-5" />
+                <span className="text-sm font-semibold whitespace-nowrap">
+                  {property.metros_cuadrados_construccion}
+                  <span className="text-[10px] ml-0.5 uppercase opacity-70">
+                    m²
+                  </span>
+                </span>
+              </div>
+            ) : null}
+            {property.metros_cuadrados_terreno ? (
+              <div
+                className="flex items-center gap-1.5 text-muted-foreground"
+                title={`${property.metros_cuadrados_terreno} m²`}
+              >
+                <MoveDiagonal className="h-5 w-5" />
+                <span className="text-sm font-semibold whitespace-nowrap">
+                  {property.metros_cuadrados_terreno}
+                  <span className="text-[10px] ml-0.5 uppercase opacity-70">
+                    m²
+                  </span>
+                </span>
+              </div>
+            ) : null}
+          </div>
+          {/* Amenidades */}
+          {property.amenidades && property.amenidades.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1.5 pt-1">
+              {property.amenidades.slice(0, 3).map((amenidad) => (
+                <span
+                  key={amenidad}
+                  className="text-xs font-semibold rounded-full px-2 py-0.5 bg-muted text-muted-foreground whitespace-nowrap"
+                >
+                  {amenidad}
+                </span>
+              ))}
+              {property.amenidades.length > 3 && (
+                <span className="text-xs font-bold rounded-full px-2 py-0.5 bg-muted text-muted-foreground whitespace-nowrap">
+                  +{property.amenidades.length - 3} más
+                </span>
+              )}
             </div>
+          )}
+        </div>
+
+        {/* Perfil del Agente */}
+        <div className="flex items-center gap-2 mt-auto border border-border/50 rounded-lg p-3 w-full bg-gray-50">
+          <Avatar
+            uri={property.asesor_foto}
+            name={property.asesor_nombre}
+            size={35}
+            className="group-hover:ring-1 group-hover:ring-primary transition-all"
+          />
+          <div className="flex flex-col">
+            <span className="text-sm font-bold leading-none text-foreground/80 line-clamp-1">
+              {property.asesor_nombre || "Agente Privado"}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {(property.asesor_rol || "Asesor Inmobiliario")
+                .charAt(0)
+                .toUpperCase() +
+                (property.asesor_rol || "Asesor Inmobiliario").slice(1)}
+            </span>
           </div>
         </div>
 
         {/* Social Proof Footer */}
-        <div className="flex justify-between items-center pt-3 border-t border-border mt-auto">
+        <div className="flex justify-between items-center pt-3 border-t border-border">
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
             <div
               className="flex items-center gap-1 cursor-pointer hover:text-red-500 transition-colors"
               onClick={handleSaveClick}
             >
-              <Heart
-                className={cn(
-                  "h-3.5 w-3.5",
-                  isSaved ? "fill-red-500 text-red-500" : "",
-                )}
-              />
+              <Heart className={cn("h-3.5 w-3.5")} />
               <span className="font-medium">{likesCount}</span>
             </div>
             <div className="flex items-center gap-1">

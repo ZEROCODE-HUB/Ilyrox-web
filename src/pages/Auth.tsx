@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MapPin } from "lucide-react";
 import authImage from "@/assets/auth-real-estate.jpg";
 import { Login } from "@/components/auth/Login";
 import { Register } from "@/components/auth/Register";
@@ -26,10 +25,8 @@ const Auth = () => {
             to="/"
             className="flex lg:hidden items-center justify-center gap-2 mb-6 hover:opacity-90 transition-opacity"
           >
-            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-              <MapPin className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-3xl font-bold text-foreground">i360</span>
+            <img src="/icon.png" alt="" className="w-10 h-10 object-contain" />
+            <span className="text-3xl font-bold text-foreground">ilyrox</span>
           </Link>
 
           {/* Header Text */}
@@ -38,11 +35,13 @@ const Auth = () => {
               to="/"
               className="flex items-center justify-center gap-2 mb-3 hover:opacity-90 transition-opacity"
             >
-              <div className="hidden lg:flex w-12 h-12 bg-primary rounded-full items-center justify-center shadow-lg">
-                <MapPin className="h-7 w-7 text-white" />
-              </div>
+              <img
+                src="/icon.png"
+                alt=""
+                className="w-10 h-10 object-contain"
+              />
               <span className="hidden lg:block text-3xl font-bold text-foreground">
-                i360
+                ilyrox
               </span>
             </Link>
             <h1 className="text-2xl font-bold text-foreground">
@@ -76,13 +75,13 @@ const Auth = () => {
 
           <div className="text-center text-sm text-muted-foreground">
             Al continuar, aceptas nuestros{" "}
-            <button className="text-primary hover:underline">
+            <a href="/terms" className="text-primary hover:underline">
               Términos de servicio
-            </button>{" "}
+            </a>{" "}
             y{" "}
-            <button className="text-primary hover:underline">
+            <a href="/privacy" className="text-primary hover:underline">
               Política de privacidad
-            </button>
+            </a>
           </div>
         </div>
       </div>

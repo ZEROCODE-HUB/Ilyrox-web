@@ -30,13 +30,15 @@ import {
   Heart,
 } from "lucide-react";
 import { UserProfile } from "@/components/UserProfile";
+import { useAuth } from "@/contexts/AuthContext";
+
 import { MainTabs } from "@/components/MainTabs";
 import { AuthPopup } from "@/components/AuthPopup";
 import { RentSellPopup } from "@/components/RentSellPopup";
 import { useNavigate, Link } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-
+import { SkeletonCard } from "@/components/shared/SkeletonCard";
 // Import Location Data
 import {
   CIUDADES_POR_ESTADO,
@@ -44,31 +46,6 @@ import {
   COLONIAS_POR_MUNICIPIO,
   COORDENADAS_ESTADO,
 } from "@/constants/locations";
-import { Card, CardContent } from "@/components/ui/card";
-
-const SkeletonCard = () => (
-  <Card className="flex flex-col h-full border-border bg-card">
-    <Skeleton height={192} className="rounded-t-lg" />
-    <CardContent className="px-4 pt-4 pb-0 flex flex-col gap-3">
-      <div className="space-y-2">
-        <Skeleton height={24} width="80%" />
-        <Skeleton height={16} width="60%" />
-      </div>
-      <div className="flex justify-between items-center">
-        <Skeleton height={32} width={100} />
-        <Skeleton height={24} width={80} />
-      </div>
-      <div className="flex gap-4">
-        <Skeleton height={16} width={60} />
-        <Skeleton height={16} width={60} />
-        <Skeleton height={16} width={60} />
-      </div>
-      <div className="pt-4 pb-[15px]">
-        <Skeleton height={40} className="w-full" />
-      </div>
-    </CardContent>
-  </Card>
-);
 
 const Index = () => {
   // Estados principales
@@ -94,7 +71,8 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(false);
   const [isMapHidden, setIsMapHidden] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user, isLoading: isAuthLoading } = useAuth();
+
   const [showAuthPopup, setShowAuthPopup] = useState(false);
   const [showRentSellPopup, setShowRentSellPopup] = useState(false);
 
@@ -107,27 +85,6 @@ const Index = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const filtersPanelRef = useRef<ImperativePanelHandle>(null);
-
-  // Verificar si el usuario está logueado
-  useEffect(() => {
-    const checkAuth = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      setIsLoggedIn(!!session);
-    };
-    checkAuth();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setIsLoggedIn(!!session);
-      },
-    );
-
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
-  }, []);
 
   // Compute Grouped Zones based on Selected State
   const groupedZones = useMemo(() => {
@@ -395,7 +352,7 @@ const Index = () => {
                 <div className="flex items-center gap-5">
                   <button
                     onClick={() =>
-                      isLoggedIn
+                      !!user
                         ? navigate("/notifications")
                         : setShowAuthPopup(true)
                     }
@@ -406,16 +363,16 @@ const Index = () => {
 
                   <button
                     onClick={() =>
-                      isLoggedIn ? navigate("/saved") : setShowAuthPopup(true)
+                      !!user ? navigate("/saved") : setShowAuthPopup(true)
                     }
                     className="p-2 hover:bg-white/15 hover:scale-110 transition-all duration-200 rounded-full"
                   >
                     <Heart className="h-9 w-9 text-white" strokeWidth={1.5} />
                   </button>
 
-                  {isLoggedIn ? (
+                  {user ? (
                     <>
-                      {isLoading ? (
+                      {isAuthLoading ? (
                         <Skeleton className="h-10 w-10 rounded-full" />
                       ) : (
                         <UserProfile />
@@ -433,7 +390,12 @@ const Index = () => {
 
                 {/* Enlace de rentar/vender */}
                 <button
-                  onClick={() => setShowRentSellPopup(true)}
+                  onClick={() => {
+                    if (user) setShowRentSellPopup(true);
+                    else {
+                      setShowAuthPopup(true);
+                    }
+                  }}
                   className="flex items-center gap-1.5 text-white/80 hover:text-white text-base font-medium transition-colors mt-1 group"
                 >
                   <Home className="h-4 w-4 group-hover:scale-110 transition-transform" />
@@ -475,9 +437,7 @@ const Index = () => {
                 variant="ghost"
                 size="icon"
                 onClick={() =>
-                  isLoggedIn
-                    ? navigate("/notifications")
-                    : setShowAuthPopup(true)
+                  !!user ? navigate("/notifications") : setShowAuthPopup(true)
                 }
                 className="h-9 w-9 hover:bg-white/10 transition-colors"
               >
@@ -488,14 +448,14 @@ const Index = () => {
                 variant="ghost"
                 size="icon"
                 onClick={() =>
-                  isLoggedIn ? navigate("/saved") : setShowAuthPopup(true)
+                  !!user ? navigate("/saved") : setShowAuthPopup(true)
                 }
                 className="h-9 w-9 hover:bg-white/10 transition-colors"
               >
                 <Heart className="h-5 w-5 text-white" />
               </Button>
 
-              {isLoggedIn ? (
+              {!!user ? (
                 <UserProfile />
               ) : (
                 <Button
@@ -607,13 +567,13 @@ const Index = () => {
                         .fill(0)
                         .map((_, i) => <SkeletonCard key={i} />)
                     ) : properties.length > 0 ? (
-                      <div className="grid gap-5 grid-cols-1">
+                      <div className="grid gap-5 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
                         {properties.map((property) => (
                           <PropertyCard
                             key={property.id}
                             property={property}
                             onViewDetails={setSelectedProperty}
-                            isLoggedIn={isLoggedIn}
+                            isLoggedIn={!!user}
                             onAuthRequired={() => setShowAuthPopup(true)}
                           />
                         ))}
@@ -848,7 +808,7 @@ const Index = () => {
                           key={property.id}
                           property={property}
                           onViewDetails={setSelectedProperty}
-                          isLoggedIn={isLoggedIn}
+                          isLoggedIn={!!user}
                           onAuthRequired={() => setShowAuthPopup(true)}
                         />
                       ))}

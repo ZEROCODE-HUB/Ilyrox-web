@@ -6,8 +6,8 @@ export type propiedades = {
   habitaciones?: number;
   banos?: number;
   estacionamientos?: number;
-  amueblado?: boolean;
-  pet_friendly?: boolean;
+  amueblado?: string;
+  pet_friendly?: string;
   antiguedad?: number;
   caracteristicas_especificas?: string[];
   descripcion_planta_baja?: string;
@@ -183,4 +183,42 @@ export interface PropertyView extends propiedades {
   // Computed / Helper
   isLiked?: boolean;
   amenidades?: string[];
+}
+
+export interface solicitudes_info {
+  id: string;
+  propiedad_id: string;
+  solicitante_id: string;
+  nombre: string;
+  telefono: string;
+  email: string;
+  mensaje: string;
+  origen: string;
+  estado: "nuevo" | "contactado" | "cerrado";
+  created_at: string;
+  updated_at: string;
+}
+
+export interface propiedades_guardadas {
+  id: string;
+  propiedad_id: string;
+  usuario_id: string;
+  created_at: string;
+  deleted_at?: string;
+}
+
+export interface solicitudes_propiedad {
+  id: string;
+  created_at: string;
+  usuario_id: string;
+  nombre_completo: string;
+  email: string;
+  telefono: string;
+  descripcion: string;
+  tipo: "habitacional" | "agricola" | "comercial" | "industrial";
+  rango_min: number;
+  rango_max: number;
+  estado: string;
+  municipio: string;
+  colonia: string;
 }

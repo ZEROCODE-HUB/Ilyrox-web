@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+import { supabase } from "@/lib/supabase";
+
 import { ContactForm } from "@/types/property";
 import { PropertyView } from "@/types/types";
 import {
@@ -28,7 +31,6 @@ import {
   Bed,
   Bath,
   Car,
-  Ruler,
   Calendar,
   Heart,
   Share2,
@@ -40,9 +42,11 @@ import {
   Home,
   MoveDiagonal,
 } from "lucide-react";
-import mapReference from "@/assets/map-reference.jpg";
 import { PropertyComments } from "@/components/PropertyComments";
 import { Avatar } from "@/components/shared/Avatar";
+import MapViewModal from "./Map/MapViewModal";
+import { savePropertyService } from "@/services/savePropertyService";
+import { cn } from "@/lib/utils";
 
 interface PropertyDetailProps {
   property: PropertyView | null;
@@ -69,7 +73,51 @@ export function PropertyDetail({
   const [purchaseTimeframe, setPurchaseTimeframe] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showContactSuccessPopup, setShowContactSuccessPopup] = useState(false);
+  const [isSaved, setIsSaved] = useState(property?.isLiked || false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    setIsSaved(property?.isLiked || false);
+  }, [property?.isLiked]);
+
+  const handleSaveToggle = async () => {
+    if (!property) return;
+
+    // Check if user is logged in
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      toast({
+        title: "Inicia sesión",
+        description: "Debes estar logueado para guardar propiedades",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const previousState = isSaved;
+    const newState = !isSaved;
+    setIsSaved(newState);
+
+    try {
+      if (newState) {
+        await savePropertyService.saveProperty(property.id);
+        toast({ title: "Propiedad guardada" });
+      } else {
+        await savePropertyService.removeProperty(property.id);
+        toast({ title: "Eliminado de guardados" });
+      }
+    } catch (error: any) {
+      setIsSaved(previousState);
+      toast({
+        title: "Error",
+        description: error.message || "No se pudo actualizar guardados",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (!property) return null;
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("es-MX", {
@@ -105,8 +153,27 @@ export function PropertyDetail({
 
     setIsSubmitting(true);
     try {
-      // Simular envío de email
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      const fullMessage = `Presupuesto: ${budgetRange}
+Plazo: ${purchaseTimeframe}
+Comentarios: ${contactForm.comments || "Sin comentarios adicionales"}`;
+
+      const { error } = await supabase.from("solicitudes_info").insert({
+        propiedad_id: property.id,
+        solicitante_id: user?.id || null,
+        nombre: contactForm.name,
+        telefono: contactForm.phone,
+        email: contactForm.email,
+        mensaje: fullMessage,
+        origen: "Web",
+        estado: "nuevo",
+      });
+
+      if (error) throw error;
+
       toast({
         title: "Solicitud enviada",
         description: `Tu solicitud ha sido enviada a ${property.asesor_nombre}. Te contactarán pronto.`,
@@ -118,12 +185,17 @@ export function PropertyDetail({
         comments: "",
         propertyId: "",
       });
+      setBudgetRange("");
+      setPurchaseTimeframe("");
       setIsContactFormOpen(false);
       setShowContactSuccessPopup(true);
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Error submitting contact form:", error);
       toast({
         title: "Error",
-        description: "No se pudo enviar la solicitud. Intenta nuevamente.",
+        description:
+          error.message ||
+          "No se pudo enviar la solicitud. Intenta nuevamente.",
         variant: "destructive",
       });
     } finally {
@@ -156,7 +228,7 @@ export function PropertyDetail({
     return reviews.breakdown[selectedStars as keyof typeof reviews.breakdown];
   };
 
-  console.log("PROPERTY", property);
+  //console.log("PROPERTY", property);
 
   return (
     <>
@@ -209,10 +281,15 @@ export function PropertyDetail({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="bg-white/80 hover:bg-white"
+                  className={cn(
+                    "bg-white/80 hover:bg-white",
+                    isSaved && "text-red-500",
+                  )}
+                  onClick={handleSaveToggle}
                 >
-                  <Heart className="h-4 w-4" />
+                  <Heart className={cn("h-4 w-4", isSaved && "fill-current")} />
                 </Button>
+
                 <Button
                   variant="ghost"
                   size="sm"
@@ -385,23 +462,29 @@ export function PropertyDetail({
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">Amoblado</span>
-                        {property.amueblado ? (
+                        {property.amueblado == "Parcial" ? (
+                          <span className="text-muted-foreground text-xs text-green-500">
+                            Parcial
+                          </span>
+                        ) : property.amueblado == "Sí" ? (
                           <Check className="h-4 w-4 text-success" />
                         ) : (
-                          <X className="h-4 w-4 text-muted-foreground" />
+                          <X className="h-4 w-4 text-muted-foreground text-red-500" />
                         )}
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">
-                          Pet-friendly
-                        </span>
-                        {property.pet_friendly ? (
-                          <Check className="h-4 w-4 text-success" />
-                        ) : (
-                          <X className="h-4 w-4 text-muted-foreground" />
-                        )}
-                      </div>
-                      <div className="flex items-center justify-between">
+                      {property.tipo_operacion == "renta" && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-muted-foreground">
+                            Pet-friendly
+                          </span>
+                          {property.pet_friendly == "Sí" ? (
+                            <Check className="h-4 w-4 text-success" />
+                          ) : (
+                            <X className="h-4 w-4 text-muted-foreground text-red-500" />
+                          )}
+                        </div>
+                      )}
+                      {/* <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">
                           Sin gravamen
                         </span>
@@ -410,7 +493,7 @@ export function PropertyDetail({
                         ) : (
                           <X className="h-4 w-4 text-muted-foreground" />
                         )}
-                      </div>
+                      </div> */}
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">
                           Antigüedad
@@ -438,7 +521,7 @@ export function PropertyDetail({
                 </div>
 
                 {/* Financiamiento */}
-                <div>
+                {/* <div>
                   <h4 className="font-medium mb-3">
                     Opciones de Financiamiento
                   </h4>
@@ -449,7 +532,7 @@ export function PropertyDetail({
                       </Badge>
                     ))}
                   </div>
-                </div>
+                </div> */}
 
                 {/* Comentarios */}
                 <Separator className="my-6" />
@@ -474,7 +557,8 @@ export function PropertyDetail({
                         {property.asesor_nombre}
                       </h3>
                       <p className="text-muted-foreground text-sm">
-                        {property.asesor_rol || "Asesor"}
+                        {property.asesor_rol.charAt(0).toUpperCase() +
+                          property.asesor_rol.slice(1) || "Asesor"}
                       </p>
                     </div>
 
@@ -731,10 +815,11 @@ export function PropertyDetail({
             </div>
 
             <div className="aspect-video rounded-lg overflow-hidden bg-muted">
-              <img
-                src={mapReference}
-                alt="Ubicación de la propiedad en el mapa"
-                className="w-full h-full object-cover"
+              <MapViewModal
+                centerLocation={{
+                  lat: property.latitud || 0,
+                  lng: property.longitud || 0,
+                }}
               />
             </div>
 

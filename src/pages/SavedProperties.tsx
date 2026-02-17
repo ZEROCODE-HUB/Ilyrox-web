@@ -1,34 +1,61 @@
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, Bookmark } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { Property } from '@/types/property';
-import { PropertyCard } from '@/components/PropertyCard';
-import { PropertyDetail } from '@/components/PropertyDetail';
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, Bookmark, Home } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { PropertyView } from "@/types/types";
+import { PropertyCard } from "@/components/PropertyCard";
+import { PropertyDetail } from "@/components/PropertyDetail";
+import { savePropertyService } from "@/services/savePropertyService";
+import { useToast } from "@/hooks/use-toast";
+import Skeleton from "react-loading-skeleton";
+import { UserProfile } from "@/components/UserProfile";
+import { useAuth } from "@/contexts/AuthContext";
+import { SkeletonCard } from "@/components/shared/SkeletonCard";
 
 const SavedProperties = () => {
   const navigate = useNavigate();
-  const [savedProperties, setSavedProperties] = useState<Property[]>([]);
-  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const { toast } = useToast();
+  const { user } = useAuth();
+
+  const [savedProperties, setSavedProperties] = useState<PropertyView[]>([]);
+  const [selectedProperty, setSelectedProperty] = useState<PropertyView | null>(
+    null,
+  );
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchSavedProperties = async () => {
+    setIsLoading(true);
+    try {
+      const data = await savePropertyService.getSavedProperties();
+      setSavedProperties(data);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "No se pudieron cargar las propiedades guardadas",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // In a real app, this would fetch from localStorage or a backend
-    const saved = localStorage.getItem('savedProperties');
-    if (saved) {
-      setSavedProperties(JSON.parse(saved));
-    }
+    fetchSavedProperties();
   }, []);
+
+  const handleViewDetails = (property: PropertyView) => {
+    setSelectedProperty(property);
+  };
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="h-16 bg-card border-b sticky top-0 z-20">
         <div className="container mx-auto px-4 h-full flex items-center">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => navigate('/')}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate("/")}
             className="mr-4"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -36,20 +63,32 @@ const SavedProperties = () => {
           </Button>
           <div className="flex items-center gap-2">
             <Bookmark className="h-5 w-5 text-primary" />
-            <span className="text-xl font-bold text-primary">Propiedades Guardadas</span>
+            <span className="text-xl font-bold text-primary">
+              Propiedades Guardadas
+            </span>
           </div>
+          <div className="ml-auto">{user && <UserProfile />}</div>
         </div>
       </div>
 
       {/* Content */}
       <div className="container mx-auto px-4 py-6">
-        {savedProperties.length > 0 ? (
+        {isLoading ? (
           <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
-            {savedProperties.map(property => (
-              <PropertyCard 
-                key={property.id} 
-                property={property} 
-                onViewDetails={setSelectedProperty}
+            {Array(3)
+              .fill(0)
+              .map((_, i) => (
+                <SkeletonCard key={i} />
+              ))}
+          </div>
+        ) : savedProperties.length > 0 ? (
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+            {savedProperties.map((property) => (
+              <PropertyCard
+                key={property.id}
+                property={property}
+                onViewDetails={handleViewDetails}
+                isLoggedIn={true}
               />
             ))}
           </div>
@@ -57,11 +96,14 @@ const SavedProperties = () => {
           <div className="text-center py-12">
             <div className="max-w-md mx-auto">
               <Bookmark className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No tienes propiedades guardadas</h3>
+              <h3 className="text-xl font-semibold mb-2">
+                No tienes propiedades guardadas
+              </h3>
               <p className="text-muted-foreground mb-4">
-                Guarda propiedades haciendo clic en el icono de marcador en las tarjetas de propiedades.
+                Guarda propiedades haciendo clic en el icono de marcador en las
+                tarjetas de propiedades.
               </p>
-              <Button onClick={() => navigate('/')} variant="outline">
+              <Button onClick={() => navigate("/")} variant="outline">
                 Explorar propiedades
               </Button>
             </div>
@@ -70,10 +112,10 @@ const SavedProperties = () => {
       </div>
 
       {/* Property Detail Modal */}
-      <PropertyDetail 
-        property={selectedProperty} 
-        isOpen={!!selectedProperty} 
-        onClose={() => setSelectedProperty(null)} 
+      <PropertyDetail
+        property={selectedProperty}
+        isOpen={!!selectedProperty}
+        onClose={() => setSelectedProperty(null)}
       />
     </div>
   );

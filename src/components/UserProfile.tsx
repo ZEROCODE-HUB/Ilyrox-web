@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,68 +9,20 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/shared/Avatar";
 import { LogOut, Settings } from "lucide-react";
-import { supabase } from "@/lib/supabase";
-import { User } from "@supabase/supabase-js";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export function UserProfile() {
-  const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<{
-    full_name?: string;
-    avatar_url?: string;
-  } | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user) {
-        setUser(user);
-        // Try to get profile or use metadata
-        const fullName =
-          user.user_metadata?.nombre || user.email?.split("@")[0];
-        const avatarUrl = user.user_metadata?.avatar_url;
-        setProfile({ full_name: fullName, avatar_url: avatarUrl });
-      } else {
-        setProfile(null);
-        setUser(null);
-      }
-      setIsLoading(false);
-    };
-
-    getUser();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (session?.user) {
-          setUser(session.user);
-          const fullName =
-            session.user.user_metadata?.full_name ||
-            session.user.email?.split("@")[0];
-          const avatarUrl = session.user.user_metadata?.avatar_url;
-          setProfile({ full_name: fullName, avatar_url: avatarUrl });
-        } else {
-          setUser(null);
-          setProfile(null);
-        }
-      },
-    );
-
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
-  }, []);
+  const { user, profile, signOut, isLoading } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setProfile(null);
-    window.location.reload(); // Reload to clear states or redirect
+    await signOut();
+    navigate("/");
+    window.location.reload();
   };
 
-  if (isLoading) return null;
-  if (!user) return null;
+  if (isLoading || !user) return null;
 
   return (
     <DropdownMenu>
@@ -82,7 +33,7 @@ export function UserProfile() {
           className="h-10 w-10 rounded-full hover:bg-white/10"
         >
           <Avatar
-            uri={profile?.avatar_url}
+            uri={profile?.foto}
             name={profile?.full_name || "Usuario"}
             size={36}
             isWithBorder

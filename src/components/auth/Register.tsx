@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,69 +10,41 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/lib/supabase";
+import { Camera, Eye, EyeOff, User as UserIcon, X } from "lucide-react";
+import { useAuthForm } from "@/hooks/useAuthForm";
 
 export const Register = () => {
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
+  const {
+    formState,
+    loading,
+    updateField,
+    handleAvatarSelect,
+    clearAvatar,
+    handleRegister,
+    resetForm,
+  } = useAuthForm();
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    updateField(id as any, value);
+  };
+
+  const onAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handleAvatarSelect(file);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    const formData = new FormData(e.currentTarget);
-    const name = formData.get("name") as string;
-    const email = formData.get("signup-email") as string;
-    const password = formData.get("password") as string;
-    const confirmPassword = formData.get("confirm-password") as string;
-
-    if (password !== confirmPassword) {
-      toast({
-        title: "Error",
-        description: "Las contraseñas no coinciden.",
-        variant: "destructive",
-      });
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: name,
-          },
-        },
-      });
-
-      if (error) throw error;
-
-      if (data.session) {
-        toast({
-          title: "¡Cuenta creada!",
-          description: "Tu cuenta ha sido creada exitosamente.",
-        });
-        navigate("/");
-      } else {
-        // Email verification required or manual approval
-        toast({
-          title: "Registro exitoso",
-          description:
-            "Por favor verifica tu correo electrónico para confirmar tu cuenta.",
-        });
-      }
-    } catch (error: any) {
-      toast({
-        title: "Error al registrarse",
-        description: error.message || "Ocurrió un error inesperado.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+    const success = await handleRegister();
+    if (success) {
+      navigate("/");
+      resetForm();
     }
   };
 
@@ -83,59 +55,176 @@ export const Register = () => {
         <CardDescription>Completa el formulario para comenzar</CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSignup} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Nombre completo</Label>
-            <Input
-              id="name"
-              name="name"
-              type="text"
-              placeholder="Juan Pérez"
-              required
-              className="h-11"
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Avatar Upload */}
+          <div className="flex flex-col items-center justify-center space-y-3 pb-2">
+            <div className="relative">
+              <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-primary/20 bg-muted flex items-center justify-center">
+                {formState.avatarPreview ? (
+                  <img
+                    src={formState.avatarPreview}
+                    alt="Preview"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <UserIcon className="w-12 h-12 text-muted-foreground" />
+                )}
+              </div>
+              <Button
+                type="button"
+                variant="secondary"
+                size="icon"
+                className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full shadow-md"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Camera className="h-4 w-4" />
+              </Button>
+              {formState.avatarPreview && (
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="icon"
+                  className="absolute -top-1 -right-1 h-6 w-6 rounded-full shadow-sm"
+                  onClick={clearAvatar}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              )}
+            </div>
+            <Label className="text-xs text-muted-foreground">
+              Foto de perfil (Opcional)
+            </Label>
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              accept="image/*"
+              onChange={onAvatarChange}
             />
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="signup-email">Correo electrónico</Label>
+            <Label htmlFor="firstName">Nombre(s)</Label>
             <Input
-              id="signup-email"
-              name="signup-email"
+              id="firstName"
+              value={formState.firstName}
+              onChange={handleInputChange}
+              placeholder="Juan"
+              required
+              className="h-11"
+              disabled={loading}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="lastNamePaternal">Apellido Paterno</Label>
+              <Input
+                id="lastNamePaternal"
+                value={formState.lastNamePaternal}
+                onChange={handleInputChange}
+                placeholder="Pérez"
+                required
+                className="h-11"
+                disabled={loading}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="lastNameMaterno">Apellido Materno</Label>
+              <Input
+                id="lastNameMaterno"
+                value={formState.lastNameMaterno}
+                onChange={handleInputChange}
+                placeholder="García"
+                required
+                className="h-11"
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email">Correo electrónico</Label>
+            <Input
+              id="email"
               type="email"
               placeholder="tu@email.com"
+              value={formState.email}
+              onChange={handleInputChange}
               required
               className="h-11"
+              disabled={loading}
             />
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="signup-password">Contraseña</Label>
-            <Input
-              id="signup-password"
-              name="password"
-              type="password"
-              placeholder="••••••••"
-              required
-              className="h-11"
-              minLength={6}
-            />
+            <Label htmlFor="password">Contraseña</Label>
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                value={formState.password}
+                onChange={handleInputChange}
+                required
+                minLength={6}
+                className="h-11 pr-10"
+                disabled={loading}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-0 h-full px-3 text-muted-foreground hover:text-foreground"
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex={-1}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="confirm-password">Confirmar contraseña</Label>
-            <Input
-              id="confirm-password"
-              name="confirm-password"
-              type="password"
-              placeholder="••••••••"
-              required
-              className="h-11"
-              minLength={6}
-            />
+            <Label htmlFor="confirmPassword">Confirmar contraseña</Label>
+            <div className="relative">
+              <Input
+                id="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="••••••••"
+                value={formState.confirmPassword}
+                onChange={handleInputChange}
+                required
+                minLength={6}
+                className="h-11 pr-10"
+                disabled={loading}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-0 h-full px-3 text-muted-foreground hover:text-foreground"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                tabIndex={-1}
+              >
+                {showConfirmPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
           </div>
+
           <Button
             type="submit"
             className="w-full h-11 text-base font-medium"
-            disabled={isLoading}
+            disabled={loading}
           >
-            {isLoading ? "Creando cuenta..." : "Crear cuenta"}
+            {loading ? "Creando cuenta..." : "Crear cuenta"}
           </Button>
         </form>
       </CardContent>

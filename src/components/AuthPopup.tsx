@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,9 +8,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { MapPin } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/lib/supabase";
+import { Camera, X, User as UserIcon, Eye, EyeOff } from "lucide-react";
+import { useAuthForm } from "@/hooks/useAuthForm";
 
 interface AuthPopupProps {
   isOpen: boolean;
@@ -19,83 +18,62 @@ interface AuthPopupProps {
 
 export function AuthPopup({ isOpen, onClose }: AuthPopupProps) {
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const {
+    formState,
+    loading,
+    updateField,
+    handleAvatarSelect,
+    clearAvatar,
+    handleLogin,
+    handleRegister,
+    resetForm,
+    setFormState,
+  } = useAuthForm();
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    updateField(id as any, value);
+  };
+
+  const onAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handleAvatarSelect(file);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      if (isLogin) {
-        // Login
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (error) throw error;
-
-        toast({
-          title: "Bienvenido",
-          description: "Has iniciado sesión correctamente",
-        });
+    if (isLogin) {
+      const success = await handleLogin();
+      if (success) {
         onClose();
-        // Index.tsx will auto-update via onAuthStateChange
-      } else {
-        // Registro
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              full_name: name,
-            },
-          },
-        });
-
-        if (error) throw error;
-
-        if (data.session) {
-          toast({
-            title: "Cuenta creada",
-            description: "Tu cuenta ha sido creada correctamente",
-          });
-          onClose();
-        } else {
-          toast({
-            title: "Registro exitoso",
-            description:
-              "Por favor verifica tu correo para confirmar tu cuenta",
-          });
-          onClose();
-        }
+        resetForm();
       }
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Ocurrió un error inesperado",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+    } else {
+      const success = await handleRegister();
+      if (success) {
+        onClose();
+        resetForm();
+      }
     }
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-center mb-4">
-            <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center shadow-lg">
-              <MapPin className="h-8 w-8 text-white" />
-            </div>
+            <img
+              src="/Logo.jpeg"
+              alt="Logo"
+              className="w-32 h-32 object-contain"
+            />
           </div>
           <DialogTitle className="text-center text-2xl font-bold">
-            {isLogin ? "Bienvenido a i360" : "Únete a i360"}
+            {isLogin ? "Bienvenido a ilyrox" : "Únete a ilyrox"}
           </DialogTitle>
           <p className="text-center text-sm text-muted-foreground">
             {isLogin
@@ -104,20 +82,93 @@ export function AuthPopup({ isOpen, onClose }: AuthPopupProps) {
           </p>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+        <form onSubmit={handleSubmit} className="space-y-4 mt-4 px-1">
           {!isLogin && (
-            <div className="space-y-2">
-              <Label htmlFor="name">Nombre completo</Label>
-              <Input
-                id="name"
-                type="text"
-                placeholder="Ingresa tu nombre"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                disabled={isLoading}
-              />
-            </div>
+            <>
+              {/* Avatar Upload */}
+              <div className="flex flex-col items-center justify-center space-y-3 pb-2">
+                <div className="relative">
+                  <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-primary/20 bg-muted flex items-center justify-center">
+                    {formState.avatarPreview ? (
+                      <img
+                        src={formState.avatarPreview}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <UserIcon className="w-12 h-12 text-muted-foreground" />
+                    )}
+                  </div>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="icon"
+                    className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full shadow-md"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Camera className="h-4 w-4" />
+                  </Button>
+                  {formState.avatarPreview && (
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute -top-1 -right-1 h-6 w-6 rounded-full shadow-sm"
+                      onClick={clearAvatar}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  )}
+                </div>
+                <Label className="text-xs text-muted-foreground">
+                  Foto de perfil (Opcional)
+                </Label>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept="image/*"
+                  onChange={onAvatarChange}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="firstName">Nombre(s)</Label>
+                <Input
+                  id="firstName"
+                  value={formState.firstName}
+                  onChange={handleInputChange}
+                  placeholder="Tu nombre"
+                  required
+                  disabled={loading}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="lastNamePaternal">Apellido Paterno</Label>
+                  <Input
+                    id="lastNamePaternal"
+                    value={formState.lastNamePaternal}
+                    onChange={handleInputChange}
+                    placeholder="Apellido"
+                    required
+                    disabled={loading}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastNameMaterno">Apellido Materno</Label>
+                  <Input
+                    id="lastNameMaterno"
+                    value={formState.lastNameMaterno}
+                    onChange={handleInputChange}
+                    placeholder="Apellido"
+                    required
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+            </>
           )}
 
           <div className="space-y-2">
@@ -126,33 +177,83 @@ export function AuthPopup({ isOpen, onClose }: AuthPopupProps) {
               id="email"
               type="email"
               placeholder="tu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={formState.email}
+              onChange={handleInputChange}
               required
-              disabled={isLoading}
+              disabled={loading}
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="password">Contraseña</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-              disabled={isLoading}
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                value={formState.password}
+                onChange={handleInputChange}
+                required
+                minLength={6}
+                disabled={loading}
+                className="pr-10"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-0 h-full px-3 text-muted-foreground hover:text-foreground"
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex={-1}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
           </div>
+
+          {!isLogin && (
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirmar contraseña</Label>
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={formState.confirmPassword}
+                  onChange={handleInputChange}
+                  required
+                  minLength={6}
+                  disabled={loading}
+                  className="pr-10"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-0 h-full px-3 text-muted-foreground hover:text-foreground"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  tabIndex={-1}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            </div>
+          )}
 
           <Button
             type="submit"
-            className="w-full h-11 bg-primary hover:bg-primary/90 text-white font-medium shadow-md"
-            disabled={isLoading}
+            className="w-full h-11 bg-primary hover:bg-primary/90 text-white font-medium shadow-md mt-2"
+            disabled={loading}
           >
-            {isLoading
+            {loading
               ? isLogin
                 ? "Iniciando sesión..."
                 : "Creando cuenta..."
@@ -161,15 +262,18 @@ export function AuthPopup({ isOpen, onClose }: AuthPopupProps) {
                 : "Crear cuenta"}
           </Button>
 
-          <div className="text-center">
+          <div className="text-center pt-2">
             <button
               type="button"
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-sm text-primary hover:underline"
-              disabled={isLoading}
+              onClick={() => {
+                setIsLogin(!isLogin);
+                resetForm();
+              }}
+              className="text-sm text-primary hover:underline font-medium"
+              disabled={loading}
             >
               {isLogin
-                ? "¿No tienes cuenta? Regístrate"
+                ? "¿No tienes cuenta? Regístrate aquí"
                 : "¿Ya tienes cuenta? Inicia sesión"}
             </button>
           </div>
