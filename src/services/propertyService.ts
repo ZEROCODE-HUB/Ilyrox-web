@@ -32,8 +32,9 @@ export const propertyService = {
     pageSize: number = 10,
   ): Promise<PropertyView[]> {
     const {
-      data: { user },
-    } = await supabase.auth.getUser();
+      data: { session },
+    } = await supabase.auth.getSession();
+    const user = session?.user;
 
     let exchangeRateToUSD = 1.0;
     const filterCurrency = filters.currency || "MXN";
@@ -125,8 +126,9 @@ export const propertyService = {
 
   async getPropertyById(id: string): Promise<PropertyView | null> {
     const {
-      data: { user },
-    } = await supabase.auth.getUser();
+      data: { session },
+    } = await supabase.auth.getSession();
+    const user = session?.user;
 
     const { data, error } = await supabase
       .from("propiedades_busqueda_view")

@@ -4,6 +4,7 @@ import {
   useState,
   useEffect,
   ReactNode,
+  useCallback,
 } from "react";
 import { supabase } from "@/lib/supabase";
 import { User } from "@supabase/supabase-js";
@@ -28,7 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchProfile = async (userId: string) => {
+  const fetchProfile = useCallback(async (userId: string) => {
     try {
       const { data, error } = await supabase
         .from("perfiles")
@@ -37,7 +38,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .single();
 
       if (error) {
-        console.error("Error fetching profile:", error);
+        if (error.code !== "PGRST116") {
+          console.error("Error fetching profile:", error);
+        }
         return null;
       }
       return data;
@@ -45,59 +48,80 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error("Unexpected error fetching profile:", error);
       return null;
     }
-  };
+  }, []);
 
-  const updateUserInfo = async (sessionUser: User | null) => {
-    if (sessionUser) {
-      setUser(sessionUser);
+  const updateUserInfo = useCallback(
+    async (sessionUser: User | null) => {
+      if (sessionUser) {
+        setUser(sessionUser);
 
-      // Fetch profile from DB
-      const dbProfile = await fetchProfile(sessionUser.id);
-
-      if (dbProfile) {
-        setProfile({
-          full_name: dbProfile.nombre_completo,
-          foto: dbProfile.foto,
-        });
-      } else {
-        // Fallback to metadata if DB fetch fails
+        // Initially set profile with metadata fallback
         const fullName =
           sessionUser.user_metadata?.full_name ||
           sessionUser.user_metadata?.nombre ||
           sessionUser.email?.split("@")[0];
         const avatarUrl = sessionUser.user_metadata?.foto;
+
         setProfile({ full_name: fullName, foto: avatarUrl });
+
+        // Then attempt to fetch enriched profile from DB asynchronously
+        // We don't await this here to avoid blocking the auth state update
+        fetchProfile(sessionUser.id).then((dbProfile) => {
+          if (dbProfile) {
+            setProfile({
+              full_name: dbProfile.nombre_completo,
+              foto: dbProfile.foto,
+            });
+          }
+        });
+      } else {
+        setUser(null);
+        setProfile(null);
       }
-    } else {
-      setUser(null);
-      setProfile(null);
-    }
-  };
+    },
+    [fetchProfile],
+  );
 
   useEffect(() => {
-    // Check active session
-    const checkSession = async () => {
+    let mounted = true;
+
+    const initializeAuth = async () => {
+      // Get initial session once
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      await updateUserInfo(session?.user ?? null);
-      setIsLoading(false);
+      if (mounted) {
+        await updateUserInfo(session?.user ?? null);
+        setIsLoading(false);
+      }
     };
 
-    checkSession();
+    initializeAuth();
 
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      await updateUserInfo(session?.user ?? null);
-      setIsLoading(false);
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (mounted) {
+        // Only trigger update if it's not the initial session check we already did,
+        // or if the event specifically requires an update (like SIGNED_IN, SIGNED_OUT)
+        if (
+          event === "SIGNED_IN" ||
+          event === "SIGNED_OUT" ||
+          event === "USER_UPDATED" ||
+          event === "TOKEN_REFRESHED"
+        ) {
+          await updateUserInfo(session?.user ?? null);
+        }
+        setIsLoading(false);
+      }
     });
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [updateUserInfo]);
 
   const signOut = async () => {
     await supabase.auth.signOut();
