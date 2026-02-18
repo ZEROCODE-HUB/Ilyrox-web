@@ -5,7 +5,7 @@ Aplicación: Ilyrox
 Sitio web público asociado: www.ilyrox.com
 Titular/Responsable: Edith Priscila Muñiz Cantu
 Contacto para reportes: ayuda@ilyrox.com
-Última actualización: 10/febrero/2026
+Última actualización: 10-febrero-2026
 
 Estas Community Guidelines forman parte integral de los Términos y Condiciones.
 El uso de la App implica su aceptación.
