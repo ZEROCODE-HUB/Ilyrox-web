@@ -46,6 +46,7 @@ import {
   COLONIAS_POR_MUNICIPIO,
   COORDENADAS_ESTADO,
 } from "@/constants/locations";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 const Index = () => {
   // Estados principales
@@ -150,11 +151,6 @@ const Index = () => {
     if (selectedState && COORDENADAS_ESTADO[selectedState]) {
       const { lat, lng } = COORDENADAS_ESTADO[selectedState];
       setCenterLocation([lat, lng]);
-
-      // If state changed explicitly (e.g. cleared), ensure filters are updated if not already
-      // But avoid loop. filters -> selectedState -> filters is bad.
-      // Index only updates filters when user uses filter component.
-      // So this effect is primarily for Map centering.
     }
   }, [selectedState]);
 
@@ -279,9 +275,6 @@ const Index = () => {
           )} km de tu ubicación.`,
         });
       }
-    } else if (!userLocation) {
-      // Opcional: Intentar obtener ubicación si no existe
-      // await handleLocationSearch();
     }
   };
 
@@ -312,10 +305,8 @@ const Index = () => {
         <div className="hidden md:block">
           <div className="px-[25px] py-3">
             <div className="flex items-center justify-between">
-              {/* Spacer izquierdo para balance */}
               <div className="flex-shrink-0 w-[200px]"></div>
 
-              {/* Logo + Barra de búsqueda - Centro */}
               <div className="flex items-center gap-4 flex-1 justify-center max-w-2xl">
                 <Link
                   to="/"
@@ -334,7 +325,6 @@ const Index = () => {
                     onLocationSearch={handleLocationSearch}
                     onFocus={handleSearchFocus}
                   />
-                  {/* Inline ZoneSearch */}
                   <div className="w-full">
                     <ZoneSearch
                       groupedZones={groupedZones}
@@ -347,7 +337,6 @@ const Index = () => {
                 </div>
               </div>
 
-              {/* Right side - Autenticación condicional */}
               <div className="flex flex-col items-end gap-1 flex-shrink-0">
                 <div className="flex items-center gap-5">
                   <button
@@ -388,7 +377,6 @@ const Index = () => {
                   )}
                 </div>
 
-                {/* Enlace de rentar/vender */}
                 <button
                   onClick={() => {
                     if (user) setShowRentSellPopup(true);
@@ -406,14 +394,11 @@ const Index = () => {
               </div>
             </div>
           </div>
-
-          {/* Zona de búsqueda por zonas - Desktop (sin borde divisor) */}
         </div>
 
         {/* Mobile Header */}
         <div className="md:hidden">
           <div className="px-3 py-3 flex items-center justify-between gap-2">
-            {/* Logo */}
             <Link
               to="/"
               className="flex items-center flex-shrink-0 hover:opacity-90 transition-opacity"
@@ -431,7 +416,6 @@ const Index = () => {
               </div>
             </Link>
 
-            {/* Right side - Autenticación condicional */}
             <div className="flex items-center gap-2 flex-shrink-0">
               <Button
                 variant="ghost"
@@ -468,7 +452,6 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Barra de búsqueda y zonas - Mobile */}
           <div className="px-3 pb-3 space-y-3">
             <SearchAndSort
               searchTerm={searchTerm}
@@ -484,7 +467,6 @@ const Index = () => {
               selectedColony={selectedColony}
               onColonyChange={setSelectedColony}
             />
-            {/* Botón de Más Filtros */}
             <Button
               variant="outline"
               onClick={() => setShowFilters(!showFilters)}
@@ -497,12 +479,10 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Tabs de Navegación Principal */}
       <MainTabs>
         <div className="h-[calc(100vh-264px)] md:h-[calc(112vh-200px)] overflow-hidden">
-          {/* Vista móvil - mapa y lista exclusivos */}
+          {/* Vista móvil */}
           <div className="lg:hidden h-full w-full flex flex-col relative">
-            {/* Panel de filtros móvil - desplegable */}
             {showFilters && (
               <div className="absolute inset-0 z-30 bg-background overflow-y-auto">
                 <div className="sticky top-0 z-10 bg-card border-b shadow-sm">
@@ -528,100 +508,30 @@ const Index = () => {
               </div>
             )}
 
-            {/* Contenido principal móvil */}
-            <div className="flex-1 overflow-hidden">
-              {isMapHidden ? (
-                // Vista de lista móvil
-                <div className="h-full overflow-y-auto bg-background">
-                  {/* Header de propiedades */}
-                  <div className="px-5 py-4 border-b bg-card sticky top-0 z-10 shadow-sm">
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex-1 min-w-0">
-                        <h2 className="text-base font-semibold truncate">
-                          {userLocation
-                            ? "Propiedades cerca de ti"
-                            : "Propiedades disponibles"}
-                        </h2>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {properties.length} resultado
-                          {properties.length !== 1 ? "s" : ""}
-                        </p>
-                      </div>
-
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setIsMapHidden(false)}
-                        className="flex items-center gap-1.5 h-9 shadow-sm"
-                      >
-                        <MapPin className="h-4 w-4" />
-                        <span className="font-medium">Mapa</span>
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Lista de propiedades */}
-                  <div className="p-5 space-y-5">
-                    {isLoading ? (
-                      Array(3)
-                        .fill(0)
-                        .map((_, i) => <SkeletonCard key={i} />)
-                    ) : properties.length > 0 ? (
-                      <div className="grid gap-5 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
-                        {properties.map((property) => (
-                          <PropertyCard
-                            key={property.id}
-                            property={property}
-                            onViewDetails={setSelectedProperty}
-                            isLoggedIn={!!user}
-                            onAuthRequired={() => setShowAuthPopup(true)}
-                          />
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-center py-20 px-5">
-                        <div className="max-w-md mx-auto">
-                          <Home className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                          <h3 className="text-lg font-semibold mb-2">
-                            No se encontraron propiedades
-                          </h3>
-                          <p className="text-sm text-muted-foreground mb-4">
-                            Intenta ajustar tus filtros de búsqueda o eliminar
-                            algunos criterios.
-                          </p>
-                          <Button
-                            onClick={handleClearFilters}
-                            variant="outline"
-                            size="sm"
-                          >
-                            Limpiar filtros
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+            <div className="flex-1 overflow-hidden relative">
+              <div
+                className="absolute inset-0 z-0 bg-background flex flex-col"
+                style={{
+                  visibility: !isMapHidden ? "visible" : "hidden",
+                }}
+              >
+                <div className="px-4 py-4 border-b bg-card shadow-sm flex items-center justify-between z-10">
+                  <h2 className="text-base font-semibold">
+                    Mapa de Propiedades
+                  </h2>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsMapHidden(true)}
+                    className="flex items-center gap-1.5 h-9 shadow-sm bg-white"
+                  >
+                    <Home className="h-4 w-4" />
+                    <span className="font-medium">Lista</span>
+                  </Button>
                 </div>
-              ) : (
-                // Vista de mapa móvil
-                <div className="h-full flex flex-col">
-                  {/* Header del mapa */}
-                  <div className="px-4 py-4 border-b bg-card shadow-sm flex items-center justify-between">
-                    <h2 className="text-base font-semibold">
-                      Mapa de Propiedades
-                    </h2>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setIsMapHidden(true)}
-                      className="flex items-center gap-1.5 h-9 shadow-sm"
-                    >
-                      <Home className="h-4 w-4" />
-                      <span className="font-medium">Lista</span>
-                    </Button>
-                  </div>
 
-                  {/* Mapa - ocupa todo el espacio en móvil */}
-                  <div className="flex-1">
+                <div className="flex-1 relative">
+                  <ErrorBoundary>
                     <MapViewContainer
                       properties={properties}
                       selectedProperty={selectedProperty}
@@ -633,9 +543,81 @@ const Index = () => {
                       }}
                       hasFilters={hasActiveFilters}
                     />
+                  </ErrorBoundary>
+                </div>
+              </div>
+
+              <div
+                className={`absolute inset-0 z-10 bg-background flex flex-col transition-transform duration-300 ease-in-out ${
+                  isMapHidden ? "translate-x-0" : "translate-x-full"
+                }`}
+              >
+                <div className="px-5 py-4 border-b bg-card sticky top-0 z-10 shadow-sm">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <h2 className="text-base font-semibold truncate">
+                        {userLocation
+                          ? "Propiedades cerca de ti"
+                          : "Propiedades disponibles"}
+                      </h2>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {properties.length} resultado
+                        {properties.length !== 1 ? "s" : ""}
+                      </p>
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsMapHidden(false)}
+                      className="flex items-center gap-1.5 h-9 shadow-sm"
+                    >
+                      <MapPin className="h-4 w-4" />
+                      <span className="font-medium">Mapa</span>
+                    </Button>
                   </div>
                 </div>
-              )}
+
+                <div className="flex-1 overflow-y-auto p-5 space-y-5">
+                  {isLoading ? (
+                    Array(3)
+                      .fill(0)
+                      .map((_, i) => <SkeletonCard key={i} />)
+                  ) : properties.length > 0 ? (
+                    <div className="grid gap-5 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+                      {properties.map((property) => (
+                        <PropertyCard
+                          key={property.id}
+                          property={property}
+                          onViewDetails={setSelectedProperty}
+                          isLoggedIn={!!user}
+                          onAuthRequired={() => setShowAuthPopup(true)}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-20 px-5">
+                      <div className="max-w-md mx-auto">
+                        <Home className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                        <h3 className="text-lg font-semibold mb-2">
+                          No se encontraron propiedades
+                        </h3>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Intenta ajustar tus filtros de búsqueda o eliminar
+                          algunos criterios.
+                        </p>
+                        <Button
+                          onClick={handleClearFilters}
+                          variant="outline"
+                          size="sm"
+                        >
+                          Limpiar filtros
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -644,8 +626,9 @@ const Index = () => {
             direction="horizontal"
             className="hidden lg:flex w-full"
           >
-            {/* Panel de Filtros - Optimizado */}
+            {/* Panel de Filtros */}
             <ResizablePanel
+              key="filters-panel"
               ref={filtersPanelRef}
               defaultSize={22}
               collapsible={true}
@@ -693,59 +676,60 @@ const Index = () => {
               </div>
             </ResizablePanel>
 
-            {!isFiltersCollapsed && <ResizableHandle withHandle />}
-
-            {/* Panel de Mapa - Equilibrado */}
-            {!isMapHidden && (
-              <>
-                <ResizablePanel
-                  defaultSize={isFiltersCollapsed ? 47.5 : 38}
-                  minSize={28}
-                  maxSize={55}
-                >
-                  <div className="h-full flex flex-col">
-                    <div className="flex-1 overflow-y-auto">
-                      <MapViewContainer
-                        properties={properties}
-                        selectedProperty={selectedProperty}
-                        onPropertySelect={setSelectedProperty}
-                        radiusKm={radiusKm}
-                        centerLocation={{
-                          lat: centerLocation[0],
-                          lng: centerLocation[1],
-                        }}
-                        hasFilters={hasActiveFilters}
-                      />
-                      <div className=" top-4 right-4 z-10">
-                        <MapControls
-                          radiusKm={radiusKm}
-                          onRadiusChange={setRadiusKm}
-                          userLocation={userLocation}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </ResizablePanel>
-
-                <ResizableHandle withHandle />
-              </>
+            {!isFiltersCollapsed && (
+              <ResizableHandle key="filters-handle" withHandle />
             )}
 
-            {/* Panel de Propiedades - Balanceado */}
+            {/* Panel de Mapa */}
+            {!isMapHidden && (
+              <ResizablePanel
+                key="map-panel"
+                defaultSize={isFiltersCollapsed ? 47.5 : 38}
+                minSize={28}
+                maxSize={55}
+              >
+                <div className="h-full flex flex-col">
+                  <div className="flex-1 overflow-y-auto">
+                    <MapViewContainer
+                      properties={properties}
+                      selectedProperty={selectedProperty}
+                      onPropertySelect={setSelectedProperty}
+                      radiusKm={radiusKm}
+                      centerLocation={{
+                        lat: centerLocation[0],
+                        lng: centerLocation[1],
+                      }}
+                      hasFilters={hasActiveFilters}
+                    />
+                    <div className=" top-4 right-4 z-10">
+                      <MapControls
+                        radiusKm={radiusKm}
+                        onRadiusChange={setRadiusKm}
+                        userLocation={userLocation}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </ResizablePanel>
+            )}
+
+            {!isMapHidden && <ResizableHandle key="map-handle" withHandle />}
+
+            {/* Panel de Propiedades */}
             <ResizablePanel
+              key="properties-panel"
               defaultSize={
                 isMapHidden
                   ? isFiltersCollapsed
-                    ? 97
-                    : 72
+                    ? 96
+                    : 78
                   : isFiltersCollapsed
                     ? 48.5
-                    : 39
+                    : 40
               }
               minSize={32}
             >
               <div className="h-full overflow-y-auto bg-background">
-                {/* Header de propiedades - Mejorado */}
                 <div className="px-4 md:px-6 py-4 border-b bg-card sticky top-0 z-10 shadow-sm">
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex-1 min-w-0">
@@ -760,7 +744,6 @@ const Index = () => {
                       </p>
                     </div>
 
-                    {/* Botón para alternar vista de mapa - solo desktop */}
                     <div className="flex gap-2">
                       {isMapHidden ? (
                         <Button
@@ -787,7 +770,6 @@ const Index = () => {
                   </div>
                 </div>
 
-                {/* Lista de propiedades */}
                 <div className="p-4 md:p-6 space-y-4 md:space-y-5">
                   {isLoading ? (
                     <div
@@ -837,20 +819,17 @@ const Index = () => {
         </div>
       </MainTabs>
 
-      {/* Modal de detalle de propiedad */}
       <PropertyDetail
         property={selectedProperty}
         isOpen={!!selectedProperty}
         onClose={() => setSelectedProperty(null)}
       />
 
-      {/* Popup de autenticación */}
       <AuthPopup
         isOpen={showAuthPopup}
         onClose={() => setShowAuthPopup(false)}
       />
 
-      {/* Popup de rentar/vender */}
       <RentSellPopup
         isOpen={showRentSellPopup}
         onClose={() => setShowRentSellPopup(false)}

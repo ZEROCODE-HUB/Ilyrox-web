@@ -43,8 +43,8 @@ export const Header = () => {
         </nav>
 
         <div className="flex items-center gap-2">
-          {/*<div className="hidden md:flex items-center gap-2">
-             <Button variant="ghost" size="icon" asChild>
+          <div className="hidden md:flex items-center gap-2">
+            {/* <Button variant="ghost" size="icon" asChild>
               <Link to="/notifications">
                 <Bell className="h-5 w-5" />
               </Link>
@@ -53,13 +53,13 @@ export const Header = () => {
               <Link to="/saved">
                 <Heart className="h-5 w-5" />
               </Link>
-            </Button> 
+            </Button> */}
             <Button variant="ghost" size="icon" asChild>
               <Link to="/auth">
                 <User className="h-5 w-5" />
               </Link>
             </Button>
-          </div>*/}
+          </div>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild className="md:hidden">
@@ -69,33 +69,13 @@ export const Header = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuItem asChild>
-                <Link to="/search" className="w-full cursor-pointer">
-                  Buscar propiedades
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/search" className="w-full cursor-pointer">
-                  Calculadora hipotecaria
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/search" className="w-full cursor-pointer">
-                  Cómo funciona
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/notifications" className="w-full cursor-pointer">
-                  Notificaciones
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/saved" className="w-full cursor-pointer">
-                  Guardados
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
                 <Link to="/auth" className="w-full cursor-pointer">
-                  Mi cuenta
+                  Iniciar Sesion
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/" className="w-full cursor-pointer">
+                  Menú
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
