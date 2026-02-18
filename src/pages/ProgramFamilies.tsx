@@ -3,9 +3,9 @@ import { Footer } from "@/components/Footer";
 import { ScrollRestoration } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import content from "@/assets/docs/TermsAndConditions.md?raw";
+import content from "@/assets/docs/Programs-Families.md?raw";
 
-const TermsAndConditions = () => {
+const ProgramFamilies = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <ScrollRestoration />
@@ -22,4 +22,4 @@ const TermsAndConditions = () => {
   );
 };
 
-export default TermsAndConditions;
+export default ProgramFamilies;

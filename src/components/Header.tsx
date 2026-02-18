@@ -43,8 +43,8 @@ export const Header = () => {
         </nav>
 
         <div className="flex items-center gap-2">
-          <div className="hidden md:flex items-center gap-2">
-            {/* <Button variant="ghost" size="icon" asChild>
+          {/*<div className="hidden md:flex items-center gap-2">
+             <Button variant="ghost" size="icon" asChild>
               <Link to="/notifications">
                 <Bell className="h-5 w-5" />
               </Link>
@@ -53,13 +53,13 @@ export const Header = () => {
               <Link to="/saved">
                 <Heart className="h-5 w-5" />
               </Link>
-            </Button> */}
+            </Button> 
             <Button variant="ghost" size="icon" asChild>
               <Link to="/auth">
                 <User className="h-5 w-5" />
               </Link>
             </Button>
-          </div>
+          </div>*/}
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild className="md:hidden">

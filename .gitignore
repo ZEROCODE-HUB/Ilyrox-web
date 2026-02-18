@@ -25,3 +25,5 @@ dist-ssr
 
 .env
 View_propiedades_busqueda.sql
+
+.prettierignore

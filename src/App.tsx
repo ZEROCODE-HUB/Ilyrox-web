@@ -11,6 +11,7 @@ import Auth from "./pages/Auth";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsAndConditions from "./pages/TermsAndConditions";
 import { AuthProvider } from "@/contexts/AuthContext";
+import ProgramFamilies from "./pages/ProgramFamilies";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,10 @@ const App = () => {
     {
       path: "/terms",
       element: <TermsAndConditions />,
+    },
+    {
+      path: "/programs-families",
+      element: <ProgramFamilies />,
     },
     {
       path: "*",
