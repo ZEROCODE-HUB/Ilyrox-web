@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Bookmark, Home } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -17,31 +18,29 @@ const SavedProperties = () => {
   const { toast } = useToast();
   const { user } = useAuth();
 
-  const [savedProperties, setSavedProperties] = useState<PropertyView[]>([]);
-  const [selectedProperty, setSelectedProperty] = useState<PropertyView | null>(
-    null,
-  );
-  const [isLoading, setIsLoading] = useState(true);
+  const {
+    data: savedProperties = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["savedProperties", user?.id],
+    queryFn: () => savePropertyService.getSavedProperties(),
+    enabled: !!user,
+  });
 
-  const fetchSavedProperties = async () => {
-    setIsLoading(true);
-    try {
-      const data = await savePropertyService.getSavedProperties();
-      setSavedProperties(data);
-    } catch (error: any) {
+  useEffect(() => {
+    if (isError) {
       toast({
         title: "Error",
         description: "No se pudieron cargar las propiedades guardadas",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
     }
-  };
+  }, [isError, toast]);
 
-  useEffect(() => {
-    fetchSavedProperties();
-  }, []);
+  const [selectedProperty, setSelectedProperty] = useState<PropertyView | null>(
+    null,
+  );
 
   const handleViewDetails = (property: PropertyView) => {
     setSelectedProperty(property);

@@ -45,8 +45,9 @@ import {
 import { PropertyComments } from "@/components/PropertyComments";
 import { Avatar } from "@/components/shared/Avatar";
 import MapViewModal from "./Map/MapViewModal";
-import { savePropertyService } from "@/services/savePropertyService";
 import { cn } from "@/lib/utils";
+import { useSavedProperties } from "@/hooks/useSavedProperties";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface PropertyDetailProps {
   property: PropertyView | null;
@@ -73,20 +74,23 @@ export function PropertyDetail({
   const [purchaseTimeframe, setPurchaseTimeframe] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showContactSuccessPopup, setShowContactSuccessPopup] = useState(false);
-  const [isSaved, setIsSaved] = useState(property?.isLiked || false);
+  const { user } = useAuth();
   const { toast } = useToast();
+  const {
+    isSaved,
+    toggleSave,
+    isLoading: isSavedLoading,
+  } = useSavedProperties();
 
-  useEffect(() => {
-    setIsSaved(property?.isLiked || false);
-  }, [property?.isLiked]);
+  const isPropertySaved = property
+    ? isSavedLoading
+      ? property.isLiked || false
+      : isSaved(property.id)
+    : false;
 
-  const handleSaveToggle = async () => {
+  const handleSaveToggle = () => {
     if (!property) return;
 
-    // Check if user is logged in
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
     if (!user) {
       toast({
         title: "Inicia sesión",
@@ -96,26 +100,7 @@ export function PropertyDetail({
       return;
     }
 
-    const previousState = isSaved;
-    const newState = !isSaved;
-    setIsSaved(newState);
-
-    try {
-      if (newState) {
-        await savePropertyService.saveProperty(property.id);
-        toast({ title: "Propiedad guardada" });
-      } else {
-        await savePropertyService.removeProperty(property.id);
-        toast({ title: "Eliminado de guardados" });
-      }
-    } catch (error: any) {
-      setIsSaved(previousState);
-      toast({
-        title: "Error",
-        description: error.message || "No se pudo actualizar guardados",
-        variant: "destructive",
-      });
-    }
+    toggleSave({ id: property.id, intendedState: !isPropertySaved });
   };
 
   if (!property) return null;
@@ -236,7 +221,9 @@ Comentarios: ${contactForm.comments || "Sin comentarios adicionales"}`;
         <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">
-              {property.tipo} {property.subtipo}
+              {property.tipo.charAt(0).toUpperCase() + property.tipo.slice(1)}
+              {" en "}
+              {property.municipio}
             </DialogTitle>
           </DialogHeader>
 
@@ -283,11 +270,13 @@ Comentarios: ${contactForm.comments || "Sin comentarios adicionales"}`;
                   size="sm"
                   className={cn(
                     "bg-white/80 hover:bg-white",
-                    isSaved && "text-red-500",
+                    isPropertySaved && "text-red-500",
                   )}
                   onClick={handleSaveToggle}
                 >
-                  <Heart className={cn("h-4 w-4", isSaved && "fill-current")} />
+                  <Heart
+                    className={cn("h-4 w-4", isPropertySaved && "fill-current")}
+                  />
                 </Button>
 
                 <Button
@@ -315,56 +304,32 @@ Comentarios: ${contactForm.comments || "Sin comentarios adicionales"}`;
               <div className="lg:col-span-2 space-y-6">
                 {/* Precio y ubicación */}
                 <div>
-                  {/* <div className="flex items-center justify-between mb-4">
-                    <div className="text-3xl font-bold text-primary">
-                      {formatPrice(property.precio_original || 0)}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                    <div className="flex flex-wrap gap-2">
+                      {property.operaciones.map((op, index) => (
+                        <div
+                          key={index}
+                          className="bg-[#1a2e2f] rounded-md px-3 py-2 flex items-center gap-2"
+                        >
+                          <span className="text-gray-400 text-xs font-bold uppercase">
+                            {op.tipo}
+                          </span>
+                          <span className="text-white text-2xl font-bold">
+                            {op.moneda} {formatPrice(op.precio || 0)}
+                          </span>
+                        </div>
+                      ))}
                     </div>
-                    <div className="flex gap-2">
-                      <Badge variant="outline">{property.tipo}</Badge>
-                      <Badge variant="secondary">{property.subtipo}</Badge>
+                    <div className="flex gap-2 shrink-0">
+                      <div className="px-3 py-1 bg-secondary text-secondary-foreground rounded-full text-xs font-semibold capitalize border border-border">
+                        {property.tipo}
+                      </div>
+                      <div className="px-3 py-1 bg-muted text-muted-foreground rounded-full text-xs font-semibold capitalize border border-border">
+                        {property.subtipo}
+                      </div>
                     </div>
-                  </div> */}
-                  <div className="text-2xl font-bold ">
-                    <h1 className="">
-                      {property.tipo.charAt(0).toUpperCase() +
-                        property.tipo.slice(1)}{" "}
-                      en {property.municipio}
-                    </h1>
-                    {property.operaciones.length > 1 ? (
-                      <div className="flex gap-2 py-3">
-                        <div className="bg-[#1a2e2f] rounded-md w-fit px-2 py-1 flex justify-center items-center gap-2">
-                          <p className="text-gray-300/80 text-nowrap text-base">
-                            {property.operaciones[0].tipo.toUpperCase()}
-                          </p>
-                          <p className="text-white text-nowrap">
-                            {property.operaciones[0].moneda}{" "}
-                            {formatPrice(property.operaciones[0].precio || 0)}
-                          </p>
-                        </div>
-                        <div className="bg-[#1a2e2f] rounded-md w-fit px-2 py-1 flex justify-center items-center gap-2">
-                          <p className="text-gray-300/80 text-nowrap text-base">
-                            {property.operaciones[1].tipo.toUpperCase()}
-                          </p>
-                          <p className="text-white text-nowrap">
-                            {property.operaciones[1].moneda}{" "}
-                            {formatPrice(property.operaciones[1].precio || 0)}
-                          </p>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex py-3">
-                        <div className="bg-[#1a2e2f] rounded-md w-fit px-2 py-1 flex justify-center items-center gap-2">
-                          <p className="text-gray-300/80 text-nowrap text-base">
-                            {property.operaciones[0].tipo.toUpperCase()}
-                          </p>
-                          <p className="text-white text-nowrap">
-                            {property.operaciones[0].moneda}{" "}
-                            {formatPrice(property.operaciones[0].precio || 0)}
-                          </p>
-                        </div>
-                      </div>
-                    )}
                   </div>
+
                   <div
                     className="flex items-center text-muted-foreground cursor-pointer hover:text-primary transition-colors"
                     onClick={() => setIsMapModalOpen(true)}

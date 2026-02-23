@@ -16,7 +16,8 @@ import {
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { savePropertyService } from "@/services/savePropertyService";
+import { useSavedProperties } from "@/hooks/useSavedProperties";
+import { useAuth } from "@/contexts/AuthContext";
 
 import { Avatar } from "@/components/shared/Avatar";
 
@@ -33,8 +34,19 @@ export function PropertyCard({
   isLoggedIn,
   onAuthRequired,
 }: PropertyCardProps) {
-  const [isSaved, setIsSaved] = useState(property.isLiked || false);
-  const [likesCount, setLikesCount] = useState(property.likes_count || 0);
+  const { user } = useAuth();
+  const {
+    isSaved,
+    toggleSave,
+    isLoading: isSavedLoading,
+  } = useSavedProperties();
+
+  // Use property.isLiked as initial state if loading, otherwise use the hook's state
+  const isPropertySaved = isSavedLoading
+    ? property.isLiked || false
+    : isSaved(property.id);
+
+  const [likesCount, setLikesCount] = useState(property.likes_count || 0); // Keep purely for potential UI count if needed later
   const [commentsCount, setCommentsCount] = useState(
     property.comentarios_count || 0,
   );
@@ -42,10 +54,9 @@ export function PropertyCard({
   const { toast } = useToast();
 
   useEffect(() => {
-    setIsSaved(property.isLiked || false);
     setLikesCount(property.likes_count || 0);
     setCommentsCount(property.comentarios_count || 0);
-  }, [property.likes_count, property.comentarios_count, property.isLiked]);
+  }, [property.likes_count, property.comentarios_count]);
 
   const checkIsLoggedIn = () => {
     if (isLoggedIn !== undefined) return isLoggedIn;
@@ -65,50 +76,31 @@ export function PropertyCard({
     setImageError(true);
   };
 
-  const handleSaveClick = async (e: React.MouseEvent) => {
+  const handleSaveClick = (e: React.MouseEvent) => {
     e.stopPropagation();
 
-    if (!checkIsLoggedIn()) {
+    if (!user) {
       if (onAuthRequired) {
         onAuthRequired();
+      } else {
+        toast({
+          title: "Inicia sesión",
+          description: "Debes iniciar sesión para guardar propiedades.",
+          variant: "destructive",
+        });
       }
       return;
     }
 
-    // Optimistic UI update
-    const previousState = isSaved;
-    const newState = !isSaved;
-    setIsSaved(newState);
-    setLikesCount((prev) => (newState ? prev + 1 : Math.max(0, prev - 1)));
+    // Optimistic UI update handled by the hook
+    const wasSaved = isPropertySaved;
+    const intendedState = !wasSaved;
 
-    // Call service to toggle save
-    try {
-      if (newState) {
-        await savePropertyService.saveProperty(property.id);
-        toast({
-          title: "Propiedad guardada",
-          description: "La propiedad se ha guardado en tu lista.",
-        });
-      } else {
-        await savePropertyService.removeProperty(property.id);
-        toast({
-          title: "Eliminado de guardados",
-          description: "La propiedad se ha eliminado de tu lista.",
-        });
-      }
-    } catch (error: any) {
-      // Revert on error
-      console.error("Error toggling save:", error);
-      setIsSaved(previousState);
-      setLikesCount((prev) =>
-        previousState ? prev + 1 : Math.max(0, prev - 1),
-      );
-      toast({
-        title: "Error",
-        description: error.message || "No se pudo actualizar guardados.",
-        variant: "destructive",
-      });
-    }
+    toggleSave({ id: property.id, intendedState });
+
+    // Update local likes count only for visual feedback if needed,
+    // relying on the hook is better but we kept this for immediate feedback
+    setLikesCount((prev) => (intendedState ? prev + 1 : Math.max(0, prev - 1)));
   };
 
   const handleShareClick = (e: React.MouseEvent) => {
@@ -154,10 +146,7 @@ export function PropertyCard({
   const rentaOp = operations.find((o) => o.tipo === "renta");
 
   return (
-    <Card
-      className="group cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg border-border bg-card animate-fade-in flex flex-col h-full min-h-[440px]"
-      onClick={() => onViewDetails(property)}
-    >
+    <Card className="group overflow-hidden transition-all duration-300 hover:shadow-lg border-border bg-card animate-fade-in flex flex-col h-full min-h-[440px]">
       <div className="relative h-56 flex-shrink-0 overflow-hidden bg-muted">
         {/* Status Badge */}
         <div className="absolute top-3 left-3 z-[1] flex gap-2">
@@ -175,25 +164,27 @@ export function PropertyCard({
         </div>
 
         {/* Action Buttons */}
-        <div className="absolute top-3 right-3 z-[1] flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        <div className="absolute top-3 right-3 z-[1] flex gap-2 transition-opacity duration-200">
           <Button
             size="icon"
             variant="secondary"
-            className={cn(
-              "h-8 w-8 rounded-full shadow-md backdrop-blur-sm hover:bg-white",
-              isSaved && "text-red-500 bg-white",
-            )}
-            onClick={handleSaveClick}
+            className="h-8 w-8 rounded-md shadow-md backdrop-blur-sm hover:bg-white"
+            onClick={handleShareClick}
           >
-            <Heart className={cn("h-4 w-4", isSaved && "fill-current")} />
+            <Share2 className="h-4 w-4" />
           </Button>
           <Button
             size="icon"
             variant="secondary"
-            className="h-8 w-8 rounded-full shadow-md backdrop-blur-sm hover:bg-white"
-            onClick={handleShareClick}
+            className={cn(
+              "h-8 w-8 rounded-md shadow-md backdrop-blur-sm hover:bg-white",
+              isPropertySaved && "text-red-500 bg-white",
+            )}
+            onClick={handleSaveClick}
           >
-            <Share2 className="h-4 w-4" />
+            <Heart
+              className={cn("h-4 w-4", isPropertySaved && "fill-current")}
+            />
           </Button>
         </div>
 
@@ -353,27 +344,16 @@ export function PropertyCard({
           </div>
         </div>
 
-        {/* Social Proof Footer */}
-        <div className="flex justify-between items-center pt-3 border-t border-border">
-          <div className="flex items-center gap-4 text-xs text-muted-foreground">
-            <div
-              className="flex items-center gap-1 cursor-pointer hover:text-red-500 transition-colors"
-              onClick={handleSaveClick}
-            >
-              <Heart className={cn("h-3.5 w-3.5")} />
-              <span className="font-medium">{likesCount}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <MessageCircle className="h-3.5 w-3.5" />
-              <span className="font-medium">{commentsCount}</span>
-            </div>
-          </div>
-          <Badge
+        {/* Button details */}
+
+        <div>
+          <Button
             variant="outline"
-            className="text-[9px] uppercase font-bold tracking-wider py-0 px-2 h-5 border-muted-foreground/30 bg-muted/20"
+            className="w-full bg-primary text-gray-100 hover:bg-primary/90 hover:text-gray-100"
+            onClick={() => onViewDetails(property)}
           >
-            {property.subtipo || property.tipo}
-          </Badge>
+            Ver detalles
+          </Button>
         </div>
       </CardContent>
     </Card>

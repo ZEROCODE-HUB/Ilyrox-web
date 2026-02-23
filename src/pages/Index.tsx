@@ -405,14 +405,8 @@ const Index = () => {
             >
               <div className="flex items-end">
                 <div className="flex flex-col items-center mr-0.5">
-                  <MapPin className="h-4 w-4 text-purple-600 -mb-0.5" />
-                  <span className="text-2xl font-bold text-purple-600 leading-none">
-                    i
-                  </span>
+                  <img src={logo360} alt="360" className="h-[60px] w-auto" />
                 </div>
-                <span className="text-2xl font-bold text-white tracking-tight leading-none">
-                  360
-                </span>
               </div>
             </Link>
 
