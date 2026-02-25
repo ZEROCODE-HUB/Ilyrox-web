@@ -37,10 +37,10 @@ export const ConfigModal = ({
               uri={profile.foto}
               name={profile.full_name || "Usuario"}
               size={100}
-              className="ring-4 ring-primary/10"
+              className="ring-4 ring-primary/10 cursor-default"
             />
             {profile.rol && (
-              <Badge className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-primary text-white border-none px-3 py-0.5 shadow-lg">
+              <Badge className="absolute cursor-default -bottom-2 left-1/2 -translate-x-1/2 bg-primary text-white border-none px-3 py-0.5 shadow-lg hover:translate-y-6 duration-150 transition-all ">
                 {profile.rol === "agente" ? "Agente Inmobiliario" : profile.rol}
               </Badge>
             )}
@@ -50,7 +50,7 @@ export const ConfigModal = ({
               {profile.full_name || "Usuario"}
             </h2>
             <p className="text-muted-foreground font-medium">
-              {profile.ocupacion || "Miembro de i360"}
+              {profile.ocupacion || "Miembro de ilyrox"}
             </p>
           </div>
         </div>
@@ -134,7 +134,7 @@ export const ConfigModal = ({
         {/* Nota de seguridad */}
         <div className="flex items-center gap-2 px-4 py-2 text-xs text-muted-foreground bg-muted/20 rounded-xl mx-2 italic">
           <Shield className="h-3 w-3" />
-          <span>Tus datos personales están protegidos por i360.</span>
+          <span>Tus datos personales están protegidos por ilyrox.</span>
         </div>
       </div>
     </Modal>

@@ -13,6 +13,7 @@ import TermsAndConditions from "./pages/TermsAndConditions";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import ProgramFamilies from "./pages/ProgramFamilies";
+import PropertyPage from "./pages/PropertyPage";
 import { sileo, Toaster as ToasterSileo } from "sileo";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,10 @@ const App = () => {
     {
       path: "/",
       element: <Index />,
+    },
+    {
+      path: "/property/:id",
+      element: <PropertyPage />,
     },
     {
       path: "/auth",
@@ -58,10 +63,10 @@ const App = () => {
       <AuthProvider>
         <NotificationProvider>
           <TooltipProvider>
-            <Toaster />
-            <Sonner />
             <ToasterSileo />
+            <Sonner />
             <RouterProvider router={router} />
+            <Toaster />
           </TooltipProvider>
         </NotificationProvider>
       </AuthProvider>

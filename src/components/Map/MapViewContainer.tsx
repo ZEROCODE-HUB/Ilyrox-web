@@ -6,6 +6,8 @@ import {
   Circle,
 } from "@react-google-maps/api";
 import { PropertyView } from "@/types/types";
+import { EyeOff, MapPin } from "lucide-react";
+import { Button } from "../ui/button";
 
 const containerStyle = {
   width: "100%",
@@ -25,6 +27,7 @@ interface MapViewContainerProps {
   hasFilters?: boolean;
   onPropertySelect?: (property: PropertyView) => void;
   selectedProperty?: PropertyView | null;
+  handleToggleMap: () => void;
 }
 
 const MapViewContainer: React.FC<MapViewContainerProps> = ({
@@ -34,6 +37,7 @@ const MapViewContainer: React.FC<MapViewContainerProps> = ({
   hasFilters = false,
   onPropertySelect,
   selectedProperty,
+  handleToggleMap,
 }) => {
   const { isLoaded, loadError } = useJsApiLoader({
     id: "google-map-script",
@@ -182,10 +186,28 @@ const MapViewContainer: React.FC<MapViewContainerProps> = ({
       </GoogleMap>
 
       {/* Overlay count */}
-      <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold shadow-md z-10 border border-gray-100 text-gray-800">
-        {hasFilters
-          ? `${properties.length} propiedades encontradas`
-          : "Aplica filtros para ver propiedades"}
+      <div className="absolute top-0 left-0 right-0 bg-white/90 backdrop-blur-sm px-4 py-4 text-sm font-semibold z-10 text-gray-800">
+        {properties ? (
+          <>
+            <p className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-primary" />
+              Mapa de Propiedades{" "}
+              <p className="rounded-full bg-gray-100 px-2">
+                {properties.length}
+              </p>
+            </p>
+          </>
+        ) : (
+          "Aplica filtros para ver propiedades"
+        )}
+        <Button
+          variant={"outline"}
+          size="icon"
+          className="absolute top-1 right-0 bg-white/90 backdrop-blur-sm px-4 py-4 text-sm font-semibold z-10 text-gray-800 border-none"
+          onClick={handleToggleMap}
+        >
+          <EyeOff className="w-4 h-4" />
+        </Button>
       </div>
     </div>
   );

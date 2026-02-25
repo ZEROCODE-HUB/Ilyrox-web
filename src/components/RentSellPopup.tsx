@@ -17,15 +17,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Home } from "lucide-react";
-import {
-  ESTADOS_MEXICO,
-  CIUDADES_POR_ESTADO,
-  COLONIAS_POR_MUNICIPIO,
-} from "@/constants/locations";
+
 import { propertyRequestService } from "@/services/propertyRequestService";
 import { solicitudes_propiedad } from "@/types/types";
 import { formatPriceInput, parseCurrency } from "@/utils/propertyUtils";
 import { sileo } from "sileo";
+import { MUNICIPIOS_ESTADO } from "@/constants/MexLocations/municipios";
+import { COLONIAS_POR_MUNICIPIO } from "@/constants/MexLocations/colonias";
+import { ESTADOS_MEXICO } from "@/constants/MexLocations/estados";
 
 interface RentSellPopupProps {
   isOpen: boolean;
@@ -55,7 +54,7 @@ export function RentSellPopup({ isOpen, onClose }: RentSellPopupProps) {
   // Update municipios when estado changes
   useEffect(() => {
     if (formData.estado) {
-      setAvailableMunicipios(CIUDADES_POR_ESTADO[formData.estado] || []);
+      setAvailableMunicipios(MUNICIPIOS_ESTADO[formData.estado] || []);
       setFormData((prev) => ({
         ...prev,
         municipio: "",

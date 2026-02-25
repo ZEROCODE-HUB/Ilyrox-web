@@ -99,6 +99,7 @@ const propertyTypes = [
 interface SimplifiedFiltersProps {
   onApplyFilters?: () => void;
   onCancel?: () => void;
+  setShowFilters?: (showFilters: boolean) => void;
 }
 
 // ──────────────────────────────────────────────
@@ -108,6 +109,7 @@ interface SimplifiedFiltersProps {
 export function SimplifiedFilters({
   onApplyFilters,
   onCancel,
+  setShowFilters,
 }: SimplifiedFiltersProps) {
   const { user } = useAuth();
   const { handleSaveSearch } = useSaveSearch(user?.id);
@@ -255,7 +257,8 @@ export function SimplifiedFilters({
           <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wide">
             Tipo de Operación
           </Label>
-          <div className="flex gap-2">
+
+          <div className="flex flex-wrap gap-2">
             {(
               [
                 { value: "todas", label: "Todas" },
@@ -284,8 +287,8 @@ export function SimplifiedFilters({
 
         {/* Rango de Precio */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <Label className="text-sm font-semibold text-foreground">
+          <div className="flex flex-wrap items-center justify-between">
+            <Label className="text-sm font-semibold text-foreground ">
               Rango de Precio
             </Label>
             <div className="flex rounded-lg border border-input overflow-hidden">
@@ -307,7 +310,10 @@ export function SimplifiedFilters({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-muted-foreground">
+              <Label
+                className="text-xs font-medium text-muted-foreground"
+                htmlFor="priceMin"
+              >
                 Mínimo ({currency})
               </Label>
               <Input
@@ -316,6 +322,7 @@ export function SimplifiedFilters({
                 value={priceMin ? formatCurrencyValue(priceMin) : ""}
                 onChange={(e) => handlePriceMinChange(e.target.value)}
                 className="h-11 bg-background"
+                maxLength={15}
               />
             </div>
             <div className="space-y-1.5">
@@ -328,6 +335,7 @@ export function SimplifiedFilters({
                 value={priceMax ? formatCurrencyValue(priceMax) : ""}
                 onChange={(e) => handlePriceMaxChange(e.target.value)}
                 className="h-11 bg-background"
+                maxLength={15}
               />
             </div>
           </div>
@@ -672,7 +680,7 @@ export function SimplifiedFilters({
         <div className="grid grid-cols-2 gap-4">
           <Button
             variant="outline"
-            onClick={onCancel}
+            onClick={() => setShowFilters?.(false)}
             className="h-12 bg-white shadow-sm font-semibold"
           >
             Cerrar

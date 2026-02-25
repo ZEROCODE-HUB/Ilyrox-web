@@ -25,7 +25,7 @@ export function MapControls({
   }, [radiusKm]);
 
   return (
-    <Card className="p-4 border-t-0 rounded-t-none mb-6">
+    <Card className="p-4 border-t-0 rounded-t-none">
       <div className="space-y-3">
         <Label className="text-sm font-medium flex items-center gap-2">
           <Radius

@@ -71,8 +71,11 @@ export function ZoneSearch() {
   if (!estadoMexico || allStateColonias.length === 0) return null;
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-2 py-1">
+    <div className="w-full max-w-4xl mx-auto space-y-2">
       <div className="flex flex-col animate-in fade-in slide-in-from-left-2 duration-300">
+        <p className="text-white/90 text-md font-bold pb-2">
+          Búsqueda por colonias
+        </p>
         <ScrollArea className="w-full whitespace-nowrap pb-3">
           <div className="flex gap-2 px-1">
             <Button

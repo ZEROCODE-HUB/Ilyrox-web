@@ -270,40 +270,55 @@ export function PropertyComments({
   const handleAddComment = async () => {
     if (!newComment.trim() || !feedItemId) return;
 
-    try {
+    const promise = async () => {
       await propertyService.addComment(feedItemId, newComment);
       setNewComment("");
-      loadComments();
-      sileo.success({
+      await loadComments();
+    };
+
+    sileo.promise(promise(), {
+      loading: {
+        title: "Enviando comentario...",
+        position: "top-right",
+      },
+      success: {
         title: "Comentario agregado",
         position: "top-right",
-      });
-    } catch (error: any) {
-      sileo.error({
+      },
+      error: (error: any) => ({
         title: "Error",
         description: error.message,
         position: "top-right",
-      });
-    }
+      }),
+    });
   };
 
   const handleAddReply = async (parentId: string) => {
     if (!replyContent.trim() || !feedItemId) return;
 
-    try {
+    const promise = async () => {
       await propertyService.addComment(feedItemId, replyContent, parentId);
       setReplyContent("");
       setReplyingTo(null);
-      loadComments();
+      await loadComments();
       setExpandedReplies((prev) => new Set(prev).add(parentId));
-      sileo.success({ title: "Respuesta agregada", position: "top-right" });
-    } catch (error: any) {
-      sileo.error({
+    };
+
+    sileo.promise(promise(), {
+      loading: {
+        title: "Enviando respuesta...",
+        position: "top-right",
+      },
+      success: {
+        title: "Respuesta agregada",
+        position: "top-right",
+      },
+      error: (error: any) => ({
         title: "Error",
         description: error.message,
         position: "top-right",
-      });
-    }
+      }),
+    });
   };
 
   const handleLike = async (
