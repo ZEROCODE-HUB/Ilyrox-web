@@ -1,47 +1,44 @@
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Bookmark, Home } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { PropertyView } from "@/types/types";
 import { PropertyCard } from "@/components/PropertyCard";
-import { PropertyDetail } from "@/components/PropertyDetail";
+import { PropertyDetail } from "@/components/PropertyDetails/PropertyDetail";
 import { savePropertyService } from "@/services/savePropertyService";
-import { useToast } from "@/hooks/use-toast";
-import Skeleton from "react-loading-skeleton";
-import { UserProfile } from "@/components/UserProfile";
+import { UserProfile } from "@/components/Header/UserProfile";
 import { useAuth } from "@/contexts/AuthContext";
 import { SkeletonCard } from "@/components/shared/SkeletonCard";
+import { sileo } from "sileo";
 
 const SavedProperties = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const { user } = useAuth();
 
-  const [savedProperties, setSavedProperties] = useState<PropertyView[]>([]);
+  const {
+    data: savedProperties = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["savedProperties", user?.id],
+    queryFn: () => savePropertyService.getSavedProperties(),
+    enabled: !!user,
+  });
+
+  useEffect(() => {
+    if (isError) {
+      sileo.error({
+        title: "Error",
+        description: "No se pudieron cargar las propiedades guardadas",
+        position: "top-right",
+      });
+    }
+  }, [isError]);
+
   const [selectedProperty, setSelectedProperty] = useState<PropertyView | null>(
     null,
   );
-  const [isLoading, setIsLoading] = useState(true);
-
-  const fetchSavedProperties = async () => {
-    setIsLoading(true);
-    try {
-      const data = await savePropertyService.getSavedProperties();
-      setSavedProperties(data);
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: "No se pudieron cargar las propiedades guardadas",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchSavedProperties();
-  }, []);
 
   const handleViewDetails = (property: PropertyView) => {
     setSelectedProperty(property);

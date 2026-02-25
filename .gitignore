@@ -27,3 +27,4 @@ dist-ssr
 View_propiedades_busqueda.sql
 
 .prettierignore
+.agents

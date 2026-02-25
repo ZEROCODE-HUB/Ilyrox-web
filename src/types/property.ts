@@ -1,41 +1,67 @@
-export interface Property {
+export type Property = {
   id: string;
+  code?: string;
   title: string;
-  description: string;
-  operationType: "venta" | "renta";
-  type: "Habitacional" | "Comercial" | "Industrial" | "Otros";
-  subtype: "Casa" | "Departamento" | "Terreno";
+  description?: string;
+  createdAt?: string;
   price: number;
+  currency: "USD" | "MXN";
   location: {
     address: string;
-    city: string;
+    country: string;
     state: string;
-    lat: number;
-    lng: number;
+    city: string;
+    municipio?: string;
+    colony: string;
+    zip?: string;
   };
-  area: number; // metros cuadrados
-  bedrooms: number;
-  bathrooms: number;
-  parking: number;
-  furnished: boolean;
-  petFriendly: boolean;
-  age: number; // años
-  amenities: string[];
-  financing: string[];
-  lien: boolean; // gravamen
+  coordinates?: { lat: number; lng: number };
   images: string[];
-  videos?: string[];
-  advisor: Advisor;
-  distance?: number; // distancia del usuario en km
-  featured?: boolean;
+  features: {
+    beds: number;
+    baths: number;
+    halfBaths?: number;
+    parking?: number;
+    floors?: number;
+    floorLevel?: number;
+    constructionSqft: number;
+    landSqft: number;
+    yearBuilt?: number;
+    maintenanceFee?: number;
+  };
+  amenities: string[];
+  type: PropertyType;
+  subtype: string;
+  operation: "Sale" | "Rent";
+  status: "Publicada" | "Suspendida" | "Rentada" | "Reservada" | "Vendida";
+  commission?: CommissionDetails;
+  legal?: LegalDetails;
+  longitud?: string;
+  latitud?: string;
+  municipio?: string;
+  ciudad?: string;
+  subtipo?: string;
+  codigo_propiedad?: string;
+  nombre_propietario?: string;
+  email_propietario?: string;
+};
 
-  // Feed Item Data
-  feedItemId?: string;
-  likesCount?: number;
-  commentsCount?: number;
-  isLiked?: boolean; // Usuario actual dio like
-  currency?: string;
-}
+export type PropertyType =
+  | "habitacional"
+  | "comercial"
+  | "industrial"
+  | "agricola";
+
+export type CommissionDetails = {
+  shared: boolean;
+  percentage?: number;
+  condition?: string;
+};
+
+export type LegalDetails = {
+  hasEncumbrance: boolean;
+  institution?: string;
+};
 
 export interface Advisor {
   id: string;
@@ -80,6 +106,7 @@ export interface PropertyFilters {
   state?: string;
   municipality?: string;
   colony?: string;
+  colonias?: string[];
   currency?: "MXN" | "USD";
 }
 

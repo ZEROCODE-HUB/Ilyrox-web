@@ -14,6 +14,12 @@ interface AuthContextType {
   profile: {
     full_name?: string;
     foto?: string;
+    email?: string;
+    celular?: string;
+    ocupacion?: string;
+    biografia?: string;
+    sitio_web?: string;
+    rol?: string;
   } | null;
   isLoading: boolean;
   signOut: () => Promise<void>;
@@ -26,6 +32,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<{
     full_name?: string;
     foto?: string;
+    email?: string;
+    celular?: string;
+    ocupacion?: string;
+    biografia?: string;
+    sitio_web?: string;
+    rol?: string;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -33,7 +45,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const { data, error } = await supabase
         .from("perfiles")
-        .select("nombre_completo, foto")
+        .select(
+          "nombre_completo, foto, email, celular, ocupacion, biografia, sitio_web, rol",
+        )
         .eq("id", userId)
         .single();
 
@@ -71,6 +85,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setProfile({
               full_name: dbProfile.nombre_completo,
               foto: dbProfile.foto,
+              email: dbProfile.email,
+              celular: dbProfile.celular,
+              ocupacion: dbProfile.ocupacion,
+              biografia: dbProfile.biografia,
+              sitio_web: dbProfile.sitio_web,
+              rol: dbProfile.rol,
             });
           }
         });

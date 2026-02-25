@@ -17,7 +17,10 @@ export const savePropertyService = {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error("Error saving property:", error);
+      throw error;
+    }
     return data;
   },
 
@@ -34,7 +37,10 @@ export const savePropertyService = {
       .eq("propiedad_id", propiedadId)
       .eq("usuario_id", user.id);
 
-    if (error) throw error;
+    if (error) {
+      console.error("Error removing property:", error);
+      throw error;
+    }
   },
 
   async isPropertySaved(propiedadId: string) {
@@ -90,5 +96,24 @@ export const savePropertyService = {
       ...p,
       isLiked: true,
     }));
+  },
+
+  async getSavedPropertyIds(): Promise<string[]> {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return [];
+
+    const { data, error } = await supabase
+      .from("propiedades_guardadas")
+      .select("propiedad_id")
+      .eq("usuario_id", user.id);
+
+    if (error) {
+      console.error("Error fetching saved property IDs:", error);
+      return [];
+    }
+
+    return data.map((item) => item.propiedad_id);
   },
 };

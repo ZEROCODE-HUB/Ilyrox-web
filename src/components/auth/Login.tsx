@@ -10,15 +10,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { Eye, EyeOff } from "lucide-react";
+import { sileo } from "sileo";
 
 export const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -36,16 +35,17 @@ export const Login = () => {
 
       if (error) throw error;
 
-      toast({
+      sileo.success({
         title: "¡Bienvenido de vuelta!",
         description: "Has iniciado sesión correctamente.",
+        position: "top-center",
       });
       navigate("/");
     } catch (error: any) {
-      toast({
+      sileo.error({
         title: "Error al iniciar sesión",
         description: error.message || "Por favor verifica tus credenciales.",
-        variant: "destructive",
+        position: "top-center",
       });
     } finally {
       setIsLoading(false);
@@ -80,10 +80,11 @@ export const Login = () => {
                 type="button"
                 className="text-sm text-primary hover:underline"
                 onClick={() =>
-                  toast({
+                  sileo.info({
                     title: "Próximamente",
                     description:
                       "La recuperación de contraseña estará disponible pronto.",
+                    position: "top-center",
                   })
                 }
               >

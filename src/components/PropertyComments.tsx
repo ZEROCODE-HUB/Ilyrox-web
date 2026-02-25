@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar } from "@/components/shared/Avatar";
-import { useToast } from "@/hooks/use-toast";
 import {
   Heart,
   MessageCircle,
@@ -12,6 +11,7 @@ import {
 } from "lucide-react";
 import { propertyService } from "@/services/propertyService";
 import { supabase } from "@/lib/supabase";
+import { sileo } from "sileo";
 
 interface Comment {
   id: string;
@@ -209,7 +209,6 @@ export function PropertyComments({
   const [expandedReplies, setExpandedReplies] = useState<Set<string>>(
     new Set(),
   );
-  const { toast } = useToast();
 
   const loadComments = useCallback(async () => {
     if (!feedItemId) return;
@@ -271,37 +270,55 @@ export function PropertyComments({
   const handleAddComment = async () => {
     if (!newComment.trim() || !feedItemId) return;
 
-    try {
+    const promise = async () => {
       await propertyService.addComment(feedItemId, newComment);
       setNewComment("");
-      loadComments();
-      toast({ title: "Comentario agregado" });
-    } catch (error: any) {
-      toast({
+      await loadComments();
+    };
+
+    sileo.promise(promise(), {
+      loading: {
+        title: "Enviando comentario...",
+        position: "top-right",
+      },
+      success: {
+        title: "Comentario agregado",
+        position: "top-right",
+      },
+      error: (error: any) => ({
         title: "Error",
         description: error.message,
-        variant: "destructive",
-      });
-    }
+        position: "top-right",
+      }),
+    });
   };
 
   const handleAddReply = async (parentId: string) => {
     if (!replyContent.trim() || !feedItemId) return;
 
-    try {
+    const promise = async () => {
       await propertyService.addComment(feedItemId, replyContent, parentId);
       setReplyContent("");
       setReplyingTo(null);
-      loadComments();
+      await loadComments();
       setExpandedReplies((prev) => new Set(prev).add(parentId));
-      toast({ title: "Respuesta agregada" });
-    } catch (error: any) {
-      toast({
+    };
+
+    sileo.promise(promise(), {
+      loading: {
+        title: "Enviando respuesta...",
+        position: "top-right",
+      },
+      success: {
+        title: "Respuesta agregada",
+        position: "top-right",
+      },
+      error: (error: any) => ({
         title: "Error",
         description: error.message,
-        variant: "destructive",
-      });
-    }
+        position: "top-right",
+      }),
+    });
   };
 
   const handleLike = async (
@@ -313,10 +330,10 @@ export function PropertyComments({
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) {
-      toast({
+      sileo.error({
         title: "Inicia sesión",
         description: "Debes estar logueado para dar like",
-        variant: "destructive",
+        position: "top-right",
       });
       return;
     }

@@ -33,7 +33,7 @@ export const Footer = () => {
               Tu aliado confiable para encontrar la propiedad de tus sueños con
               las mejores opciones de financiamiento.
             </p>
-            <div className="flex gap-3">
+            {/* <div className="flex gap-3">
               <a
                 href="#"
                 className="p-2 rounded-full hover:bg-primary/10 transition-colors"
@@ -58,7 +58,7 @@ export const Footer = () => {
               >
                 <Linkedin className="h-4 w-4 text-muted-foreground hover:text-primary" />
               </a>
-            </div>
+            </div> */}
           </div>
 
           {/* Servicios */}
@@ -81,22 +81,6 @@ export const Footer = () => {
                   Calculadora hipotecaria
                 </Link>
               </li>
-              <li>
-                <Link
-                  to="/search"
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                >
-                  Financiamiento
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/search"
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                >
-                  Asesoría personalizada
-                </Link>
-              </li>
             </ul>
           </div>
 
@@ -112,22 +96,14 @@ export const Footer = () => {
                   Acerca de nosotros
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   to="/search"
                   className="text-sm text-muted-foreground hover:text-primary transition-colors"
                 >
                   Cómo funciona
                 </Link>
-              </li>
-              <li>
-                <Link
-                  to="/search"
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                >
-                  Blog
-                </Link>
-              </li>
+              </li> */}
               <li>
                 <Link
                   to="/search"
@@ -145,7 +121,7 @@ export const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-start gap-2 text-sm text-muted-foreground">
                 <Mail className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                <span>contacto@ilyrox.com</span>
+                <span>ayuda@ilyrox.com</span>
               </li>
               <li className="flex items-start gap-2 text-sm text-muted-foreground">
                 <Phone className="h-4 w-4 mt-0.5 flex-shrink-0" />

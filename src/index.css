@@ -38,17 +38,21 @@ All colors MUST be HSL.
 
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
-    
+
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
-    
+
     --info: 217 91% 60%;
     --info-foreground: 0 0% 100%;
 
     --navbar: 185 39% 59%;
     --navbar-foreground: 0 0% 100%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.8));
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(var(--primary)),
+      hsl(var(--primary) / 0.8)
+    );
     --shadow-elegant: 0 4px 20px -2px hsl(var(--primary) / 0.15);
 
     --radius: 0.5rem;
@@ -161,4 +165,11 @@ All colors MUST be HSL.
 * {
   scrollbar-width: thin;
   scrollbar-color: hsl(var(--muted-foreground) / 0.2) transparent;
+}
+
+/* Ensure Sileo notifications are on top of modals */
+.sileo-toaster,
+.sileo-toast-container,
+[class*="sileo"] {
+  z-index: 40000 !important;
 }

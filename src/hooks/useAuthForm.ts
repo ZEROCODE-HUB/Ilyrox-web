@@ -6,7 +6,7 @@
 import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { uploadImage } from "@/services/uploadService";
-import { useToast } from "@/hooks/use-toast";
+import { sileo } from "sileo";
 
 export interface AuthFormState {
   email: string;
@@ -33,7 +33,6 @@ const initialFormState: AuthFormState = {
 export function useAuthForm() {
   const [formState, setFormState] = useState<AuthFormState>(initialFormState);
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
 
   const updateField = useCallback(
     <K extends keyof AuthFormState>(field: K, value: AuthFormState[K]) => {
@@ -48,10 +47,10 @@ export function useAuthForm() {
 
   const handleAvatarSelect = (file: File) => {
     if (!file.type.startsWith("image/")) {
-      toast({
+      sileo.error({
         title: "Archivo no válido",
         description: "Por favor selecciona una imagen (JPG, PNG).",
-        variant: "destructive",
+        position: "top-center",
       });
       return;
     }
@@ -76,15 +75,15 @@ export function useAuthForm() {
 
   const validateLogin = useCallback(() => {
     if (!formState.email || !formState.password) {
-      toast({
+      sileo.error({
         title: "Error",
         description: "Por favor ingresa email y contraseña",
-        variant: "destructive",
+        position: "top-center",
       });
       return false;
     }
     return true;
-  }, [formState, toast]);
+  }, [formState]);
 
   const validateRegister = useCallback(() => {
     if (
@@ -94,39 +93,39 @@ export function useAuthForm() {
       !formState.email ||
       !formState.password
     ) {
-      toast({
+      sileo.error({
         title: "Error",
         description: "Por favor completa todos los campos obligatorios",
-        variant: "destructive",
+        position: "top-center",
       });
       return false;
     }
     if (!formState.email.includes("@")) {
-      toast({
+      sileo.error({
         title: "Error",
         description: "Email inválido",
-        variant: "destructive",
+        position: "top-center",
       });
       return false;
     }
     if (formState.password.length < 6) {
-      toast({
+      sileo.error({
         title: "Error",
         description: "La contraseña debe tener al menos 6 caracteres",
-        variant: "destructive",
+        position: "top-center",
       });
       return false;
     }
     if (formState.password !== formState.confirmPassword) {
-      toast({
+      sileo.error({
         title: "Error",
         description: "Las contraseñas no coinciden",
-        variant: "destructive",
+        position: "top-center",
       });
       return false;
     }
     return true;
-  }, [formState, toast]);
+  }, [formState]);
 
   const handleLogin = useCallback(async (): Promise<boolean> => {
     if (!validateLogin()) return false;
@@ -141,16 +140,16 @@ export function useAuthForm() {
       if (error) throw error;
       return true;
     } catch (error: any) {
-      toast({
+      sileo.error({
         title: "Error al iniciar sesión",
         description: error.message || "Credenciales incorrectas",
-        variant: "destructive",
+        position: "top-center",
       });
       return false;
     } finally {
       setLoading(false);
     }
-  }, [formState, validateLogin, toast]);
+  }, [formState, validateLogin]);
 
   const handleRegister = useCallback(async (): Promise<boolean> => {
     if (!validateRegister()) return false;
@@ -174,11 +173,11 @@ export function useAuthForm() {
           finalAvatarUrl = await uploadImage(formState.avatarFile, "perfiles");
         } catch (error) {
           console.error("Avatar upload failed:", error);
-          toast({
+          sileo.error({
             title: "Advertencia",
             description:
               "No se pudo subir la foto de perfil, pero se continuará con el registro.",
-            variant: "destructive", // Using destructive to catch attention, or we could use default
+            position: "top-center",
           });
           // Continue without avatar
         }
@@ -206,25 +205,25 @@ export function useAuthForm() {
 
       if (profileError) {
         console.error("Profile creation error:", profileError);
-        toast({
+        sileo.error({
           title: "Advertencia",
           description: "Usuario creado, pero hubo un error al crear el perfil.",
-          variant: "destructive",
+          position: "top-center",
         });
       }
 
       return true;
     } catch (error: any) {
-      toast({
+      sileo.error({
         title: "Error",
         description: error.message || "Ocurrió un error al registrarse",
-        variant: "destructive",
+        position: "top-center",
       });
       return false;
     } finally {
       setLoading(false);
     }
-  }, [formState, validateRegister, toast]);
+  }, [formState, validateRegister]);
 
   return {
     formState,

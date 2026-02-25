@@ -1,9 +1,8 @@
-import { useState, useEffect } from "react";
-import { PropertyFilters as FilterType } from "@/types/property";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Home, Building2, Factory, FolderOpen } from "lucide-react";
+import { Home, Building2, Factory, Save, Sprout } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -11,24 +10,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { MUNICIPIOS_ESTADO } from "@/constants/MexLocations/municipios";
+import { COLONIAS_POR_MUNICIPIO } from "@/constants/MexLocations/colonias";
+import { useSaveSearch } from "@/hooks/useSaveSearch";
+import { useAuth } from "@/contexts/AuthContext";
+import { sileo } from "sileo";
+import { cn } from "@/lib/utils";
+
 import {
-  ESTADOS_MEXICO,
-  CIUDADES_POR_ESTADO,
-  MUNICIPIOS_POR_CIUDAD,
-  COLONIAS_POR_MUNICIPIO,
-} from "@/constants/locations";
+  useFilterStore,
+  useEstadoMexico,
+  useColonias,
+  usePriceRange,
+  useOperationType,
+  usePropertyType,
+  useFeatures,
+  useAreaFilters,
+} from "@/stores/useFilterStore";
 
-interface SimplifiedFiltersProps {
-  filters: FilterType;
-  onFiltersChange: (filters: FilterType) => void;
-  onClearFilters: () => void;
-  onApplyFilters?: () => void;
-  onCancel?: () => void;
-}
+// ──────────────────────────────────────────────
+// Static data
+// ──────────────────────────────────────────────
 
-// Subtipos por tipo de propiedad (Matching constants/propertyData structure roughly)
 const subtiposPorTipo: Record<string, { value: string; label: string }[]> = {
-  Habitacional: [
+  habitacional: [
     { value: "Casa (Fracc. Abierto)", label: "Casa (Fracc. Abierto)" },
     { value: "Casa en Condominio", label: "Casa en Condominio" },
     { value: "Casa de campo/Descanso", label: "Casa de Campo/Descanso" },
@@ -38,7 +43,7 @@ const subtiposPorTipo: Record<string, { value: string; label: string }[]> = {
     { value: "Terreno", label: "Terreno" },
     { value: "Villa", label: "Villa" },
   ],
-  Comercial: [
+  comercial: [
     { value: "Bodega Comercial", label: "Bodega Comercial" },
     {
       value: "Casa con uso de suelo comercial",
@@ -51,12 +56,12 @@ const subtiposPorTipo: Record<string, { value: string; label: string }[]> = {
     { value: "Oficina", label: "Oficina" },
     { value: "Terreno Comercial", label: "Terreno Comercial" },
   ],
-  Industrial: [
+  industrial: [
     { value: "Bodega Industrial", label: "Bodega Industrial" },
     { value: "Nave Industrial", label: "Nave Industrial" },
     { value: "Terreno Industrial", label: "Terreno Industrial" },
   ],
-  Agricola: [
+  agricola: [
     { value: "Rancho agrícola", label: "Rancho" },
     { value: "Terreno Agrícola", label: "Terreno Agrícola" },
     { value: "Granja", label: "Granja" },
@@ -64,141 +69,184 @@ const subtiposPorTipo: Record<string, { value: string; label: string }[]> = {
   ],
 };
 
+const propertyTypes = [
+  {
+    value: "habitacional",
+    label: "Habitacional",
+    icon: <Home className="w-5 h-5" />,
+  },
+  {
+    value: "comercial",
+    label: "Comercial",
+    icon: <Building2 className="w-5 h-5" />,
+  },
+  {
+    value: "industrial",
+    label: "Industrial",
+    icon: <Factory className="w-5 h-5" />,
+  },
+  {
+    value: "agricola",
+    label: "Agrícola",
+    icon: <Sprout className="w-5 h-5" />,
+  },
+];
+
+// ──────────────────────────────────────────────
+// Props (kept minimal for backward compatibility)
+// ──────────────────────────────────────────────
+
+interface SimplifiedFiltersProps {
+  onApplyFilters?: () => void;
+  onCancel?: () => void;
+  setShowFilters?: (showFilters: boolean) => void;
+}
+
+// ──────────────────────────────────────────────
+// Component
+// ──────────────────────────────────────────────
+
 export function SimplifiedFilters({
-  filters,
-  onFiltersChange,
-  onClearFilters,
   onApplyFilters,
   onCancel,
+  setShowFilters,
 }: SimplifiedFiltersProps) {
-  // Local state for UI responsiveness, can sync with props if needed
-  // Using props directly for controlled component behavior is better if parent manages state well.
-  // But let's use local state for complex forms to avoid stutter if updates are slow,
-  // though here updates are likely fast. Let's sync with filters prop.
+  const { user } = useAuth();
+  const { handleSaveSearch } = useSaveSearch(user?.id);
 
-  const [selectedEstado, setSelectedEstado] = useState<string>(
-    filters.state || "",
-  );
-  const [selectedCiudad, setSelectedCiudad] = useState<string>(""); // Not in filters explicitly but needed for hierarchy
-  const [selectedMunicipio, setSelectedMunicipio] = useState<string>(
-    filters.municipality || "",
-  );
-  const [selectedColonia, setSelectedColonia] = useState<string>(
-    filters.colony || "",
-  );
+  // ── Granular store selectors ────────────────
+  const estadoMexico = useEstadoMexico();
+  const colonias = useColonias();
+  const { priceMin, priceMax, currency } = usePriceRange();
+  const operationType = useOperationType();
+  const { type, subtype } = usePropertyType();
+  const { bedrooms, bathrooms, parking, levels } = useFeatures();
+  const { landAreaMin, constructionAreaMin } = useAreaFilters();
 
-  const [priceMin, setPriceMin] = useState<string>(
-    filters.priceMin?.toString() || "",
-  );
-  const [priceMax, setPriceMax] = useState<string>(
-    filters.priceMax?.toString() || "",
-  );
+  // ── Store actions (stable references) ───────
+  const {
+    setEstadoMexico,
+    setPriceMin,
+    setPriceMax,
+    setCurrency,
+    setOperationType,
+    setType,
+    setSubtype,
+    setBedrooms,
+    setBathrooms,
+    setParking,
+    setLevels,
+    setLandAreaMin,
+    setConstructionAreaMin,
+    resetFilters,
+  } = useFilterStore();
 
-  const [operationType, setOperationType] = useState<
-    "todas" | "venta" | "renta"
-  >(filters.operationType || "todas");
+  // ── Local UI state ──────────────────────────
+  const [coloniaSearch, setColoniaSearch] = useState("");
 
-  const [currency, setCurrency] = useState<"MXN" | "USD">("MXN");
+  // ── Derived data ────────────────────────────
+  const availableColonias = useMemo(() => {
+    if (!estadoMexico) return [];
+    const municipios = MUNICIPIOS_ESTADO[estadoMexico] || [];
+    const allCols: string[] = [];
+    municipios.forEach((muni) => {
+      const cols = COLONIAS_POR_MUNICIPIO[muni] || [];
+      allCols.push(...cols);
+    });
+    return Array.from(new Set(allCols)).sort();
+  }, [estadoMexico]);
 
-  // Update logic
-  // Helper to update parent filters
-  const updateFilters = (newFilters: Partial<FilterType>) => {
-    onFiltersChange({ ...filters, ...newFilters });
+  const filteredColonias = useMemo(() => {
+    if (!coloniaSearch) return availableColonias;
+    return availableColonias.filter((c) =>
+      c.toLowerCase().includes(coloniaSearch.toLowerCase()),
+    );
+  }, [availableColonias, coloniaSearch]);
+
+  const subtiposDisponibles = type ? subtiposPorTipo[type] || [] : [];
+  const hasPropertyTypeSelected = !!type;
+
+  // ── Handlers ────────────────────────────────
+  const handleEstadoChange = (estado: string) => {
+    setEstadoMexico(estado);
+    setColoniaSearch("");
   };
-
-  // Sync state with props when props change (e.g. Cleared externally)
-  useEffect(() => {
-    setSelectedEstado(filters.state || "");
-    setSelectedMunicipio(filters.municipality || "");
-    setSelectedColonia(filters.colony || "");
-    setPriceMin(filters.priceMin?.toString() || "");
-    setPriceMax(filters.priceMax?.toString() || "");
-    setOperationType(filters.operationType || "todas");
-    setCurrency(filters.currency || "MXN");
-  }, [filters]);
 
   const handlePriceMinChange = (value: string) => {
     const numericValue = value.replace(/[^0-9]/g, "");
-    setPriceMin(numericValue);
-    updateFilters({
-      priceMin: numericValue ? parseInt(numericValue) : undefined,
-    });
+    setPriceMin(numericValue ? parseInt(numericValue) : undefined);
   };
 
   const handlePriceMaxChange = (value: string) => {
     const numericValue = value.replace(/[^0-9]/g, "");
-    setPriceMax(numericValue);
-    updateFilters({
-      priceMax: numericValue ? parseInt(numericValue) : undefined,
-    });
+    setPriceMax(numericValue ? parseInt(numericValue) : undefined);
   };
 
   const handleCurrencyChange = (newCurrency: "MXN" | "USD") => {
     setCurrency(newCurrency);
-    updateFilters({ currency: newCurrency });
   };
 
-  const formatCurrency = (value: string) => {
+  const formatCurrencyValue = (value: number | undefined) => {
     if (!value) return "";
-    const num = parseInt(value);
     return new Intl.NumberFormat("es-MX", {
       style: "currency",
-      currency: currency,
+      currency,
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(num);
+    }).format(value);
   };
 
-  // Hierarchy Data
-  const ciudadesDisponibles = selectedEstado
-    ? CIUDADES_POR_ESTADO[selectedEstado] || []
-    : [];
-  const municipiosDisponibles = selectedCiudad
-    ? MUNICIPIOS_POR_CIUDAD[selectedCiudad] || []
-    : [];
-  const coloniasDisponibles = selectedMunicipio
-    ? COLONIAS_POR_MUNICIPIO[selectedMunicipio] || []
-    : [];
+  const handleClearAll = () => {
+    resetFilters();
+    setColoniaSearch("");
+  };
 
-  const propertyTypes = [
-    {
-      value: "habitacional",
-      label: "Habitacional",
-      icon: <Home className="w-5 h-5" />,
-    },
-    {
-      value: "comercial",
-      label: "Comercial",
-      icon: <Building2 className="w-5 h-5" />,
-    },
-    {
-      value: "industrial",
-      label: "Industrial",
-      icon: <Factory className="w-5 h-5" />,
-    },
-    {
-      value: "agricola",
-      label: "Agrícola",
-      icon: <FolderOpen className="w-5 h-5" />,
-    },
-  ];
+  const onSaveClick = async () => {
+    if (!user) {
+      sileo.error({ title: "Debes iniciar sesión para guardar tu búsqueda" });
+      return;
+    }
 
-  const subtiposDisponibles = filters.type
-    ? subtiposPorTipo[filters.type] || []
-    : [];
+    const success = await handleSaveSearch(
+      {
+        operacion: operationType,
+        tipoPropiedad: type,
+        subtipo: subtype,
+        precioMin: priceMin,
+        precioMax: priceMax,
+        moneda: currency,
+        habitaciones: bedrooms,
+        banos: bathrooms,
+        estacionamientos: parking,
+        niveles: levels,
+        m2TerrenoMin: landAreaMin,
+        m2ConstruccionMin: constructionAreaMin,
+        locationFilter: {
+          estado: estadoMexico,
+          municipio: "",
+          colonias: colonias,
+        },
+      },
+      () => {},
+    );
 
-  const hasPropertyTypeSelected = !!filters.type;
-
+    if (success) {
+      sileo.success({ title: "Búsqueda guardada con éxito" });
+    }
+  };
+  // ── Render ──────────────────────────────────
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-background">
       {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto space-y-6 px-5 py-5 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto space-y-7 px-5 py-5 custom-scrollbar">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-border">
-          <h3 className="font-bold text-lg text-foreground">Filtros</h3>
+          <h3 className="font-bold text-lg text-foreground">
+            Filtros Avanzados
+          </h3>
           <button
-            onClick={onClearFilters}
-            className="text-sm font-medium text-info hover:text-info/80 hover:underline transition-colors"
+            onClick={handleClearAll}
+            className="text-sm font-medium text-primary hover:underline transition-colors"
           >
             Limpiar todo
           </button>
@@ -206,28 +254,27 @@ export function SimplifiedFilters({
 
         {/* Tipo de Operación */}
         <div className="space-y-3">
-          <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+          <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wide">
             Tipo de Operación
           </Label>
-          <div className="flex gap-2">
-            {[
-              { value: "todas", label: "Todas" },
-              { value: "venta", label: "Venta" },
-              { value: "renta", label: "Renta" },
-            ].map((option) => {
+
+          <div className="flex flex-wrap gap-2">
+            {(
+              [
+                { value: "todas", label: "Todas" },
+                { value: "venta", label: "Venta" },
+                { value: "renta", label: "Renta" },
+              ] as const
+            ).map((option) => {
               const isSelected = operationType === option.value;
               return (
                 <button
                   key={option.value}
                   type="button"
-                  onClick={() => {
-                    const val = option.value as "todas" | "venta" | "renta";
-                    setOperationType(val);
-                    updateFilters({ operationType: val });
-                  }}
+                  onClick={() => setOperationType(option.value)}
                   className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
                     isSelected
-                      ? "border-2 border-primary text-foreground bg-background"
+                      ? "border-2 border-primary text-foreground bg-primary/5"
                       : "border border-input text-muted-foreground bg-background hover:border-primary/50"
                   }`}
                 >
@@ -240,46 +287,42 @@ export function SimplifiedFilters({
 
         {/* Rango de Precio */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <Label className="text-sm font-semibold text-foreground">
+          <div className="flex flex-wrap items-center justify-between">
+            <Label className="text-sm font-semibold text-foreground ">
               Rango de Precio
             </Label>
             <div className="flex rounded-lg border border-input overflow-hidden">
-              <button
-                type="button"
-                onClick={() => handleCurrencyChange("MXN")}
-                className={`px-3 py-1 text-xs font-medium transition-all ${
-                  currency === "MXN"
-                    ? "bg-primary/10 text-primary border-r border-input"
-                    : "bg-background text-muted-foreground hover:bg-muted border-r border-input"
-                }`}
-              >
-                MXN
-              </button>
-              <button
-                type="button"
-                onClick={() => handleCurrencyChange("USD")}
-                className={`px-3 py-1 text-xs font-medium transition-all ${
-                  currency === "USD"
-                    ? "bg-primary/10 text-primary"
-                    : "bg-background text-muted-foreground hover:bg-muted"
-                }`}
-              >
-                USD
-              </button>
+              {(["MXN", "USD"] as const).map((curr) => (
+                <button
+                  key={curr}
+                  type="button"
+                  onClick={() => handleCurrencyChange(curr)}
+                  className={`px-3 py-1 text-xs font-medium transition-all ${
+                    currency === curr
+                      ? "bg-primary/10 text-primary"
+                      : "bg-background text-muted-foreground hover:bg-muted"
+                  } ${curr === "MXN" ? "border-r border-input" : ""}`}
+                >
+                  {curr}
+                </button>
+              ))}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-muted-foreground">
+              <Label
+                className="text-xs font-medium text-muted-foreground"
+                htmlFor="priceMin"
+              >
                 Mínimo ({currency})
               </Label>
               <Input
                 type="text"
                 placeholder="0"
-                value={priceMin ? formatCurrency(priceMin) : ""}
+                value={priceMin ? formatCurrencyValue(priceMin) : ""}
                 onChange={(e) => handlePriceMinChange(e.target.value)}
-                className="h-11 bg-background border-input text-sm"
+                className="h-11 bg-background"
+                maxLength={15}
               />
             </div>
             <div className="space-y-1.5">
@@ -289,44 +332,30 @@ export function SimplifiedFilters({
               <Input
                 type="text"
                 placeholder="Sin límite"
-                value={priceMax ? formatCurrency(priceMax) : ""}
+                value={priceMax ? formatCurrencyValue(priceMax) : ""}
                 onChange={(e) => handlePriceMaxChange(e.target.value)}
-                className="h-11 bg-background border-input text-sm"
+                className="h-11 bg-background"
+                maxLength={15}
               />
             </div>
           </div>
         </div>
 
-        {/* Ubicación - Cascading Dropdowns */}
+        {/* Ubicación
         <div className="space-y-4">
           <Label className="text-sm font-semibold text-foreground">
             Ubicación
           </Label>
 
-          {/* Estado */}
-          <div className="space-y-1.5">
-            <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              Estado <span className="text-destructive">*</span>
+          <div className="space-y-2">
+            <Label className="text-xs font-medium text-muted-foreground uppercase">
+              Estado
             </Label>
-            <Select
-              value={selectedEstado}
-              onValueChange={(value) => {
-                setSelectedEstado(value);
-                setSelectedCiudad("");
-                setSelectedMunicipio("");
-                setSelectedColonia("");
-                // Update filters
-                updateFilters({
-                  state: value,
-                  municipality: undefined,
-                  colony: undefined,
-                });
-              }}
-            >
-              <SelectTrigger className="h-11 bg-background border-input">
+            <Select value={estadoMexico} onValueChange={handleEstadoChange}>
+              <SelectTrigger className="w-full h-11">
                 <SelectValue placeholder="Selecciona un estado" />
               </SelectTrigger>
-              <SelectContent className="bg-background border-border z-50">
+              <SelectContent className="max-h-[300px]">
                 {ESTADOS_MEXICO.map((estado) => (
                   <SelectItem key={estado} value={estado}>
                     {estado}
@@ -336,157 +365,146 @@ export function SimplifiedFilters({
             </Select>
           </div>
 
-          {/* Ciudad - visible when Estado is selected */}
-          {selectedEstado && (
-            <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Ciudad <span className="text-destructive">*</span>
-              </Label>
-              <Select
-                value={selectedCiudad}
-                onValueChange={(value) => {
-                  setSelectedCiudad(value);
-                  setSelectedMunicipio("");
-                  setSelectedColonia("");
-                  // Note: 'city' is not in standard filters but useful for drilldown.
-                  // We don't filter by city usually if we have municipality
-                }}
-              >
-                <SelectTrigger className="h-11 bg-background border-input">
-                  <SelectValue placeholder="Selecciona una ciudad" />
-                </SelectTrigger>
-                <SelectContent className="bg-background border-border z-50">
-                  {ciudadesDisponibles.map((ciudad) => (
-                    <SelectItem key={ciudad} value={ciudad}>
-                      {ciudad}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
+         
+          {estadoMexico && (
+            <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-medium text-muted-foreground uppercase">
+                  Colonias en {estadoMexico} ({availableColonias.length} disponibles)
+                </Label>
+                {colonias.length > 0 && (
+                  <button
+                    onClick={() => setColonias([])}
+                    className="text-[10px] text-primary hover:underline font-medium"
+                  >
+                    Limpiar selección
+                  </button>
+                )}
+              </div>
 
-          {/* Municipio - visible when Ciudad is selected */}
-          {selectedCiudad && (
-            <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Municipio <span className="text-destructive">*</span>
-              </Label>
-              <Select
-                value={selectedMunicipio}
-                onValueChange={(value) => {
-                  setSelectedMunicipio(value);
-                  setSelectedColonia("");
-                  updateFilters({ municipality: value, colony: undefined });
-                }}
-              >
-                <SelectTrigger className="h-11 bg-background border-input">
-                  <SelectValue placeholder="Selecciona un municipio" />
-                </SelectTrigger>
-                <SelectContent className="bg-background border-border z-50">
-                  {municipiosDisponibles.map((municipio) => (
-                    <SelectItem key={municipio} value={municipio}>
-                      {municipio}
-                    </SelectItem>
+              
+              {colonias.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-1">
+                  {colonias.map((col) => (
+                    <Badge
+                      key={col}
+                      variant="default"
+                      className="flex items-center gap-1 bg-primary text-white border-primary px-3 py-1.5 rounded-full text-xs font-medium shadow-sm cursor-pointer hover:bg-primary/90 transition-all"
+                    >
+                      {col}
+                      <X
+                        className="h-3 w-3 ml-0.5 hover:opacity-70"
+                        onClick={() => removeColonia(col)}
+                      />
+                    </Badge>
                   ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
+                </div>
+              )}
 
-          {/* Colonia - visible when Municipio is selected */}
-          {selectedMunicipio && (
-            <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Colonia
-              </Label>
-              <Select
-                value={selectedColonia}
-                onValueChange={(value) => {
-                  setSelectedColonia(value);
-                  updateFilters({ colony: value });
-                }}
-              >
-                <SelectTrigger className="h-11 bg-background border-input">
-                  <SelectValue
-                    placeholder={
-                      coloniasDisponibles.length > 0
-                        ? "Selecciona una colonia"
-                        : "No hay colonias disponibles"
-                    }
-                  />
-                </SelectTrigger>
-                <SelectContent className="bg-background border-border z-50">
-                  {coloniasDisponibles.length > 0 ? (
-                    coloniasDisponibles.map((colonia) => (
-                      <SelectItem key={colonia} value={colonia}>
+              
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Filtrar colonias..."
+                  value={coloniaSearch}
+                  onChange={(e) => setColoniaSearch(e.target.value)}
+                  className="pl-9 h-10 text-sm"
+                />
+                {coloniaSearch && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setColoniaSearch("")}
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 hover:bg-slate-100 rounded-full"
+                  >
+                    <X className="h-3.5 w-3.5 text-muted-foreground" />
+                  </Button>
+                )}
+              </div>
+
+              
+              <ScrollArea className="h-52 w-full rounded-lg border bg-white/50">
+                <div className="flex flex-wrap gap-2 p-3">
+                  {filteredColonias.map((colonia) => {
+                    const isSelected = colonias.includes(colonia);
+                    return (
+                      <Badge
+                        key={colonia}
+                        variant={isSelected ? "default" : "outline"}
+                        className={cn(
+                          "cursor-pointer px-3 py-1.5 rounded-full text-xs transition-all border font-medium select-none",
+                          isSelected
+                            ? "bg-primary text-white border-primary shadow-sm scale-[1.02]"
+                            : "bg-white text-slate-600 border-slate-200 hover:bg-primary/5 hover:border-primary/40 hover:text-primary",
+                        )}
+                        onClick={() => toggleColonia(colonia)}
+                      >
+                        {isSelected && <Check className="h-3 w-3 mr-1" />}
                         {colonia}
-                      </SelectItem>
-                    ))
-                  ) : (
-                    <SelectItem value="none" disabled>
-                      No hay colonias disponibles
-                    </SelectItem>
+                      </Badge>
+                    );
+                  })}
+                  {filteredColonias.length === 0 && (
+                    <div className="w-full text-center py-6 text-sm text-muted-foreground">
+                      No se encontraron colonias
+                    </div>
                   )}
-                </SelectContent>
-              </Select>
+                </div>
+              </ScrollArea>
             </div>
           )}
-        </div>
+
+          {!estadoMexico && (
+            <div className="p-4 rounded-lg border border-dashed border-slate-200 bg-slate-50/30 text-center">
+              <Label className="text-sm font-medium text-slate-600">
+                Selecciona un Estado para ver colonias disponibles
+              </Label>
+            </div>
+          )}
+        </div> */}
 
         {/* Tipo de Propiedad */}
-        <div className="space-y-3 ">
+        <div className="space-y-4">
           <Label className="text-sm font-semibold text-foreground">
             Tipo de Propiedad
           </Label>
-          <div className="grid grid-cols-2 sm:grid-cols-2 gap-3">
-            {propertyTypes.map((type) => {
-              const isSelected = filters.type === type.value;
+          <div className="grid grid-cols-2 gap-3">
+            {propertyTypes.map((pt) => {
+              const isSelected = type === pt.value;
               return (
                 <button
-                  key={type.value}
+                  key={pt.value}
                   type="button"
-                  onClick={() => {
-                    const newType = isSelected ? undefined : type.value;
-                    updateFilters({
-                      type: newType,
-                      subtype: undefined,
-                    });
-                  }}
-                  className={`flex flex-col items-center justify-center p-3 rounded-xl text-sm font-medium transition-all border-2 ${
+                  onClick={() => setType(isSelected ? undefined : pt.value)}
+                  className={`flex flex-col items-center justify-center p-4 rounded-xl text-sm font-medium transition-all border-2 ${
                     isSelected
                       ? "border-primary text-foreground bg-primary/5"
                       : "border-input text-muted-foreground bg-background hover:border-primary/50"
                   }`}
                 >
-                  <span className="text-xl mb-1">{type.icon}</span>
-                  <span className="text-center leading-tight">
-                    {type.label}
-                  </span>
+                  <span className="mb-2">{pt.icon}</span>
+                  <span>{pt.label}</span>
                 </button>
               );
             })}
           </div>
 
-          {/* Subtipo - visible when property type is selected */}
-          {filters.type && subtiposDisponibles.length > 0 && (
-            <div className="space-y-1.5 mt-4">
-              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+          {type && subtiposDisponibles.length > 0 && (
+            <div className="space-y-1.5 mt-2">
+              <Label className="text-xs font-medium text-muted-foreground uppercase">
                 Subtipo
               </Label>
               <Select
-                value={filters.subtype || ""}
-                onValueChange={(value) => {
-                  updateFilters({ subtype: value });
-                }}
+                value={subtype || ""}
+                onValueChange={(val) => setSubtype(val)}
               >
-                <SelectTrigger className="h-11 bg-background border-input">
+                <SelectTrigger className="h-11">
                   <SelectValue placeholder="Selecciona un subtipo" />
                 </SelectTrigger>
-                <SelectContent className="bg-background border-border z-50">
-                  {subtiposDisponibles.map((subtipo) => (
-                    <SelectItem key={subtipo.value} value={subtipo.value}>
-                      {subtipo.label}
+                <SelectContent className="max-h-[300px]">
+                  {subtiposDisponibles.map((sub) => (
+                    <SelectItem key={sub.value} value={sub.value}>
+                      {sub.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -495,42 +513,36 @@ export function SimplifiedFilters({
           )}
         </div>
 
-        {/* Characteristics sections - only visible when property type is selected */}
+        {/* Características */}
         {hasPropertyTypeSelected && (
-          <>
-            <div className="border-t border-border my-2" />
-            <div className="space-y-4">
-              <Label className="text-sm font-semibold text-foreground">
-                Características
-              </Label>
+          <div className="space-y-5 pt-2">
+            <Label className="text-sm font-semibold text-foreground">
+              Características
+            </Label>
 
-              {/* Espacios/Recámaras */}
+            <div className="grid grid-cols-2 gap-4">
+              {/* Recámaras */}
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium text-muted-foreground">
-                  {filters.type === "Comercial" ||
-                  filters.type === "Industrial" ||
-                  filters.type === "Agricola"
-                    ? "Espacios"
-                    : "Recámaras"}
+                  Recámaras
                 </Label>
                 <Select
-                  value={filters.bedrooms?.toString() || "any"}
-                  onValueChange={(value) =>
-                    updateFilters({
-                      bedrooms: value === "any" ? undefined : parseInt(value),
-                    })
+                  value={bedrooms?.toString() || "any"}
+                  onValueChange={(val) =>
+                    setBedrooms(val === "any" ? undefined : parseInt(val))
                   }
                 >
-                  <SelectTrigger className="h-11 bg-background border-input">
+                  <SelectTrigger className="h-10">
                     <SelectValue placeholder="Cualquiera" />
                   </SelectTrigger>
-                  <SelectContent className="bg-background border-border z-50">
+                  <SelectContent>
                     <SelectItem value="any">Cualquiera</SelectItem>
-                    <SelectItem value="1">1</SelectItem>
-                    <SelectItem value="2">2</SelectItem>
-                    <SelectItem value="3">3</SelectItem>
-                    <SelectItem value="4">4</SelectItem>
-                    <SelectItem value="5">5+</SelectItem>
+                    {["1", "2", "3", "4", "5"].map((n) => (
+                      <SelectItem key={n} value={n}>
+                        {n}
+                        {n === "5" ? "+" : ""}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -541,121 +553,93 @@ export function SimplifiedFilters({
                   Baños
                 </Label>
                 <Select
-                  value={filters.bathrooms?.toString() || "any"}
-                  onValueChange={(value) =>
-                    updateFilters({
-                      bathrooms: value === "any" ? undefined : parseInt(value),
-                    })
+                  value={bathrooms?.toString() || "any"}
+                  onValueChange={(val) =>
+                    setBathrooms(val === "any" ? undefined : parseInt(val))
                   }
                 >
-                  <SelectTrigger className="h-11 bg-background border-input">
+                  <SelectTrigger className="h-10">
                     <SelectValue placeholder="Cualquiera" />
                   </SelectTrigger>
-                  <SelectContent className="bg-background border-border z-50">
+                  <SelectContent>
                     <SelectItem value="any">Cualquiera</SelectItem>
-                    <SelectItem value="1">1</SelectItem>
-                    <SelectItem value="2">2</SelectItem>
-                    <SelectItem value="3">3</SelectItem>
-                    <SelectItem value="4">4</SelectItem>
-                    <SelectItem value="5">5+</SelectItem>
+                    {["1", "2", "3", "4", "5"].map((n) => (
+                      <SelectItem key={n} value={n}>
+                        {n}
+                        {n === "5" ? "+" : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Estacionamiento */}
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium text-muted-foreground">
+                  Estacionamiento
+                </Label>
+                <Select
+                  value={parking?.toString() || "any"}
+                  onValueChange={(val) =>
+                    setParking(val === "any" ? undefined : parseInt(val))
+                  }
+                >
+                  <SelectTrigger className="h-10">
+                    <SelectValue placeholder="Cualquiera" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="any">Cualquiera</SelectItem>
+                    {["1", "2", "3", "4"].map((n) => (
+                      <SelectItem key={n} value={n}>
+                        {n}
+                        {n === "4" ? "+" : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Niveles */}
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium text-muted-foreground">
+                  Niveles
+                </Label>
+                <Select
+                  value={levels?.toString() || "any"}
+                  onValueChange={(val) =>
+                    setLevels(val === "any" ? undefined : parseInt(val))
+                  }
+                >
+                  <SelectTrigger className="h-10">
+                    <SelectValue placeholder="Cualquiera" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="any">Cualquiera</SelectItem>
+                    {["1", "2", "3", "4"].map((n) => (
+                      <SelectItem key={n} value={n}>
+                        {n}
+                        {n === "4" ? "+" : ""}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
-            {/* Estacionamiento */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-muted-foreground">
-                Estacionamiento
-              </Label>
-              <Select
-                value={filters.parking?.toString() || "any"}
-                onValueChange={(value) =>
-                  updateFilters({
-                    parking: value === "any" ? undefined : parseInt(value),
-                  })
-                }
-              >
-                <SelectTrigger className="h-11 bg-background border-input">
-                  <SelectValue placeholder="Cualquiera" />
-                </SelectTrigger>
-                <SelectContent className="bg-background border-border z-50">
-                  <SelectItem value="any">Cualquiera</SelectItem>
-                  <SelectItem value="1">1</SelectItem>
-                  <SelectItem value="2">2</SelectItem>
-                  <SelectItem value="3">3</SelectItem>
-                  <SelectItem value="4">4+</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Niveles */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-muted-foreground">
-                Niveles
-              </Label>
-              <Select
-                value={filters.levels?.toString() || "any"}
-                onValueChange={(value) =>
-                  updateFilters({
-                    levels: value === "any" ? undefined : parseInt(value),
-                  })
-                }
-              >
-                <SelectTrigger className="h-11 bg-background border-input">
-                  <SelectValue placeholder="Cualquiera" />
-                </SelectTrigger>
-                <SelectContent className="bg-background border-border z-50">
-                  <SelectItem value="any">Cualquiera</SelectItem>
-                  <SelectItem value="1">1</SelectItem>
-                  <SelectItem value="2">2</SelectItem>
-                  <SelectItem value="3">3</SelectItem>
-                  <SelectItem value="4">4+</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Antigüedad */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-muted-foreground">
-                Antigüedad
-              </Label>
-              <Select
-                value={filters.age?.toString() || "any"}
-                onValueChange={(value) =>
-                  updateFilters({ age: value === "any" ? undefined : value })
-                }
-              >
-                <SelectTrigger className="h-11 bg-background border-input">
-                  <SelectValue placeholder="Cualquiera" />
-                </SelectTrigger>
-                <SelectContent className="bg-background border-border z-50">
-                  <SelectItem value="any">Cualquiera</SelectItem>
-                  <SelectItem value="new">Nuevo</SelectItem>
-                  <SelectItem value="1-5">1-5 años</SelectItem>
-                  <SelectItem value="6-10">6-10 años</SelectItem>
-                  <SelectItem value="11-20">11-20 años</SelectItem>
-                  <SelectItem value="20+">Más de 20 años</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
             {/* m² Terreno y Construcción */}
-            <div className="grid grid-cols-2 gap-3 pt-2">
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium text-muted-foreground">
                   m² Terreno Mín.
                 </Label>
                 <Input
                   type="number"
-                  placeholder="Mínimo"
-                  value={filters.landAreaMin || ""}
+                  placeholder="0"
+                  value={landAreaMin || ""}
                   onChange={(e) =>
-                    updateFilters({
-                      landAreaMin: parseInt(e.target.value) || undefined,
-                    })
+                    setLandAreaMin(parseInt(e.target.value) || undefined)
                   }
-                  className="h-11 bg-background border-input text-sm focus:border-primary focus:ring-primary"
+                  className="h-10"
                 />
               </div>
               <div className="space-y-1.5">
@@ -664,37 +648,48 @@ export function SimplifiedFilters({
                 </Label>
                 <Input
                   type="number"
-                  placeholder="Mínimo"
-                  value={filters.constructionAreaMin || ""}
+                  placeholder="0"
+                  value={constructionAreaMin || ""}
                   onChange={(e) =>
-                    updateFilters({
-                      constructionAreaMin:
-                        parseInt(e.target.value) || undefined,
-                    })
+                    setConstructionAreaMin(
+                      parseInt(e.target.value) || undefined,
+                    )
                   }
-                  className="h-11 bg-background border-input text-sm focus:border-primary focus:ring-primary"
+                  className="h-10"
                 />
               </div>
             </div>
-          </>
+          </div>
         )}
+
+        {/* Botón Guardar */}
+        <div className="pt-4">
+          <Button
+            className="w-full h-12 bg-white hover:bg-slate-50 text-foreground border border-input shadow-sm transition-all"
+            variant="outline"
+            onClick={onSaveClick}
+          >
+            <Save className="w-5 h-5 mr-3" />
+            Guardar búsqueda
+          </Button>
+        </div>
       </div>
 
-      {/* Fixed Footer */}
-      <div className="border-t border-border bg-muted/30 p-4 mb-6">
-        <div className="grid grid-cols-2 gap-3">
+      {/* Footer */}
+      <div className="border-t border-border bg-slate-50/50 p-4 sticky bottom-0 z-10">
+        <div className="grid grid-cols-2 gap-4">
           <Button
             variant="outline"
-            onClick={onCancel}
-            className="h-12 text-sm font-medium bg-background border-input hover:bg-accent"
+            onClick={() => setShowFilters?.(false)}
+            className="h-12 bg-white shadow-sm font-semibold"
           >
             Cerrar
           </Button>
           <Button
             onClick={onApplyFilters}
-            className="h-12 text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90"
+            className="h-12 bg-primary hover:bg-primary/90 text-white shadow-md transition-all active:scale-95 font-semibold"
           >
-            Aplicar Filtros
+            Ver Resultados
           </Button>
         </div>
       </div>

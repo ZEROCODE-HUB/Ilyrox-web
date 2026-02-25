@@ -22,44 +22,21 @@ export const Header = () => {
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">
-          <Link
-            to="/"
-            className="text-sm font-medium hover:text-[#41c4eb] transition-colors"
-          >
-            Inicio
-          </Link>
-          {/* <Link
-            to="/search"
-            className="text-sm font-medium hover:text-primary transition-colors"
-          >
-            Calculadora hipotecaria
-          </Link>
-          <Link
-            to="/search"
-            className="text-sm font-medium hover:text-primary transition-colors"
-          >
-            Cómo funciona
-          </Link> */}
+          <Button variant="ghost" size="icon" asChild>
+            <Link to="/">
+              <Home className="h-5 w-5" />
+            </Link>
+          </Button>
         </nav>
 
         <div className="flex items-center gap-2">
-          <div className="hidden md:flex items-center gap-2">
-            {/* <Button variant="ghost" size="icon" asChild>
-              <Link to="/notifications">
-                <Bell className="h-5 w-5" />
+          {/* <div className="hidden md:flex items-center gap-2">
+            <Button variant="ghost" size="icon" asChild>
+              <Link to="/">
+                <Home className="h-5 w-5" />
               </Link>
             </Button>
-            <Button variant="ghost" size="icon" asChild>
-              <Link to="/saved">
-                <Heart className="h-5 w-5" />
-              </Link>
-            </Button> */}
-            <Button variant="ghost" size="icon" asChild>
-              <Link to="/auth">
-                <User className="h-5 w-5" />
-              </Link>
-            </Button>
-          </div>
+          </div> */}
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild className="md:hidden">
