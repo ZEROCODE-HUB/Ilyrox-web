@@ -1,11 +1,9 @@
 import { useState, useEffect, useMemo, useRef } from "react";
-import { supabase } from "@/lib/supabase";
 import logo360 from "@/assets/logo-360.png";
 import { PropertyView } from "@/types/types";
-import { PropertyFilters, UserLocation } from "@/types/property";
-import { propertyService } from "@/services/propertyService";
+import { UserLocation } from "@/types/property";
 import { PropertyCard } from "@/components/PropertyCard";
-import { PropertyDetail } from "@/components/PropertyDetail";
+import { PropertyDetail } from "@/components/PropertyDetails/PropertyDetail";
 import { SimplifiedFilters as FiltersComponent } from "@/components/SimplifiedFilters";
 import { SearchAndSort } from "@/components/SearchAndSort";
 import MapViewContainer from "@/components/Map/MapViewContainer";
@@ -48,28 +46,27 @@ import {
 } from "@/constants/locations";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
+// ── Zustand + React Query ─────────────────────
+import { useFilterStore, useEstadoMexico } from "@/stores/useFilterStore";
+import { useProperties } from "@/hooks/useProperties";
+
 const Index = () => {
-  // Estados principales
-  const [properties, setProperties] = useState<PropertyView[]>([]);
+  // ── Store state ─────────────────────────────
+  const estadoMexico = useEstadoMexico();
+  const resetFilters = useFilterStore((s) => s.resetFilters);
+
+  // ── React Query (replaces manual fetching) ──
+  const { data: properties = [], isLoading } = useProperties(0, 50);
+
+  // ── Local UI state ──────────────────────────
   const [selectedProperty, setSelectedProperty] = useState<PropertyView | null>(
     null,
   );
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
 
-  // Estados de filtros y búsqueda
-  const [filters, setFilters] = useState<PropertyFilters>({});
-  const [searchTerm, setSearchTerm] = useState("");
-
-  // Location Hierarchy State
-  const [selectedState, setSelectedState] = useState<string>("");
-  const [selectedMunicipality, setSelectedMunicipality] = useState<
-    string | null
-  >(null);
-  const [selectedColony, setSelectedColony] = useState<string | null>(null);
-
-  // Estados de UI
+  // Client-side radius filtering
+  const [radiusKm, setRadiusKm] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(false);
   const [isMapHidden, setIsMapHidden] = useState(false);
   const { user, isLoading: isAuthLoading } = useAuth();
@@ -77,145 +74,52 @@ const Index = () => {
   const [showAuthPopup, setShowAuthPopup] = useState(false);
   const [showRentSellPopup, setShowRentSellPopup] = useState(false);
 
-  // Estados para controles del mapa
-  const [radiusKm, setRadiusKm] = useState(0);
   const [centerLocation, setCenterLocation] = useState<[number, number]>([
     19.4326, -99.1332,
-  ]); // CDMX Default
+  ]);
 
   const { toast } = useToast();
   const navigate = useNavigate();
   const filtersPanelRef = useRef<ImperativePanelHandle>(null);
 
-  // Compute Grouped Zones based on Selected State
-  const groupedZones = useMemo(() => {
-    if (!selectedState) return {};
+  // ── Derived ─────────────────────────────────
+  const hasStateSelected = Boolean(estadoMexico);
 
-    const cities = CIUDADES_POR_ESTADO[selectedState] || [];
-    const zones: Record<string, string[]> = {};
-
-    cities.forEach((city) => {
-      const municipios = MUNICIPIOS_POR_CIUDAD[city] || [];
-      municipios.forEach((municipio) => {
-        const colonias = COLONIAS_POR_MUNICIPIO[municipio] || [];
-        if (colonias.length > 0) {
-          // Merge if mostly duplicates or just assign
-          const existing = zones[municipio] || [];
-          zones[municipio] = Array.from(
-            new Set([...existing, ...colonias]),
-          ).sort();
-        }
+  // Client-side distance-filtered properties
+  const filteredProperties = useMemo(() => {
+    if (radiusKm > 0 && userLocation) {
+      return properties.filter((p) => {
+        const dist = getDistanceFromLatLonInKm(
+          centerLocation[0],
+          centerLocation[1],
+          p.latitud || 0,
+          p.longitud || 0,
+        );
+        return dist <= radiusKm;
       });
-    });
-    return zones;
-  }, [selectedState]);
+    }
+    return properties;
+  }, [properties, radiusKm, userLocation, centerLocation]);
 
-  // Handlers for search selections to ensure consistent filtering
-  const handleStateSelect = (state: string) => {
-    setSelectedState(state);
-    setSelectedMunicipality("");
-    setSelectedColony("");
-  };
+  // ── Effects ─────────────────────────────────
 
-  const handleMunicipalitySelect = (municipality: string) => {
-    setSelectedMunicipality(municipality);
-    setSelectedColony("");
-  };
-
-  const handleColonySelect = (colony: string) => {
-    setSelectedColony(colony);
-  };
-
-  // Sync filters.state with local state (if updated from SimplifiedFilters)
+  // Map center when state changes
   useEffect(() => {
-    // Sync State
-    if (filters.state !== undefined && filters.state !== selectedState) {
-      setSelectedState(filters.state || "");
-    }
-
-    // Sync Municipality
-    const currentMuni = filters.municipality || null;
-    if (currentMuni !== selectedMunicipality) {
-      setSelectedMunicipality(currentMuni);
-    }
-
-    // Sync Colony
-    const currentCol = filters.colony || null;
-    if (currentCol !== selectedColony) {
-      setSelectedColony(currentCol);
-    }
-  }, [filters]);
-
-  // Handle State Change: Update Map Center and Reset Sub-locations
-  useEffect(() => {
-    if (selectedState && COORDENADAS_ESTADO[selectedState]) {
-      const { lat, lng } = COORDENADAS_ESTADO[selectedState];
+    if (estadoMexico && COORDENADAS_ESTADO[estadoMexico]) {
+      const { lat, lng } = COORDENADAS_ESTADO[estadoMexico];
       setCenterLocation([lat, lng]);
     }
-  }, [selectedState]);
+  }, [estadoMexico]);
 
-  // Fetch Properties
-  useEffect(() => {
-    const fetchProperties = async () => {
-      setIsLoading(true);
-      try {
-        const result = await propertyService.searchProperties({
-          ...filters,
-          searchText: searchTerm,
-          state: selectedState || filters.location || undefined,
-          municipality: selectedMunicipality || undefined,
-          colony: selectedColony || undefined,
-        });
+  // ── Helpers ─────────────────────────────────
 
-        let filtered = result;
-
-        // Client-side Distance Filter if Radius and User Location are set
-        if (radiusKm > 0 && userLocation) {
-          filtered = result.filter((p) => {
-            const dist = getDistanceFromLatLonInKm(
-              centerLocation[0],
-              centerLocation[1],
-              p.latitud || 0,
-              p.longitud || 0,
-            );
-            return dist <= radiusKm;
-          });
-        }
-
-        setProperties(filtered);
-      } catch (e) {
-        console.error(e);
-        toast({
-          title: "Error",
-          description: "No se pudieron cargar las propiedades",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    // Debounce a bit
-    const timeoutId = setTimeout(fetchProperties, 500);
-    return () => clearTimeout(timeoutId);
-  }, [
-    filters,
-    searchTerm,
-    selectedState,
-    selectedMunicipality,
-    selectedColony,
-    radiusKm,
-    centerLocation,
-  ]);
-
-  // Helper Distance
   function getDistanceFromLatLonInKm(
     lat1: number,
     lon1: number,
     lat2: number,
     lon2: number,
   ) {
-    const R = 6371; // Radius of the earth in km
+    const R = 6371;
     const dLat = deg2rad(lat2 - lat1);
     const dLon = deg2rad(lon2 - lon1);
     const a =
@@ -225,25 +129,26 @@ const Index = () => {
         Math.sin(dLon / 2) *
         Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const d = R * c; // Distance in km
-    return d;
+    return R * c;
   }
+
   function deg2rad(deg: number) {
     return deg * (Math.PI / 180);
   }
 
-  // Manejar permisos de ubicación
+  // ── Handlers ────────────────────────────────
+
   const handleLocationSearch = async () => {
     try {
       const location = await getCurrentLocation();
       setUserLocation(location);
       setCenterLocation([location.lat, location.lng]);
-      setRadiusKm(5); // Default radius when locating user
+      setRadiusKm(5);
       toast({
         title: "Ubicación detectada",
         description: "Mostrando propiedades cercanas a tu ubicación.",
       });
-    } catch (error) {
+    } catch {
       toast({
         title: "Error de ubicación",
         description:
@@ -254,10 +159,9 @@ const Index = () => {
   };
 
   const handleSearchFocus = async () => {
-    // Si ya tenemos ubicación, calcular distancia
-    if (userLocation && properties.length > 0) {
+    if (userLocation && filteredProperties.length > 0) {
       let minDistance = Infinity;
-      properties.forEach((p) => {
+      filteredProperties.forEach((p) => {
         const d = getDistanceFromLatLonInKm(
           userLocation.lat,
           userLocation.lng,
@@ -278,28 +182,18 @@ const Index = () => {
     }
   };
 
-  // Limpiar filtros
   const handleClearFilters = () => {
-    setFilters({});
-    setSearchTerm("");
-    setSelectedState("");
-    setSelectedMunicipality(null);
-    setSelectedColony(null);
+    resetFilters();
     setRadiusKm(0);
   };
 
-  const hasActiveFilters = Boolean(
-    selectedState ||
-    searchTerm ||
-    selectedMunicipality ||
-    selectedColony ||
-    Object.keys(filters).length > 0 ||
-    radiusKm > 0,
-  );
+  const hasActiveFilters = Boolean(estadoMexico || radiusKm > 0);
+
+  // ── Render ──────────────────────────────────
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header Principal - Logo, Búsqueda y Navegación */}
+      {/* Header Principal */}
       <div className="bg-navbar sticky top-0 z-20 shadow-md">
         {/* Desktop Header */}
         <div className="hidden md:block">
@@ -314,25 +208,13 @@ const Index = () => {
                 >
                   <img src={logo360} alt="360" className="h-[74px] w-auto" />
                 </Link>
-                <div className="flex-1">
+                <div className="flex-1 flex flex-col gap-2 w-full">
                   <SearchAndSort
-                    searchTerm={searchTerm}
-                    onSearchChange={setSearchTerm}
-                    selectedState={selectedState}
-                    onStateChange={handleStateSelect}
-                    onMunicipalityChange={handleMunicipalitySelect}
-                    onColonyChange={handleColonySelect}
                     onLocationSearch={handleLocationSearch}
                     onFocus={handleSearchFocus}
                   />
                   <div className="w-full">
-                    <ZoneSearch
-                      groupedZones={groupedZones}
-                      selectedMunicipality={selectedMunicipality}
-                      onMunicipalityChange={setSelectedMunicipality}
-                      selectedColony={selectedColony}
-                      onColonyChange={setSelectedColony}
-                    />
+                    <ZoneSearch />
                   </div>
                 </div>
               </div>
@@ -447,20 +329,8 @@ const Index = () => {
           </div>
 
           <div className="px-3 pb-3 space-y-3">
-            <SearchAndSort
-              searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
-              selectedState={selectedState}
-              onStateChange={setSelectedState}
-              onLocationSearch={handleLocationSearch}
-            />
-            <ZoneSearch
-              groupedZones={groupedZones}
-              selectedMunicipality={selectedMunicipality}
-              onMunicipalityChange={setSelectedMunicipality}
-              selectedColony={selectedColony}
-              onColonyChange={setSelectedColony}
-            />
+            <SearchAndSort onLocationSearch={handleLocationSearch} />
+            <ZoneSearch />
             <Button
               variant="outline"
               onClick={() => setShowFilters(!showFilters)}
@@ -475,6 +345,7 @@ const Index = () => {
 
       <MainTabs>
         <div className="h-[calc(100vh-264px)] md:h-[calc(112vh-200px)] overflow-hidden">
+          {/* Empty State: No state selected */}
           {/* Vista móvil */}
           <div className="lg:hidden h-full w-full flex flex-col relative">
             {showFilters && (
@@ -493,11 +364,7 @@ const Index = () => {
                   </div>
                 </div>
                 <div className="p-5">
-                  <FiltersComponent
-                    filters={filters}
-                    onFiltersChange={setFilters}
-                    onClearFilters={handleClearFilters}
-                  />
+                  <FiltersComponent />
                 </div>
               </div>
             )}
@@ -527,7 +394,7 @@ const Index = () => {
                 <div className="flex-1 relative">
                   <ErrorBoundary>
                     <MapViewContainer
-                      properties={properties}
+                      properties={filteredProperties}
                       selectedProperty={selectedProperty}
                       onPropertySelect={setSelectedProperty}
                       radiusKm={radiusKm}
@@ -555,8 +422,8 @@ const Index = () => {
                           : "Propiedades disponibles"}
                       </h2>
                       <p className="text-xs text-muted-foreground mt-1">
-                        {properties.length} resultado
-                        {properties.length !== 1 ? "s" : ""}
+                        {filteredProperties.length} resultado
+                        {filteredProperties.length !== 1 ? "s" : ""}
                       </p>
                     </div>
 
@@ -577,9 +444,9 @@ const Index = () => {
                     Array(3)
                       .fill(0)
                       .map((_, i) => <SkeletonCard key={i} />)
-                  ) : properties.length > 0 ? (
+                  ) : filteredProperties.length > 0 ? (
                     <div className="grid gap-5 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
-                      {properties.map((property) => (
+                      {filteredProperties.map((property) => (
                         <PropertyCard
                           key={property.id}
                           property={property}
@@ -594,11 +461,14 @@ const Index = () => {
                       <div className="max-w-md mx-auto">
                         <Home className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                         <h3 className="text-lg font-semibold mb-2">
-                          No se encontraron propiedades
+                          {hasStateSelected
+                            ? "No se encontraron propiedades"
+                            : "Comienza tu búsqueda"}
                         </h3>
                         <p className="text-sm text-muted-foreground mb-4">
-                          Intenta ajustar tus filtros de búsqueda o eliminar
-                          algunos criterios.
+                          {hasStateSelected
+                            ? "Intenta ajustar tus filtros de búsqueda o eliminar algunos criterios."
+                            : "Selecciona un estado o utiliza tu ubicación para encontrar propiedades."}
                         </p>
                         <Button
                           onClick={handleClearFilters}
@@ -615,7 +485,7 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Vista desktop - mapa y lista simultáneos */}
+          {/* Vista desktop */}
           <ResizablePanelGroup
             direction="horizontal"
             className="hidden lg:flex w-full"
@@ -646,9 +516,6 @@ const Index = () => {
                       </Button>
                     </div>
                     <FiltersComponent
-                      filters={filters}
-                      onFiltersChange={setFilters}
-                      onClearFilters={handleClearFilters}
                       onCancel={() => filtersPanelRef.current?.collapse()}
                     />
                   </div>
@@ -685,7 +552,7 @@ const Index = () => {
                 <div className="h-full flex flex-col">
                   <div className="flex-1 overflow-y-auto">
                     <MapViewContainer
-                      properties={properties}
+                      properties={filteredProperties}
                       selectedProperty={selectedProperty}
                       onPropertySelect={setSelectedProperty}
                       radiusKm={radiusKm}
@@ -733,8 +600,8 @@ const Index = () => {
                           : "Propiedades disponibles"}
                       </h2>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        {properties.length} resultado
-                        {properties.length !== 1 ? "s" : ""}
+                        {filteredProperties.length} resultado
+                        {filteredProperties.length !== 1 ? "s" : ""}
                       </p>
                     </div>
 
@@ -775,11 +642,11 @@ const Index = () => {
                           <SkeletonCard key={i} />
                         ))}
                     </div>
-                  ) : properties.length > 0 ? (
+                  ) : filteredProperties.length > 0 ? (
                     <div
                       className={`grid gap-4 md:gap-5 ${isMapHidden ? "grid-cols-1 md:grid-cols-2 xl:grid-cols-3" : "grid-cols-1 lg:grid-cols-2"}`}
                     >
-                      {properties.map((property) => (
+                      {filteredProperties.map((property) => (
                         <PropertyCard
                           key={property.id}
                           property={property}
@@ -794,11 +661,14 @@ const Index = () => {
                       <div className="max-w-md mx-auto">
                         <Home className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                         <h3 className="text-xl font-semibold mb-2">
-                          No se encontraron propiedades
+                          {hasStateSelected
+                            ? "No se encontraron propiedades"
+                            : "Comienza tu búsqueda"}
                         </h3>
                         <p className="text-muted-foreground mb-4">
-                          Intenta ajustar tus filtros de búsqueda o eliminar
-                          algunos criterios.
+                          {hasStateSelected
+                            ? "Intenta ajustar tus filtros de búsqueda o eliminar algunos criterios."
+                            : "Selecciona un estado o utiliza tu ubicación para encontrar propiedades."}
                         </p>
                         <Button onClick={handleClearFilters} variant="outline">
                           Limpiar filtros

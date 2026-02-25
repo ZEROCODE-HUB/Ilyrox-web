@@ -5,7 +5,7 @@ import { ArrowLeft, Bookmark, Home } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { PropertyView } from "@/types/types";
 import { PropertyCard } from "@/components/PropertyCard";
-import { PropertyDetail } from "@/components/PropertyDetail";
+import { PropertyDetail } from "@/components/PropertyDetails/PropertyDetail";
 import { savePropertyService } from "@/services/savePropertyService";
 import { useToast } from "@/hooks/use-toast";
 import Skeleton from "react-loading-skeleton";

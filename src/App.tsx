@@ -11,7 +11,9 @@ import Auth from "./pages/Auth";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsAndConditions from "./pages/TermsAndConditions";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { NotificationProvider } from "@/contexts/NotificationContext";
 import ProgramFamilies from "./pages/ProgramFamilies";
+import { sileo, Toaster as ToasterSileo } from "sileo";
 
 const queryClient = new QueryClient();
 
@@ -54,11 +56,14 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <RouterProvider router={router} />
-        </TooltipProvider>
+        <NotificationProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <ToasterSileo />
+            <RouterProvider router={router} />
+          </TooltipProvider>
+        </NotificationProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

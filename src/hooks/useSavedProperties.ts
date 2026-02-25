@@ -1,12 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { savePropertyService } from "@/services/savePropertyService";
-import { useToast } from "@/hooks/use-toast";
+import { sileo } from "sileo";
+import { Heart } from "lucide-react";
 
 export const useSavedProperties = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const { toast } = useToast();
 
   const { data: savedIds = [], isLoading } = useQuery({
     queryKey: ["savedPropertyIds", user?.id],
@@ -66,20 +66,19 @@ export const useSavedProperties = () => {
         ["savedPropertyIds", user?.id],
         context?.previousSavedIds,
       );
-      toast({
+      sileo.error({
         title: "Error",
         description: "No se pudo actualizar guardados.",
-        variant: "destructive",
       });
     },
     onSuccess: (data) => {
       if (data.type === "added") {
-        toast({
+        sileo.info({
           title: "Propiedad guardada",
           description: "La propiedad se ha guardado en tu lista.",
         });
       } else {
-        toast({
+        sileo.info({
           title: "Eliminado de guardados",
           description: "La propiedad se ha eliminado de tu lista.",
         });

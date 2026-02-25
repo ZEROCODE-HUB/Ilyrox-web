@@ -13,6 +13,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { Eye, EyeOff } from "lucide-react";
+import { sileo } from "sileo";
 
 export const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -36,16 +37,17 @@ export const Login = () => {
 
       if (error) throw error;
 
-      toast({
+      sileo.success({
         title: "¡Bienvenido de vuelta!",
         description: "Has iniciado sesión correctamente.",
+        position: "top-center",
       });
       navigate("/");
     } catch (error: any) {
-      toast({
+      sileo.error({
         title: "Error al iniciar sesión",
         description: error.message || "Por favor verifica tus credenciales.",
-        variant: "destructive",
+        position: "top-center",
       });
     } finally {
       setIsLoading(false);

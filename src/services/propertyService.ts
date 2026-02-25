@@ -66,6 +66,9 @@ export const propertyService = {
     if (filters.municipality)
       query = query.eq("municipio", filters.municipality);
     if (filters.colony) query = query.eq("colonia", filters.colony);
+    if (filters.colonias && filters.colonias.length > 0) {
+      query = query.in("colonia", filters.colonias);
+    }
 
     if (filters.type && filters.type !== "Otros")
       query = query.ilike("tipo", filters.type);
@@ -143,6 +146,27 @@ export const propertyService = {
     if (!data) return null;
 
     return mapViewToPropertyView(data, user?.id);
+  },
+
+  async getPropertiesByIds(ids: string[]): Promise<PropertyView[]> {
+    if (!ids || ids.length === 0) return [];
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    const user = session?.user;
+
+    const { data, error } = await supabase
+      .from("propiedades_busqueda_view")
+      .select("*")
+      .in("id", ids);
+
+    if (error) {
+      console.error("Error getting properties by ids:", error);
+      return [];
+    }
+
+    return (data || []).map((row) => mapViewToPropertyView(row, user?.id));
   },
 
   async getComments(feedItemId: string) {

@@ -9,17 +9,16 @@ import {
   Car,
   Heart,
   Share2,
-  MessageCircle,
   Home,
   MoveDiagonal,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useSavedProperties } from "@/hooks/useSavedProperties";
 import { useAuth } from "@/contexts/AuthContext";
 
 import { Avatar } from "@/components/shared/Avatar";
+import { sileo } from "sileo";
 
 interface PropertyCardProps {
   property: PropertyView;
@@ -46,12 +45,17 @@ export function PropertyCard({
     ? property.isLiked || false
     : isSaved(property.id);
 
+  const IconHeart = isPropertySaved ? (
+    <Heart className="h-4 w-4" />
+  ) : (
+    <Heart className="h-4 w-4" />
+  );
+
   const [likesCount, setLikesCount] = useState(property.likes_count || 0); // Keep purely for potential UI count if needed later
   const [commentsCount, setCommentsCount] = useState(
     property.comentarios_count || 0,
   );
   const [imageError, setImageError] = useState(false);
-  const { toast } = useToast();
 
   useEffect(() => {
     setLikesCount(property.likes_count || 0);
@@ -83,10 +87,9 @@ export function PropertyCard({
       if (onAuthRequired) {
         onAuthRequired();
       } else {
-        toast({
+        sileo.error({
           title: "Inicia sesión",
           description: "Debes iniciar sesión para guardar propiedades.",
-          variant: "destructive",
         });
       }
       return;
@@ -109,17 +112,16 @@ export function PropertyCard({
     navigator.clipboard
       .writeText(propertyUrl)
       .then(() => {
-        toast({
+        sileo.info({
           title: "Enlace copiado",
           description:
             "El enlace de la propiedad se ha copiado al portapapeles",
         });
       })
       .catch(() => {
-        toast({
+        sileo.error({
           title: "Error",
           description: "No se pudo copiar el enlace",
-          variant: "destructive",
         });
       });
   };
@@ -152,7 +154,7 @@ export function PropertyCard({
         <div className="absolute top-3 left-3 z-[1] flex gap-2">
           <Badge
             variant={isVenta && !isRenta ? "default" : "secondary"}
-            className="backdrop-blur-md bg-primary/90 text-white shadow-sm font-semibold"
+            className="cursor-default backdrop-blur-md bg-primary/90 text-white shadow-sm font-semibold hover:bg-primary"
           >
             {badgeText}
           </Badge>

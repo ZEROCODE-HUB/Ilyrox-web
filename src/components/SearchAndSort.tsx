@@ -1,176 +1,178 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, MapPin } from "lucide-react";
+import { Search, MapPin, Check, X, MapPinned } from "lucide-react";
 import { Command, CommandItem, CommandList } from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useState, useEffect } from "react";
-import { propertyService } from "@/services/propertyService";
+import { useState, useMemo } from "react";
+import { ESTADOS_MEXICO } from "@/constants/MexLocations/estados";
+import { MUNICIPIOS_ESTADO } from "@/constants/MexLocations/municipios";
+import { COLONIAS_POR_MUNICIPIO } from "@/constants/MexLocations/colonias";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+
+import {
+  useFilterStore,
+  useEstadoMexico,
+  useColonias,
+  useSearchTerm,
+} from "@/stores/useFilterStore";
 
 interface SearchAndSortProps {
-  searchTerm: string;
-  onSearchChange: (term: string) => void;
-  selectedState?: string;
-  onStateChange?: (state: string) => void;
-  onMunicipalityChange?: (municipality: string) => void;
-  onColonyChange?: (colony: string) => void;
   onLocationSearch?: () => void;
   onFocus?: () => void;
 }
 
 export function SearchAndSort({
-  searchTerm,
-  onSearchChange,
   onLocationSearch,
-  selectedState,
-  onStateChange,
-  onMunicipalityChange,
-  onColonyChange,
   onFocus,
 }: SearchAndSortProps) {
   const [open, setOpen] = useState(false);
-  const [locations, setLocations] = useState<
-    { name: string; type: "estado" | "municipio" | "colonia" }[]
-  >([]);
 
-  // Sort helpers
-  const getTypePriority = (type: string) => {
-    switch (type) {
-      case "estado":
-        return 1;
-      case "municipio":
-        return 2;
-      case "colonia":
-        return 3;
-      default:
-        return 4;
-    }
+  // ── Store state (granular selectors) ────────
+  const estadoMexico = useEstadoMexico();
+  const selectedColonias = useColonias();
+  const searchTerm = useSearchTerm();
+
+  const { setSearchTerm, setEstadoMexico } = useFilterStore();
+
+  // ── Derived Data ────────────────────────────
+
+  // States filtered by search term
+  const filteredStates = useMemo(() => {
+    const term = searchTerm.toLowerCase().trim();
+    if (!term) return ESTADOS_MEXICO.slice(0, 5);
+    return ESTADOS_MEXICO.filter((state) =>
+      state.toLowerCase().includes(term),
+    ).slice(0, 5);
+  }, [searchTerm]);
+
+  // ── Handlers ────────────────────────────────
+
+  const handleSelectState = (state: string) => {
+    setEstadoMexico(state);
+    setSearchTerm(""); // Clear search term when state is selected
+    setOpen(false); // Close popover after selecting state
   };
 
-  useEffect(() => {
-    let mounted = true;
-    const fetchLocations = async () => {
-      try {
-        const data = await propertyService.getLocationsForProperty();
-        if (mounted && data) {
-          const locsMap = new Map<string, "estado" | "municipio" | "colonia">();
-          data.forEach((item: any) => {
-            if (item.estado) locsMap.set(item.estado, "estado");
-            if (item.municipio) locsMap.set(item.municipio, "municipio");
-            if (item.colonia) locsMap.set(item.colonia, "colonia");
-          });
-          const sortedLocs = Array.from(locsMap.entries())
-            .map(([name, type]) => ({ name, type }))
-            .sort((a, b) => {
-              const priorityA = getTypePriority(a.type);
-              const priorityB = getTypePriority(b.type);
-              if (priorityA !== priorityB) {
-                return priorityA - priorityB;
-              }
-              return a.name.localeCompare(b.name);
-            });
-          setLocations(sortedLocs);
-        }
-      } catch (error) {
-        console.error("Error fetching locations", error);
-      }
-    };
-    fetchLocations();
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  const handleClearAll = () => {
+    setEstadoMexico("");
+    setSearchTerm("");
+    setOpen(false);
+  };
 
-  const filteredLocations = searchTerm
-    ? locations
-        .filter((loc) =>
-          loc.name.toLowerCase().includes(searchTerm.toLowerCase()),
-        )
-        .slice(0, 10)
-    : [];
+  const hasResults = filteredStates.length > 0;
 
   return (
-    <div className="flex-1 max-w-2xl relative">
-      <Popover
-        open={open && filteredLocations.length > 0}
-        onOpenChange={setOpen}
-      >
-        <PopoverTrigger asChild>
-          <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
-            <Input
-              placeholder="Buscar por ciudad, zona, código..."
-              value={searchTerm}
-              onChange={(e) => {
-                onSearchChange(e.target.value);
-                setOpen(true);
-              }}
-              onFocus={() => {
-                setOpen(true);
-                if (onFocus) onFocus();
-              }}
-              className="pl-10 pr-12 bg-white w-full shadow-sm"
-            />
-            {onLocationSearch && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onLocationSearch();
-                }}
-                className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 hover:bg-slate-100 rounded-full"
-                title="Usar mi ubicación"
-              >
-                <MapPin className="h-4 w-4 text-primary" />
-              </Button>
-            )}
-          </div>
-        </PopoverTrigger>
-        <PopoverContent
-          className="p-0"
-          align="start"
-          onOpenAutoFocus={(e) => e.preventDefault()}
-          style={{ width: "var(--radix-popover-trigger-width)" }}
+    <div className="flex flex-col w-full max-w-2xl gap-2">
+      <div className="relative w-full">
+        <Popover
+          open={open && (hasResults || !!searchTerm)}
+          onOpenChange={setOpen}
         >
-          <Command>
-            <CommandList>
-              {filteredLocations.map((loc) => (
-                <CommandItem
-                  key={`${loc.type}-${loc.name}`}
-                  value={loc.name}
-                  onSelect={() => {
-                    onSearchChange(loc.name);
-                    if (loc.type === "estado" && onStateChange) {
-                      onStateChange(loc.name);
-                    } else if (
-                      loc.type === "municipio" &&
-                      onMunicipalityChange
-                    ) {
-                      onMunicipalityChange(loc.name);
-                    } else if (loc.type === "colonia" && onColonyChange) {
-                      onColonyChange(loc.name);
-                    }
-                    setOpen(false);
-                  }}
-                  className="cursor-pointer mx-1 my-0.5 rounded-lg hover:bg-slate-100 transition-colors py-2 px-3"
-                >
-                  <MapPin className="mr-3 h-4 w-4 text-primary" />
-                  <div className="flex items-center justify-between w-full">
-                    <span className="text-sm font-medium">{loc.name}</span>
-                    <span className="text-[9px] font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded-full uppercase tracking-tighter">
-                      {loc.type}
-                    </span>
+          <PopoverTrigger asChild>
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+              <Input
+                placeholder="Busca por Estado..."
+                value={searchTerm || estadoMexico || ""}
+                onChange={(e) => {
+                  if (estadoMexico && !searchTerm && e.target.value === "") {
+                    setEstadoMexico("");
+                  }
+                  setSearchTerm(e.target.value);
+                  setOpen(true);
+                }}
+                onFocus={() => {
+                  setOpen(true);
+                  if (onFocus) onFocus();
+                }}
+                className="pl-10 pr-12 bg-white w-full shadow-sm rounded-full h-11 border-slate-200 focus:border-primary transition-all text-sm font-medium"
+              />
+              {(onLocationSearch || estadoMexico || searchTerm) && (
+                <div className="absolute right-1 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
+                  {(estadoMexico || searchTerm) && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSearchTerm("");
+                        setEstadoMexico("");
+                        setOpen(false);
+                      }}
+                      className="h-8 w-8 p-0 hover:bg-slate-100 rounded-full"
+                    >
+                      <X className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                  )}
+                  {onLocationSearch && !searchTerm && !estadoMexico && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onLocationSearch();
+                      }}
+                      className="h-8 w-8 p-0 hover:bg-slate-100 rounded-full"
+                      title="Usar mi ubicación"
+                    >
+                      <MapPin className="h-4 w-4 text-primary" />
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
+          </PopoverTrigger>
+          <PopoverContent
+            className="p-0 border-slate-200 shadow-xl rounded-xl overflow-hidden mt-1"
+            align="start"
+            onOpenAutoFocus={(e) => e.preventDefault()}
+            style={{ width: "var(--radix-popover-trigger-width)" }}
+          >
+            <Command className="max-h-[450px]">
+              <CommandList className="max-h-none overflow-y-auto">
+                {/* States SECTION (only if no state selected or searching for another) */}
+                {(!estadoMexico ||
+                  (searchTerm && filteredStates.length > 0)) && (
+                  <>
+                    <div className="px-3 py-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wider bg-slate-50/50">
+                      Estados
+                    </div>
+                    {filteredStates.map((state) => (
+                      <CommandItem
+                        key={state}
+                        value={`state-${state}`}
+                        onSelect={() => handleSelectState(state)}
+                        className="cursor-pointer mx-1 my-0.5 rounded-lg hover:bg-primary/5 transition-colors py-2.5 px-3 flex items-center justify-between group"
+                      >
+                        <div className="flex items-center">
+                          <MapPin className="mr-3 h-4 w-4 text-primary opacity-60 group-hover:opacity-100 transition-opacity" />
+                          <span className="text-sm font-medium">{state}</span>
+                        </div>
+                        {estadoMexico === state && (
+                          <Check className="h-4 w-4 text-primary" />
+                        )}
+                      </CommandItem>
+                    ))}
+                  </>
+                )}
+
+                {filteredStates.length === 0 && searchTerm && !estadoMexico && (
+                  <div className="px-3 py-4 text-center text-sm text-muted-foreground">
+                    No se encontraron estados
                   </div>
-                </CommandItem>
-              ))}
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
+                )}
+
+                {/* Colonies SECTION (only if state selected) */}
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+      </div>
     </div>
   );
 }
