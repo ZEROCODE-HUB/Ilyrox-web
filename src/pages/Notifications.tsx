@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Bell, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { UserProfile } from "@/components/UserProfile";
+import { UserProfile } from "@/components/Header/UserProfile";
 import { useAuth } from "@/contexts/AuthContext";
 import { notificationService } from "@/services/notificationService";
 import { NotificationList } from "@/components/Notifications/NotificationList";

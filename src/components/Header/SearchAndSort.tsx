@@ -5,7 +5,7 @@ import { Command, CommandItem, CommandList } from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
-  PopoverTrigger,
+  PopoverAnchor,
 } from "@/components/ui/popover";
 import { useState, useMemo } from "react";
 import { ESTADOS_MEXICO } from "@/constants/MexLocations/estados";
@@ -73,22 +73,27 @@ export function SearchAndSort({
           open={open && (hasResults || !!searchTerm)}
           onOpenChange={setOpen}
         >
-          <PopoverTrigger asChild>
+          <PopoverAnchor asChild>
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
               <Input
                 placeholder="Busca por Estado..."
                 value={searchTerm || estadoMexico || ""}
                 onChange={(e) => {
-                  if (estadoMexico && !searchTerm && e.target.value === "") {
+                  const val = e.target.value;
+                  setSearchTerm(val);
+                  // If user clears the input, clear the state filter too
+                  if (val === "") {
                     setEstadoMexico("");
                   }
-                  setSearchTerm(e.target.value);
-                  setOpen(true);
+                  if (!open) setOpen(true);
                 }}
                 onFocus={() => {
                   setOpen(true);
                   if (onFocus) onFocus();
+                }}
+                onClick={() => {
+                  if (!open) setOpen(true);
                 }}
                 className="pl-10 pr-12 bg-white w-full shadow-sm rounded-full h-11 border-slate-200 focus:border-primary transition-all text-sm font-medium"
               />
@@ -126,7 +131,7 @@ export function SearchAndSort({
                 </div>
               )}
             </div>
-          </PopoverTrigger>
+          </PopoverAnchor>
           <PopoverContent
             className="p-0 border-slate-200 shadow-xl rounded-xl overflow-hidden mt-1"
             align="start"

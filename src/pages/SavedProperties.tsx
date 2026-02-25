@@ -7,15 +7,13 @@ import { PropertyView } from "@/types/types";
 import { PropertyCard } from "@/components/PropertyCard";
 import { PropertyDetail } from "@/components/PropertyDetails/PropertyDetail";
 import { savePropertyService } from "@/services/savePropertyService";
-import { useToast } from "@/hooks/use-toast";
-import Skeleton from "react-loading-skeleton";
-import { UserProfile } from "@/components/UserProfile";
+import { UserProfile } from "@/components/Header/UserProfile";
 import { useAuth } from "@/contexts/AuthContext";
 import { SkeletonCard } from "@/components/shared/SkeletonCard";
+import { sileo } from "sileo";
 
 const SavedProperties = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const { user } = useAuth();
 
   const {
@@ -30,13 +28,13 @@ const SavedProperties = () => {
 
   useEffect(() => {
     if (isError) {
-      toast({
+      sileo.error({
         title: "Error",
         description: "No se pudieron cargar las propiedades guardadas",
-        variant: "destructive",
+        position: "top-right",
       });
     }
-  }, [isError, toast]);
+  }, [isError]);
 
   const [selectedProperty, setSelectedProperty] = useState<PropertyView | null>(
     null,

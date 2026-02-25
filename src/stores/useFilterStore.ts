@@ -38,6 +38,9 @@ export interface FilterState {
 
   // Search
   searchTerm: string;
+
+  // Radius
+  radiusKm: number;
 }
 
 export interface FilterActions {
@@ -65,6 +68,8 @@ export interface FilterActions {
   setConstructionAreaMin: (n: number | undefined) => void;
 
   setSearchTerm: (term: string) => void;
+
+  setRadiusKm: (radius: number) => void;
 
   // Bulk
   resetFilters: () => void;
@@ -98,6 +103,8 @@ const initialState: FilterState = {
   constructionAreaMin: undefined,
 
   searchTerm: "",
+
+  radiusKm: 0,
 };
 
 // ──────────────────────────────────────────────
@@ -154,6 +161,8 @@ export const useFilterStore = create<FilterStore>()(
     // ── Search ────────────────────────────────
     setSearchTerm: (term) => set({ searchTerm: term }),
 
+    setRadiusKm: (radius) => set({ radiusKm: radius }),
+
     // ── Reset ─────────────────────────────────
     resetFilters: () => set(initialState),
   })),
@@ -201,6 +210,8 @@ export const useAreaFilters = () =>
 
 export const useSearchTerm = () => useFilterStore((s) => s.searchTerm);
 
+export const useRadiusKm = () => useFilterStore((s) => s.radiusKm);
+
 /** Build the queryKey-friendly snapshot of all filters */
 export const useFilterSnapshot = () =>
   useFilterStore(
@@ -220,5 +231,6 @@ export const useFilterSnapshot = () =>
       landAreaMin: s.landAreaMin,
       constructionAreaMin: s.constructionAreaMin,
       searchTerm: s.searchTerm,
+      radiusKm: s.radiusKm,
     })),
   );

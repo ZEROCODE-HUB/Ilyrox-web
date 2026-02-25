@@ -11,10 +11,14 @@ import { Avatar } from "@/components/shared/Avatar";
 import { LogOut, Settings } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { ConfigModal } from "./ConfigModal";
+import { Badge } from "../ui/badge";
 
 export function UserProfile() {
   const { user, profile, signOut, isLoading } = useAuth();
   const navigate = useNavigate();
+  const [openConfig, setOpenConfig] = useState(false);
 
   const handleLogout = async () => {
     await signOut();
@@ -40,19 +44,36 @@ export function UserProfile() {
           />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">
-              {profile?.full_name || "Usuario"}
-            </p>
-            <p className="text-xs leading-none text-muted-foreground">
-              {user.email}
-            </p>
+      <DropdownMenuContent align="end" className="w-64 p-2">
+        <DropdownMenuLabel className="font-normal p-2">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-3">
+              <Avatar
+                uri={profile?.foto}
+                name={profile?.full_name || "Usuario"}
+                size={40}
+              />
+              <div className="flex flex-col min-w-0">
+                <p className="text-sm font-bold leading-none truncate">
+                  {profile?.full_name || "Usuario"}
+                </p>
+                <p className="text-[10px] leading-none text-muted-foreground mt-1 truncate">
+                  {user.email}
+                </p>
+              </div>
+            </div>
+            {profile?.rol === "agente" && (
+              <Badge
+                variant="secondary"
+                className="w-fit text-[10px] h-5 px-1.5 bg-primary/10 text-primary border-none"
+              >
+                Agente Pro
+              </Badge>
+            )}
           </div>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => {}}>
+        <DropdownMenuSeparator className="my-2" />
+        <DropdownMenuItem onClick={() => setOpenConfig(true)}>
           <Settings className="mr-2 h-4 w-4" />
           <span>Configuración</span>
         </DropdownMenuItem>
@@ -65,6 +86,11 @@ export function UserProfile() {
           <span>Cerrar sesión</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
+      <ConfigModal
+        open={openConfig}
+        onOpenChange={setOpenConfig}
+        profile={profile!}
+      />
     </DropdownMenu>
   );
 }

@@ -5,10 +5,10 @@ import { UserLocation } from "@/types/property";
 import { PropertyCard } from "@/components/PropertyCard";
 import { PropertyDetail } from "@/components/PropertyDetails/PropertyDetail";
 import { SimplifiedFilters as FiltersComponent } from "@/components/SimplifiedFilters";
-import { SearchAndSort } from "@/components/SearchAndSort";
+import { SearchAndSort } from "@/components/Header/SearchAndSort";
 import MapViewContainer from "@/components/Map/MapViewContainer";
 import { MapControls } from "@/components/MapControls";
-import { ZoneSearch } from "@/components/ZoneSearch";
+import { ZoneSearch } from "@/components/Header/ZoneSearch";
 import { Button } from "@/components/ui/button";
 import {
   ResizablePanelGroup,
@@ -17,7 +17,6 @@ import {
   ImperativePanelHandle,
 } from "@/components/ui/resizable";
 import { getCurrentLocation } from "@/utils/geolocation";
-import { useToast } from "@/hooks/use-toast";
 import {
   MapPin,
   Home,
@@ -27,7 +26,7 @@ import {
   Bell,
   Heart,
 } from "lucide-react";
-import { UserProfile } from "@/components/UserProfile";
+import { UserProfile } from "@/components/Header/UserProfile";
 import { useAuth } from "@/contexts/AuthContext";
 
 import { MainTabs } from "@/components/MainTabs";
@@ -49,6 +48,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 // ── Zustand + React Query ─────────────────────
 import { useFilterStore, useEstadoMexico } from "@/stores/useFilterStore";
 import { useProperties } from "@/hooks/useProperties";
+import { sileo } from "sileo";
 
 const Index = () => {
   // ── Store state ─────────────────────────────
@@ -58,6 +58,9 @@ const Index = () => {
   // ── React Query (replaces manual fetching) ──
   const { data: properties = [], isLoading } = useProperties(0, 50);
 
+  const radiusKm = useFilterStore((s) => s.radiusKm);
+  const setRadiusKm = useFilterStore((s) => s.setRadiusKm);
+
   // ── Local UI state ──────────────────────────
   const [selectedProperty, setSelectedProperty] = useState<PropertyView | null>(
     null,
@@ -65,7 +68,6 @@ const Index = () => {
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
 
   // Client-side radius filtering
-  const [radiusKm, setRadiusKm] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
   const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(false);
   const [isMapHidden, setIsMapHidden] = useState(false);
@@ -78,7 +80,6 @@ const Index = () => {
     19.4326, -99.1332,
   ]);
 
-  const { toast } = useToast();
   const navigate = useNavigate();
   const filtersPanelRef = useRef<ImperativePanelHandle>(null);
 
@@ -144,16 +145,17 @@ const Index = () => {
       setUserLocation(location);
       setCenterLocation([location.lat, location.lng]);
       setRadiusKm(5);
-      toast({
+      sileo.success({
         title: "Ubicación detectada",
         description: "Mostrando propiedades cercanas a tu ubicación.",
+        position: "top-right",
       });
     } catch {
-      toast({
+      sileo.error({
         title: "Error de ubicación",
         description:
           "No se pudo obtener tu ubicación. Verifica los permisos del navegador.",
-        variant: "destructive",
+        position: "top-right",
       });
     }
   };
@@ -172,11 +174,12 @@ const Index = () => {
       });
 
       if (minDistance !== Infinity) {
-        toast({
+        sileo.info({
           title: "Distancia",
           description: `La propiedad más cercana está a ${minDistance.toFixed(
             2,
           )} km de tu ubicación.`,
+          position: "top-right",
         });
       }
     }
@@ -184,7 +187,6 @@ const Index = () => {
 
   const handleClearFilters = () => {
     resetFilters();
-    setRadiusKm(0);
   };
 
   const hasActiveFilters = Boolean(estadoMexico || radiusKm > 0);
@@ -211,7 +213,7 @@ const Index = () => {
                 <div className="flex-1 flex flex-col gap-2 w-full">
                   <SearchAndSort
                     onLocationSearch={handleLocationSearch}
-                    onFocus={handleSearchFocus}
+                    onFocus={() => {}} // Notificación de propiedades cercanas handleSearchFocus
                   />
                   <div className="w-full">
                     <ZoneSearch />

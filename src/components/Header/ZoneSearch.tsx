@@ -10,9 +10,9 @@ import {
 } from "@/stores/useFilterStore";
 import { MUNICIPIOS_ESTADO } from "@/constants/MexLocations/municipios";
 import { COLONIAS_POR_MUNICIPIO } from "@/constants/MexLocations/colonias";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Modal } from "./ui/Modal";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Modal } from "../ui/Modal";
 import { usePropertyColonias } from "@/hooks/usePropertyColonias";
 
 export function ZoneSearch() {

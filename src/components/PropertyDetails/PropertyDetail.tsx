@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
-import { useToast } from "@/hooks/use-toast";
 import {
   MapPin,
   Bed,
@@ -33,6 +32,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Modal } from "../ui/Modal";
 import { MapModal } from "./MapModal";
 import { InfoModal } from "./InfoModal";
+import { sileo } from "sileo";
 
 interface PropertyDetailProps {
   property: PropertyView | null;
@@ -61,7 +61,6 @@ export function PropertyDetail({
   }, [property]);
 
   const { user } = useAuth();
-  const { toast } = useToast();
   const {
     isSaved,
     toggleSave,
@@ -78,10 +77,10 @@ export function PropertyDetail({
     if (!displayProperty) return;
 
     if (!user) {
-      toast({
+      sileo.error({
         title: "Inicia sesión",
         description: "Debes estar logueado para guardar propiedades",
-        variant: "destructive",
+        position: "top-center",
       });
       return;
     }
@@ -206,10 +205,11 @@ export function PropertyDetail({
                 onClick={() => {
                   const propertyUrl = `${window.location.origin}/property/${displayProperty.id}`;
                   navigator.clipboard.writeText(propertyUrl).then(() => {
-                    toast({
+                    sileo.success({
                       title: "Enlace copiado",
                       description:
                         "El enlace de la propiedad se ha copiado al portapapeles",
+                      position: "top-right",
                     });
                   });
                 }}
