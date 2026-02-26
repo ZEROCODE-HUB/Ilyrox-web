@@ -1,7 +1,7 @@
 import { upperWord } from "@/utils/upperWord";
 import { SkeletonCard } from "../shared/SkeletonCard";
 import { NotificationItem } from "./NotificationItem";
-import { BellOff, Search, Bell } from "lucide-react";
+import { BellOff, Search, Bell, MapPin } from "lucide-react";
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -91,8 +91,8 @@ export const NotificationList = ({
                 <div className="flex flex-wrap gap-4 text-sm text-muted-foreground bg-white/50 p-3 rounded-xl border border-border/50">
                   {group.busqueda.colonias && (
                     <div className="flex items-center gap-1.5">
-                      <span className="font-semibold text-foreground/70">
-                        📍 Colonias:
+                      <span className="font-semibold text-foreground/70 flex justify-center items-center">
+                        <MapPin className="w-4 h-4" /> Colonias:
                       </span>{" "}
                       {group.busqueda.colonias.join(", ")}
                     </div>

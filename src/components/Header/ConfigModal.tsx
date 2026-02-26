@@ -1,6 +1,14 @@
 import { Modal } from "../ui/Modal";
 import { Avatar } from "../shared/Avatar";
-import { Mail, Phone, Briefcase, Info, Globe, Shield } from "lucide-react";
+import {
+  Mail,
+  Phone,
+  Briefcase,
+  Info,
+  Globe,
+  Shield,
+  MapPin,
+} from "lucide-react";
 import { Badge } from "../ui/badge";
 
 interface ConfigModalProps {
@@ -13,7 +21,7 @@ interface ConfigModalProps {
     celular?: string;
     ocupacion?: string;
     biografia?: string;
-    sitio_web?: string;
+    estado?: string;
     rol?: string;
   };
 }
@@ -24,11 +32,7 @@ export const ConfigModal = ({
   profile,
 }: ConfigModalProps) => {
   return (
-    <Modal
-      isOpen={open}
-      onClose={() => onOpenChange(false)}
-      title="Configuración de la Cuenta"
-    >
+    <Modal isOpen={open} onClose={() => onOpenChange(false)} title="Mi Perfil">
       <div className="flex flex-col gap-6 py-4">
         {/* Header con foto y nombre */}
         <div className="flex flex-col items-center gap-4 text-center">
@@ -101,14 +105,14 @@ export const ConfigModal = ({
 
           <div className="flex items-center gap-3 p-3 rounded-2xl bg-muted/30 border border-border/50">
             <div className="bg-primary/10 p-2 rounded-lg text-primary">
-              <Globe className="h-4 w-4" />
+              <MapPin className="h-4 w-4" />
             </div>
             <div className="min-w-0">
               <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">
-                Sitio Web
+                Estado
               </p>
               <p className="text-sm font-semibold truncate">
-                {profile.sitio_web || "No especificado"}
+                {profile.estado || "No especificado"}
               </p>
             </div>
           </div>

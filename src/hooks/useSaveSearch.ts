@@ -260,18 +260,7 @@ export const useSaveSearch = (userId?: string) => {
     }
 
     if (filters.moneda) {
-      const { data: monedaData, error: monedaError } = await supabase
-        .from("configuracion_monedas")
-        .select("codigo")
-        .eq("simbolo", filters.moneda === "MXN" ? "$" : "USD")
-        .eq("activa", true)
-        .single();
-
-      if (monedaData && !monedaError) {
-        insertData.moneda = monedaData.codigo;
-      } else {
-        insertData.moneda = filters.moneda;
-      }
+      insertData.moneda = filters.moneda;
     }
 
     const { data: searchData, error: searchError } = await supabase

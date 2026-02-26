@@ -89,6 +89,7 @@ const Index = () => {
 
   const handleClearFilters = () => {
     resetFilters();
+    setUserLocation(null);
   };
 
   const handleToggleMap = () => {
@@ -127,6 +128,8 @@ const Index = () => {
           onLogin={() => setShowAuthPopup(true)}
           setShowRentSellPopup={setShowRentSellPopup}
           isAuthLoading={isAuthLoading}
+          setUserLocation={setUserLocation}
+          setCenterLocation={setCenterLocation}
         />
         {/* Mobile Header */}
         <MobileHeader
@@ -160,6 +163,7 @@ const Index = () => {
             userLocation={userLocation}
             hasActiveFilters={hasActiveFilters}
             hasStateSelected={hasStateSelected}
+            setRadiusKm={setRadiusKm}
           />
 
           {/* Vista desktop */}

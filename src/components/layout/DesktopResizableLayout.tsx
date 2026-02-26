@@ -87,10 +87,7 @@ export const DesktopResizableLayout = ({
         <div className="h-full border-r bg-card shadow-sm">
           {!isFiltersCollapsed ? (
             <div className="h-full flex flex-col">
-              <div className="flex items-center justify-between px-4 py-3 border-b bg-muted/30">
-                <span className="text-sm font-semibold text-foreground/80">
-                  Filtros Avanzados
-                </span>
+              {/* <div className="flex items-center justify-between px-4 py-3 border-b bg-muted/30">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -99,8 +96,16 @@ export const DesktopResizableLayout = ({
                 >
                   <ChevronLeft className="h-5 w-5" />
                 </Button>
-              </div>
-              <div className="flex-1 overflow-y-auto custom-scrollbar p-1">
+              </div> */}
+              <div className="flex-1 overflow-y-auto custom-scrollbar p-1 ">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => filtersPanelRef.current?.collapse()}
+                  className="h-8 w-8 p-0 ml-2 hover:bg-background rounded-full transition-transform hover:scale-110"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </Button>
                 <FiltersComponent
                   onCancel={() => filtersPanelRef.current?.collapse()}
                 />

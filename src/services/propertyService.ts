@@ -40,14 +40,23 @@ export const propertyService = {
     const filterCurrency = filters.currency || "MXN";
 
     if ((filters.priceMin || filters.priceMax) && filterCurrency !== "USD") {
-      const { data: config } = await supabase
-        .from("configuracion_monedas")
-        .select("valor_en_usd")
-        .eq("codigo", filterCurrency)
-        .single();
+      try {
+        const { data: config, error } = await supabase
+          .from("configuracion_monedas")
+          .select("valor_en_usd")
+          .eq("codigo", filterCurrency)
+          .single();
 
-      if (config?.valor_en_usd) {
-        exchangeRateToUSD = config.valor_en_usd;
+        if (!error && config?.valor_en_usd) {
+          exchangeRateToUSD = config.valor_en_usd;
+        } else if (filterCurrency === "MXN") {
+          // Fallback to average rate if database query fails
+          exchangeRateToUSD = 18.0;
+        }
+      } catch (e) {
+        if (filterCurrency === "MXN") {
+          exchangeRateToUSD = 18.0;
+        }
       }
     }
 
@@ -80,11 +89,13 @@ export const propertyService = {
 
     if (filters.priceMin) {
       const minUSD = filters.priceMin / exchangeRateToUSD;
-      query = query.gte("precio_usd_normalizado", minUSD);
+      // Subtract a small epsilon to account for potential floating-point inaccuracies
+      query = query.gte("precio_usd_normalizado", minUSD - 0.0001);
     }
     if (filters.priceMax) {
       const maxUSD = filters.priceMax / exchangeRateToUSD;
-      query = query.lte("precio_usd_normalizado", maxUSD);
+      // Add a small epsilon to account for potential floating-point inaccuracies
+      query = query.lte("precio_usd_normalizado", maxUSD + 0.0001);
     }
 
     if (filters.bedrooms && filters.bedrooms > 0)

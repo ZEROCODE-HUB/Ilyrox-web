@@ -4,18 +4,19 @@ import { ArrowLeft, Bell, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { UserProfile } from "@/components/Header/UserProfile";
 import { useAuth } from "@/contexts/AuthContext";
-import { notificationService } from "@/services/notificationService";
 import { NotificationList } from "@/components/Notifications/NotificationList";
-import { useNotifications } from "@/contexts/NotificationContext";
+import { useNotificationsQuery } from "@/hooks/useNotificationsQuery";
 import { PropertyDetail } from "@/components/PropertyDetails/PropertyDetail";
 import { PropertyView } from "@/types/types";
 
 const Notifications = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { refreshNotifications } = useNotifications();
-  const [notifications, setNotifications] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const {
+    data: notifications = [],
+    isLoading,
+    markAsRead,
+  } = useNotificationsQuery(user?.id);
   const [selectedProperty, setSelectedProperty] = useState<PropertyView | null>(
     null,
   );
@@ -26,30 +27,16 @@ const Notifications = () => {
     setIsDetailOpen(true);
   };
 
-  const fetchNotifications = async () => {
-    if (!user) return;
-    try {
-      setIsLoading(true);
-      const data = await notificationService.getNotifications(user.id);
-      setNotifications(data || []);
-
-      // Mark as read automatically when entering the page
-      if (data && data.some((m: any) => m.estado === "pendiente")) {
-        await notificationService.markAsRead(user.id);
-        refreshNotifications(); // Update unread count in context
-      }
-    } catch (error) {
-      console.error("Error fetching notifications:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    if (user) {
-      fetchNotifications();
+    // Mark as read automatically when entering the page if we have pending notifications
+    if (
+      user &&
+      notifications &&
+      notifications.some((m: any) => m.estado === "pendiente")
+    ) {
+      markAsRead();
     }
-  }, [user]);
+  }, [user, notifications, markAsRead]);
 
   return (
     <div className="min-h-screen bg-background pb-20">

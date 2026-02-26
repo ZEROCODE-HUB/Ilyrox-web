@@ -27,6 +27,7 @@ export const MobileHeader = ({
   setUserLocation,
   setCenterLocation,
   setShowFilters,
+  showFilters,
 }: MobileHeaderProps) => {
   const navigate = useNavigate();
   const setRadiusKm = useFilterStore((s) => s.setRadiusKm);
@@ -103,11 +104,11 @@ export const MobileHeader = ({
         <ZoneSearch />
         <Button
           variant="outline"
-          onClick={() => setShowFilters(true)}
+          onClick={() => setShowFilters(!showFilters)}
           className="w-full bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white"
         >
           <Filter className="h-4 w-4 mr-2" />
-          Más filtros
+          {showFilters ? "Ocultar filtros" : "Más filtros"}
         </Button>
       </div>
     </div>
