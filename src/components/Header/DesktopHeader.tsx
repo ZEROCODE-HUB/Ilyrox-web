@@ -2,17 +2,22 @@ import { Link, useNavigate } from "react-router-dom";
 import { SearchAndSort } from "./SearchAndSort";
 import { ZoneSearch } from "./ZoneSearch";
 import logo360 from "@/assets/logo-360.png";
-import { useState } from "react";
 import { Bell, Heart, Home } from "lucide-react";
 import Skeleton from "react-loading-skeleton";
 import { UserProfile } from "./UserProfile";
 import { Button } from "../ui/button";
+import { getCurrentLocation } from "@/utils/geolocation";
+import { UserLocation } from "@/types/property";
+import { useFilterStore } from "@/stores/useFilterStore";
+import { sileo } from "sileo";
 
 interface DesktopHeaderProps {
   user: any;
   onLogin: () => void;
   setShowRentSellPopup: (show: boolean) => void;
   isAuthLoading: boolean;
+  setUserLocation: (loc: UserLocation | null) => void;
+  setCenterLocation: (loc: [number, number]) => void;
 }
 
 export const DesktopHeader = ({
@@ -20,9 +25,32 @@ export const DesktopHeader = ({
   onLogin,
   setShowRentSellPopup,
   isAuthLoading,
+  setUserLocation,
+  setCenterLocation,
 }: DesktopHeaderProps) => {
   const navigate = useNavigate();
-  const handleLocationSearch = () => {};
+  const setRadiusKm = useFilterStore((s) => s.setRadiusKm);
+
+  const handleLocationSearch = async () => {
+    try {
+      const location = await getCurrentLocation();
+      setUserLocation(location);
+      setCenterLocation([location.lat, location.lng]);
+      setRadiusKm(5);
+      sileo.success({
+        title: "Ubicación detectada",
+        description: "Mostrando propiedades cercanas a tu ubicación.",
+        position: "top-right",
+      });
+    } catch {
+      sileo.error({
+        title: "Error de ubicación",
+        description:
+          "No se pudo obtener tu ubicación. Verifica los permisos del navegador.",
+        position: "top-right",
+      });
+    }
+  };
 
   return (
     <div className="hidden md:block">
@@ -41,7 +69,7 @@ export const DesktopHeader = ({
                 <img
                   src={logo360}
                   alt="360"
-                  className="h-14 lg:h-16 w-auto object-contain"
+                  className="h-14 lg:h-16 w-auto object-contain hover:scale-110 transition-transform"
                 />
               </Link>
               <div className="w-full max-w-2xl">

@@ -113,6 +113,13 @@ export function PropertyDetailContent({
     ];
   };
 
+  // Construct location string
+  const lineCalle = property.calle == null ? "" : property.calle + ", ";
+  const lineColonia = property.colonia == null ? "" : property.colonia + ", ";
+  const lineMunicipio =
+    property.municipio == null ? "" : property.municipio + ", ";
+  const lineEstado = property.estado == null ? "" : property.estado + ", ";
+
   return (
     <>
       <div className="p-6 space-y-6">
@@ -232,9 +239,7 @@ export function PropertyDetailContent({
               >
                 <MapPin className="h-4 w-4 mr-2" />
                 <span className="underline underline-offset-2">
-                  {displayProperty.calle || displayProperty.colonia},{" "}
-                  {displayProperty.ciudad || displayProperty.municipio},{" "}
-                  {displayProperty.estado}
+                  {lineCalle} {lineColonia} {lineMunicipio} {lineEstado}
                 </span>
               </div>
             </div>

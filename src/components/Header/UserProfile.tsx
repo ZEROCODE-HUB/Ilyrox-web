@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/shared/Avatar";
-import { LogOut, Settings } from "lucide-react";
+import { LogOut, Settings, User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -74,8 +74,8 @@ export function UserProfile() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="my-2" />
         <DropdownMenuItem onClick={() => setOpenConfig(true)}>
-          <Settings className="mr-2 h-4 w-4" />
-          <span>Configuración</span>
+          <User className="mr-2 h-4 w-4" />
+          <span>Mi Perfil</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem

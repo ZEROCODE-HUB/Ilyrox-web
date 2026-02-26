@@ -19,6 +19,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 import { Avatar } from "@/components/shared/Avatar";
 import { sileo } from "sileo";
+import { upperWord } from "@/utils/upperWord";
 
 interface PropertyCardProps {
   property: PropertyView;
@@ -127,10 +128,11 @@ export function PropertyCard({
   };
 
   // Construct location string
-  const locationLine1 =
-    `${property.calle || ""} ${property.numero_exterior || ""}`.trim() ||
-    property.colonia;
-  const locationLine2 = `${property.municipio || ""}, ${property.estado || ""}`;
+  const lineCalle = property.calle == null ? "" : property.calle + ", ";
+  const lineColonia = property.colonia == null ? "" : property.colonia + ", ";
+  const lineMunicipio =
+    property.municipio == null ? "" : property.municipio + ", ";
+  const lineEstado = property.estado == null ? "" : property.estado + ", ";
 
   const operations = property.operaciones || [];
   const isVenta =
@@ -212,14 +214,13 @@ export function PropertyCard({
           <div>
             <h3 className="font-bold text-lg leading-tight text-foreground group-hover:text-primary transition-colors min-h-[3.5rem] flex items-center">
               <span className="line-clamp-2">
-                {property.tipo.charAt(0).toUpperCase() + property.tipo.slice(1)}{" "}
-                en {property.municipio}
+                {upperWord(property.tipo)} en {property.municipio}
               </span>
             </h3>
             <div className="flex items-start text-muted-foreground mt-1">
               <MapPin className="h-3.5 w-3.5 mr-1 mt-0.5 flex-shrink-0" />
               <p className="text-xs line-clamp-1 flex-1">
-                {locationLine1} {locationLine2}
+                {lineCalle} {lineColonia} {lineMunicipio} {lineEstado}
               </p>
             </div>
           </div>
@@ -228,8 +229,7 @@ export function PropertyCard({
           <div className="text-primary flex flex-col gap-0">
             {ventaOp ? (
               <p className="text-xl font-bold">
-                {ventaOp.moneda === "MXN" ? "MXN" : "USD"}{" "}
-                {formatPrice(ventaOp.precio)}
+                {ventaOp.moneda || ""} {formatPrice(ventaOp.precio)}
               </p>
             ) : rentaOp ? (
               <p className="text-xl font-bold">

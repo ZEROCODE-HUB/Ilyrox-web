@@ -7,6 +7,7 @@ import MapViewContainer from "@/components/Map/MapViewContainer";
 import { PropertyCard } from "@/components/PropertyCard";
 import { SkeletonCard } from "@/components/shared/SkeletonCard";
 import { SimplifiedFilters } from "@/components/SimplifiedFilters";
+import { MapControls } from "../MapControls";
 
 interface MobileLayoutProps {
   showFilters: boolean;
@@ -26,6 +27,7 @@ interface MobileLayoutProps {
   userLocation: UserLocation | null;
   hasActiveFilters: boolean;
   hasStateSelected: boolean;
+  setRadiusKm: (radius: number) => void;
 }
 
 export const MobileLayout = ({
@@ -46,13 +48,14 @@ export const MobileLayout = ({
   userLocation,
   hasActiveFilters,
   hasStateSelected,
+  setRadiusKm,
 }: MobileLayoutProps) => {
   return (
     <div className="lg:hidden h-full w-full flex flex-col relative">
       {showFilters && (
         <div className="absolute inset-0 z-30 bg-background overflow-y-auto">
           <div className="sticky top-0 z-10 bg-card border-b shadow-sm">
-            <div className="px-4 py-3 flex items-center justify-between">
+            {/* <div className="px-4 py-3 flex items-center justify-between">
               <h2 className="text-lg font-bold">Filtros</h2>
               <Button
                 variant="ghost"
@@ -62,7 +65,7 @@ export const MobileLayout = ({
               >
                 Aplicar
               </Button>
-            </div>
+            </div> */}
           </div>
           <div className="p-5">
             <SimplifiedFilters setShowFilters={() => setShowFilters(false)} />
@@ -104,6 +107,13 @@ export const MobileLayout = ({
                 hasFilters={hasActiveFilters}
                 handleToggleMap={handleToggleMap}
               />
+              <div className=" absolute bottom-0 right-0 z-10 w-full">
+                <MapControls
+                  radiusKm={radiusKm}
+                  onRadiusChange={setRadiusKm}
+                  userLocation={userLocation}
+                />
+              </div>
             </ErrorBoundary>
           </div>
         </div>

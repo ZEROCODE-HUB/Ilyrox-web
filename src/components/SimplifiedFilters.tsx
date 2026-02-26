@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Home, Building2, Factory, Save, Sprout } from "lucide-react";
+import { Home, Building2, Factory, Sprout, Bookmark } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -166,20 +166,17 @@ export function SimplifiedFilters({
   const subtiposDisponibles = type ? subtiposPorTipo[type] || [] : [];
   const hasPropertyTypeSelected = !!type;
 
-  // ── Handlers ────────────────────────────────
-  const handleEstadoChange = (estado: string) => {
-    setEstadoMexico(estado);
-    setColoniaSearch("");
-  };
-
   const handlePriceMinChange = (value: string) => {
-    const numericValue = value.replace(/[^0-9]/g, "");
-    setPriceMin(numericValue ? parseInt(numericValue) : undefined);
+    // Preserve digits, optional dot, and remove other characters like commas or $
+    const cleanValue = value.replace(/[$,\s]/g, "").replace(/[^0-9.]/g, "");
+    const numericValue = parseFloat(cleanValue);
+    setPriceMin(!isNaN(numericValue) ? Math.floor(numericValue) : undefined);
   };
 
   const handlePriceMaxChange = (value: string) => {
-    const numericValue = value.replace(/[^0-9]/g, "");
-    setPriceMax(numericValue ? parseInt(numericValue) : undefined);
+    const cleanValue = value.replace(/[$,\s]/g, "").replace(/[^0-9.]/g, "");
+    const numericValue = parseFloat(cleanValue);
+    setPriceMax(!isNaN(numericValue) ? Math.ceil(numericValue) : undefined);
   };
 
   const handleCurrencyChange = (newCurrency: "MXN" | "USD") => {
@@ -204,6 +201,23 @@ export function SimplifiedFilters({
   const onSaveClick = async () => {
     if (!user) {
       sileo.error({ title: "Debes iniciar sesión para guardar tu búsqueda" });
+      return;
+    }
+
+    if (!type) {
+      sileo.warning({
+        title: "Información faltante",
+        description:
+          "Debe seleccionar un tipo de propiedad para guardar la búsqueda.",
+      });
+      return;
+    }
+
+    if (!estadoMexico) {
+      sileo.warning({
+        title: "Información faltante",
+        description: "Debe seleccionar un estado para guardar la búsqueda.",
+      });
       return;
     }
 
@@ -241,9 +255,7 @@ export function SimplifiedFilters({
       <div className="flex-1 overflow-y-auto space-y-7 px-5 py-5 custom-scrollbar">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-border">
-          <h3 className="font-bold text-lg text-foreground">
-            Filtros Avanzados
-          </h3>
+          <h3 className="font-bold text-lg text-foreground">Filtros</h3>
           <button
             onClick={handleClearAll}
             className="text-sm font-medium text-primary hover:underline transition-colors"
@@ -292,7 +304,7 @@ export function SimplifiedFilters({
               Rango de Precio
             </Label>
             <div className="flex rounded-lg border border-input overflow-hidden">
-              {(["MXN", "USD"] as const).map((curr) => (
+              {(["USD", "MXN"] as const).map((curr) => (
                 <button
                   key={curr}
                   type="button"
@@ -340,128 +352,6 @@ export function SimplifiedFilters({
             </div>
           </div>
         </div>
-
-        {/* Ubicación
-        <div className="space-y-4">
-          <Label className="text-sm font-semibold text-foreground">
-            Ubicación
-          </Label>
-
-          <div className="space-y-2">
-            <Label className="text-xs font-medium text-muted-foreground uppercase">
-              Estado
-            </Label>
-            <Select value={estadoMexico} onValueChange={handleEstadoChange}>
-              <SelectTrigger className="w-full h-11">
-                <SelectValue placeholder="Selecciona un estado" />
-              </SelectTrigger>
-              <SelectContent className="max-h-[300px]">
-                {ESTADOS_MEXICO.map((estado) => (
-                  <SelectItem key={estado} value={estado}>
-                    {estado}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-         
-          {estadoMexico && (
-            <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
-              <div className="flex items-center justify-between">
-                <Label className="text-xs font-medium text-muted-foreground uppercase">
-                  Colonias en {estadoMexico} ({availableColonias.length} disponibles)
-                </Label>
-                {colonias.length > 0 && (
-                  <button
-                    onClick={() => setColonias([])}
-                    className="text-[10px] text-primary hover:underline font-medium"
-                  >
-                    Limpiar selección
-                  </button>
-                )}
-              </div>
-
-              
-              {colonias.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-1">
-                  {colonias.map((col) => (
-                    <Badge
-                      key={col}
-                      variant="default"
-                      className="flex items-center gap-1 bg-primary text-white border-primary px-3 py-1.5 rounded-full text-xs font-medium shadow-sm cursor-pointer hover:bg-primary/90 transition-all"
-                    >
-                      {col}
-                      <X
-                        className="h-3 w-3 ml-0.5 hover:opacity-70"
-                        onClick={() => removeColonia(col)}
-                      />
-                    </Badge>
-                  ))}
-                </div>
-              )}
-
-              
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Filtrar colonias..."
-                  value={coloniaSearch}
-                  onChange={(e) => setColoniaSearch(e.target.value)}
-                  className="pl-9 h-10 text-sm"
-                />
-                {coloniaSearch && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setColoniaSearch("")}
-                    className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 hover:bg-slate-100 rounded-full"
-                  >
-                    <X className="h-3.5 w-3.5 text-muted-foreground" />
-                  </Button>
-                )}
-              </div>
-
-              
-              <ScrollArea className="h-52 w-full rounded-lg border bg-white/50">
-                <div className="flex flex-wrap gap-2 p-3">
-                  {filteredColonias.map((colonia) => {
-                    const isSelected = colonias.includes(colonia);
-                    return (
-                      <Badge
-                        key={colonia}
-                        variant={isSelected ? "default" : "outline"}
-                        className={cn(
-                          "cursor-pointer px-3 py-1.5 rounded-full text-xs transition-all border font-medium select-none",
-                          isSelected
-                            ? "bg-primary text-white border-primary shadow-sm scale-[1.02]"
-                            : "bg-white text-slate-600 border-slate-200 hover:bg-primary/5 hover:border-primary/40 hover:text-primary",
-                        )}
-                        onClick={() => toggleColonia(colonia)}
-                      >
-                        {isSelected && <Check className="h-3 w-3 mr-1" />}
-                        {colonia}
-                      </Badge>
-                    );
-                  })}
-                  {filteredColonias.length === 0 && (
-                    <div className="w-full text-center py-6 text-sm text-muted-foreground">
-                      No se encontraron colonias
-                    </div>
-                  )}
-                </div>
-              </ScrollArea>
-            </div>
-          )}
-
-          {!estadoMexico && (
-            <div className="p-4 rounded-lg border border-dashed border-slate-200 bg-slate-50/30 text-center">
-              <Label className="text-sm font-medium text-slate-600">
-                Selecciona un Estado para ver colonias disponibles
-              </Label>
-            </div>
-          )}
-        </div> */}
 
         {/* Tipo de Propiedad */}
         <div className="space-y-4">
@@ -669,7 +559,7 @@ export function SimplifiedFilters({
             variant="outline"
             onClick={onSaveClick}
           >
-            <Save className="w-5 h-5 mr-3" />
+            <Bookmark className="w-5 h-5 mr-3" />
             Guardar búsqueda
           </Button>
         </div>
@@ -686,10 +576,13 @@ export function SimplifiedFilters({
             Cerrar
           </Button>
           <Button
-            onClick={onApplyFilters}
+            onClick={() => {
+              onApplyFilters?.();
+              setShowFilters?.(false);
+            }}
             className="h-12 bg-primary hover:bg-primary/90 text-white shadow-md transition-all active:scale-95 font-semibold"
           >
-            Ver Resultados
+            <span className="text-wrap"> Ver Resultados</span>
           </Button>
         </div>
       </div>

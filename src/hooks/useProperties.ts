@@ -14,6 +14,7 @@ import type { PropertyView } from "@/types/types";
 export function useProperties(page = 0, pageSize = 10) {
   // Primitive selectors – only re-render when the actual value changes
   const estadoMexico = useFilterStore((s) => s.estadoMexico);
+  const radiusKm = useFilterStore((s) => s.radiusKm);
   const coloniasKey = useFilterStore((s) => JSON.stringify(s.colonias));
   const priceMin = useFilterStore((s) => s.priceMin);
   const priceMax = useFilterStore((s) => s.priceMax);
@@ -33,6 +34,7 @@ export function useProperties(page = 0, pageSize = 10) {
     queryKey: [
       "properties",
       estadoMexico,
+      radiusKm,
       coloniasKey,
       priceMin,
       priceMax,
@@ -53,7 +55,7 @@ export function useProperties(page = 0, pageSize = 10) {
     queryFn: async () => {
       // Read latest state directly from the store (not from hook values)
       const s = useFilterStore.getState();
-      if (!s.estadoMexico) return [];
+      if (!s.estadoMexico && s.radiusKm === 0 && !s.searchTerm) return [];
 
       return propertyService.searchProperties(
         {
@@ -78,7 +80,7 @@ export function useProperties(page = 0, pageSize = 10) {
         pageSize,
       );
     },
-    enabled: !!estadoMexico,
+    enabled: !!estadoMexico || radiusKm > 0 || !!searchTerm,
     placeholderData: (prev) => prev,
     staleTime: 30_000,
     refetchOnWindowFocus: false,
