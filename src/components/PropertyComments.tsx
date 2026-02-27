@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { propertyService } from "@/services/propertyService";
 import { supabase } from "@/lib/supabase";
-import { sileo } from "sileo";
+import { useToast } from "@/hooks/use-toast";
 
 interface Comment {
   id: string;
@@ -68,7 +68,7 @@ const CommentItem = ({
   expandedReplies,
   toggleReplies,
 }: CommentItemProps) => (
-  <div className={`flex gap-3 ${isReply ? "ml-10 mt-3" : ""}`}>
+  <div className={`flex gap-3 ${isReply ? "ml-5 mt-3" : ""}`}>
     <Avatar
       uri={comment.author.avatar}
       name={comment.author.name}
@@ -201,6 +201,7 @@ export function PropertyComments({
   propertyId,
   feedItemId,
 }: PropertyCommentsProps) {
+  const { toast } = useToast();
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [newComment, setNewComment] = useState("");
@@ -258,10 +259,15 @@ export function PropertyComments({
       setComments(rootComments);
     } catch (error) {
       console.error(error);
+      toast({
+        variant: "destructive",
+        title: "Error al cargar comentarios",
+        description: (error as Error).message,
+      });
     } finally {
       setIsLoading(false);
     }
-  }, [feedItemId]);
+  }, [feedItemId, toast]);
 
   useEffect(() => {
     loadComments();
@@ -270,55 +276,49 @@ export function PropertyComments({
   const handleAddComment = async () => {
     if (!newComment.trim() || !feedItemId) return;
 
-    const promise = async () => {
+    toast({
+      title: "Enviando comentario...",
+    });
+
+    try {
       await propertyService.addComment(feedItemId, newComment);
       setNewComment("");
       await loadComments();
-    };
-
-    sileo.promise(promise(), {
-      loading: {
-        title: "Enviando comentario...",
-        position: "top-right",
-      },
-      success: {
+      toast({
         title: "Comentario agregado",
-        position: "top-right",
-      },
-      error: (error: any) => ({
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
         title: "Error",
         description: error.message,
-        position: "top-right",
-      }),
-    });
+      });
+    }
   };
 
   const handleAddReply = async (parentId: string) => {
     if (!replyContent.trim() || !feedItemId) return;
 
-    const promise = async () => {
+    toast({
+      title: "Enviando respuesta...",
+    });
+
+    try {
       await propertyService.addComment(feedItemId, replyContent, parentId);
       setReplyContent("");
       setReplyingTo(null);
       await loadComments();
       setExpandedReplies((prev) => new Set(prev).add(parentId));
-    };
-
-    sileo.promise(promise(), {
-      loading: {
-        title: "Enviando respuesta...",
-        position: "top-right",
-      },
-      success: {
+      toast({
         title: "Respuesta agregada",
-        position: "top-right",
-      },
-      error: (error: any) => ({
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
         title: "Error",
         description: error.message,
-        position: "top-right",
-      }),
-    });
+      });
+    }
   };
 
   const handleLike = async (
@@ -330,10 +330,10 @@ export function PropertyComments({
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) {
-      sileo.error({
+      toast({
+        variant: "destructive",
         title: "Inicia sesión",
         description: "Debes estar logueado para dar like",
-        position: "top-right",
       });
       return;
     }

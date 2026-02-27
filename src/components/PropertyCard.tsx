@@ -18,7 +18,7 @@ import { useSavedProperties } from "@/hooks/useSavedProperties";
 import { useAuth } from "@/contexts/AuthContext";
 
 import { Avatar } from "@/components/shared/Avatar";
-import { sileo } from "sileo";
+import { useToast } from "@/hooks/use-toast";
 import { upperWord } from "@/utils/upperWord";
 
 interface PropertyCardProps {
@@ -34,6 +34,7 @@ export function PropertyCard({
   isLoggedIn,
   onAuthRequired,
 }: PropertyCardProps) {
+  const { toast } = useToast();
   const { user } = useAuth();
   const {
     isSaved,
@@ -88,7 +89,8 @@ export function PropertyCard({
       if (onAuthRequired) {
         onAuthRequired();
       } else {
-        sileo.error({
+        toast({
+          variant: "destructive",
           title: "Inicia sesión",
           description: "Debes iniciar sesión para guardar propiedades.",
         });
@@ -113,14 +115,15 @@ export function PropertyCard({
     navigator.clipboard
       .writeText(propertyUrl)
       .then(() => {
-        sileo.info({
+        toast({
           title: "Enlace copiado",
           description:
             "El enlace de la propiedad se ha copiado al portapapeles",
         });
       })
       .catch(() => {
-        sileo.error({
+        toast({
+          variant: "destructive",
           title: "Error",
           description: "No se pudo copiar el enlace",
         });

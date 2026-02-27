@@ -108,6 +108,7 @@ export const DesktopResizableLayout = ({
                 </Button>
                 <FiltersComponent
                   onCancel={() => filtersPanelRef.current?.collapse()}
+                  onClearAll={handleClearFilters}
                 />
               </div>
             </div>

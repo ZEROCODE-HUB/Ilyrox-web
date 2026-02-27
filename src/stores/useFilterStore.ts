@@ -164,7 +164,7 @@ export const useFilterStore = create<FilterStore>()(
     setRadiusKm: (radius) => set({ radiusKm: radius }),
 
     // ── Reset ─────────────────────────────────
-    resetFilters: () => set(initialState),
+    resetFilters: () => set((state) => ({ ...initialState })),
   })),
 );
 

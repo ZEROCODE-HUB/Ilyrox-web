@@ -14,7 +14,7 @@ import { MUNICIPIOS_ESTADO } from "@/constants/MexLocations/municipios";
 import { COLONIAS_POR_MUNICIPIO } from "@/constants/MexLocations/colonias";
 import { useSaveSearch } from "@/hooks/useSaveSearch";
 import { useAuth } from "@/contexts/AuthContext";
-import { sileo } from "sileo";
+import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 import {
@@ -100,6 +100,7 @@ interface SimplifiedFiltersProps {
   onApplyFilters?: () => void;
   onCancel?: () => void;
   setShowFilters?: (showFilters: boolean) => void;
+  onClearAll?: () => void;
 }
 
 // ──────────────────────────────────────────────
@@ -110,7 +111,9 @@ export function SimplifiedFilters({
   onApplyFilters,
   onCancel,
   setShowFilters,
+  onClearAll,
 }: SimplifiedFiltersProps) {
+  const { toast } = useToast();
   const { user } = useAuth();
   const { handleSaveSearch } = useSaveSearch(user?.id);
 
@@ -196,16 +199,22 @@ export function SimplifiedFilters({
   const handleClearAll = () => {
     resetFilters();
     setColoniaSearch("");
+    if (onClearAll) onClearAll();
   };
 
   const onSaveClick = async () => {
     if (!user) {
-      sileo.error({ title: "Debes iniciar sesión para guardar tu búsqueda" });
+      toast({
+        variant: "destructive",
+        title: "Iniciar Sesión",
+        description: "Debes iniciar sesión para guardar tu búsqueda",
+      });
       return;
     }
 
     if (!type) {
-      sileo.warning({
+      toast({
+        variant: "destructive",
         title: "Información faltante",
         description:
           "Debe seleccionar un tipo de propiedad para guardar la búsqueda.",
@@ -214,7 +223,8 @@ export function SimplifiedFilters({
     }
 
     if (!estadoMexico) {
-      sileo.warning({
+      toast({
+        variant: "destructive",
         title: "Información faltante",
         description: "Debe seleccionar un estado para guardar la búsqueda.",
       });
@@ -232,7 +242,7 @@ export function SimplifiedFilters({
         habitaciones: bedrooms,
         banos: bathrooms,
         estacionamientos: parking,
-        niveles: levels,
+        pisos: levels,
         m2TerrenoMin: landAreaMin,
         m2ConstruccionMin: constructionAreaMin,
         locationFilter: {
@@ -245,7 +255,9 @@ export function SimplifiedFilters({
     );
 
     if (success) {
-      sileo.success({ title: "Búsqueda guardada con éxito" });
+      toast({
+        title: "Búsqueda guardada con éxito",
+      });
     }
   };
   // ── Render ──────────────────────────────────

@@ -80,7 +80,9 @@ export const propertyService = {
     }
 
     if (filters.type && filters.type !== "Otros")
-      query = query.ilike("tipo", filters.type);
+      query = query.eq("tipo", filters.type);
+
+    if (filters.subtype) query = query.eq("subtipo", filters.subtype);
 
     if (filters.operationType && filters.operationType !== "todas") {
       // Use ilike because now it's a comma separated string in the view
@@ -104,6 +106,8 @@ export const propertyService = {
       query = query.gte("banos", filters.bathrooms);
     if (filters.parking && filters.parking > 0)
       query = query.gte("estacionamientos", filters.parking);
+    if (filters.levels && filters.levels > 0)
+      query = query.gte("pisos", filters.levels);
     if (filters.constructionAreaMin)
       query = query.gte(
         "metros_cuadrados_construccion",

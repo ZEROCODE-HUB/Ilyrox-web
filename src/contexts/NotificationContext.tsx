@@ -6,8 +6,9 @@ import {
   ReactNode,
 } from "react";
 import { useAuth } from "./AuthContext";
+import { supabase } from "@/lib/supabase";
 import { notificationService } from "@/services/notificationService";
-import { sileo } from "sileo";
+import { useToast } from "@/hooks/use-toast";
 
 interface NotificationContextType {
   unreadCount: number;
@@ -18,8 +19,9 @@ const NotificationContext = createContext<NotificationContextType | undefined>(
   undefined,
 );
 
-export function NotificationProvider({ children }: { children: ReactNode }) {
+export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [unreadCount, setUnreadCount] = useState(0);
 
   const checkNotifications = async () => {
@@ -32,9 +34,10 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       setUnreadCount(pending.length);
 
       if (pending.length > 0) {
-        sileo.info({
-          title: "Nuevos matches encontrados",
-          description: `Tienes ${pending.length} nuevas propiedades que coinciden con tus búsquedas.`,
+        toast({
+          title: "Nueva actualización",
+          description:
+            "Se encontraron nuevas propiedades que coinciden con tus búsquedas.",
         });
       }
     } catch (error) {
@@ -66,7 +69,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       {children}
     </NotificationContext.Provider>
   );
-}
+};
 
 export const useNotifications = () => {
   const context = useContext(NotificationContext);

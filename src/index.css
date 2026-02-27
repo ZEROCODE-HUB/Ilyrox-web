@@ -167,9 +167,8 @@ All colors MUST be HSL.
   scrollbar-color: hsl(var(--muted-foreground) / 0.2) transparent;
 }
 
-/* Ensure Sileo notifications are on top of modals */
-.sileo-toaster,
-.sileo-toast-container,
-[class*="sileo"] {
-  z-index: 40000 !important;
+/* Ensure Toast notifications are on top of modals */
+[role="region"] {
+  z-index: 50000 !important;
+  pointer-events: none !important;
 }

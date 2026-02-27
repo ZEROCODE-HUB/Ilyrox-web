@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Modal } from "../ui/Modal";
-import { Label } from "../ui/label";
+// Removed duplicate Label import
 import {
   Select,
   SelectContent,
@@ -9,11 +9,13 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Textarea } from "../ui/textarea";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { ContactForm } from "@/types/property";
 import { supabase } from "@/lib/supabase";
-import { sileo } from "sileo";
 import { cn } from "@/lib/utils";
 import {
   User,
@@ -28,12 +30,12 @@ import {
 interface InfoModalProps {
   isOpen: boolean;
   onClose: () => void;
-  property: any;
+  propertyId: string;
 }
 
-export const InfoModal = ({ isOpen, onClose, property }: InfoModalProps) => {
-  const [budgetRange, setBudgetRange] = useState("");
-  const [purchaseTimeframe, setPurchaseTimeframe] = useState("");
+export function InfoModal({ isOpen, onClose, propertyId }: InfoModalProps) {
+  const { toast } = useToast();
+  const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [contactForm, setContactForm] = useState<ContactForm>({
@@ -41,36 +43,31 @@ export const InfoModal = ({ isOpen, onClose, property }: InfoModalProps) => {
     email: "",
     phone: "",
     comments: "",
-    propertyId: property?.id || "",
+    budget: "",
+    timeframe: "",
+    propertyId: propertyId || "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!budgetRange || !purchaseTimeframe) {
-      sileo.error({
-        title: "Error al realizar la solicitud",
-        description: (
-          <span className="text-red-500/50! font-medium!">
-            Por favor selecciona tu presupuesto y plazo de compra.
-          </span>
-        ),
+    if (!contactForm.budget || !contactForm.timeframe) {
+      toast({
+        variant: "destructive",
+        title: "Información incompleta",
+        description: "Por favor selecciona tu presupuesto y plazo de compra.",
       });
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      const fullMessage = `Presupuesto: ${budgetRange}
-Plazo: ${purchaseTimeframe}
+      const fullMessage = `Presupuesto: ${contactForm.budget}
+Plazo: ${contactForm.timeframe}
 Comentarios: ${contactForm.comments || "Sin comentarios adicionales"}`;
 
       const { error } = await supabase.from("solicitudes_info").insert({
-        propiedad_id: property.id,
+        propiedad_id: propertyId,
         solicitante_id: user?.id || null,
         nombre: contactForm.name,
         telefono: contactForm.phone,
@@ -82,14 +79,10 @@ Comentarios: ${contactForm.comments || "Sin comentarios adicionales"}`;
 
       if (error) throw error;
 
-      sileo.success({
+      toast({
         title: "Solicitud enviada",
-        description: (
-          <span className="text-red-500/50! font-medium!">
-            Tu solicitud ha sido enviada a {property.asesor_nombre}. Te
-            contactarán pronto.
-          </span>
-        ),
+        description:
+          "Gracias por tu interés. Uno de nuestros asesores te contactarán pronto.",
       });
 
       setContactForm({
@@ -97,20 +90,17 @@ Comentarios: ${contactForm.comments || "Sin comentarios adicionales"}`;
         email: "",
         phone: "",
         comments: "",
-        propertyId: property.id,
+        budget: "",
+        timeframe: "",
+        propertyId: propertyId,
       });
-      setBudgetRange("");
-      setPurchaseTimeframe("");
       onClose();
     } catch (error: any) {
       console.error("Error submitting contact form:", error);
-      sileo.error({
-        title: "Error al realizar la solicitud",
-        description: (
-          <span className="text-red-500/50! font-medium!">
-            No se pudo enviar la solicitud. Intenta nuevamente.
-          </span>
-        ),
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "No se pudo enviar la solicitud. Intenta nuevamente.",
       });
     } finally {
       setIsSubmitting(false);
@@ -143,11 +133,17 @@ Comentarios: ${contactForm.comments || "Sin comentarios adicionales"}`;
             <Wallet className="h-4 w-4 text-primary" />
             ¿Cuál es tu presupuesto? <span className="text-destructive">*</span>
           </Label>
-          <Select value={budgetRange} onValueChange={setBudgetRange} required>
+          <Select
+            value={contactForm.budget}
+            onValueChange={(val) =>
+              setContactForm((prev) => ({ ...prev, budget: val }))
+            }
+            required
+          >
             <SelectTrigger
               className={cn(
                 "transition-all duration-200",
-                !budgetRange
+                !contactForm.budget
                   ? "border-slate-200"
                   : "border-primary ring-1 ring-primary/20 shadow-sm",
               )}
@@ -171,14 +167,16 @@ Comentarios: ${contactForm.comments || "Sin comentarios adicionales"}`;
             <span className="text-destructive">*</span>
           </Label>
           <Select
-            value={purchaseTimeframe}
-            onValueChange={setPurchaseTimeframe}
+            value={contactForm.timeframe}
+            onValueChange={(val) =>
+              setContactForm((prev) => ({ ...prev, timeframe: val }))
+            }
             required
           >
             <SelectTrigger
               className={cn(
                 "transition-all duration-200",
-                !purchaseTimeframe
+                !contactForm.timeframe
                   ? "border-slate-200"
                   : "border-primary ring-1 ring-primary/20 shadow-sm",
               )}
@@ -311,4 +309,4 @@ Comentarios: ${contactForm.comments || "Sin comentarios adicionales"}`;
       </form>
     </Modal>
   );
-};
+}

@@ -78,6 +78,8 @@ export interface ContactForm {
   phone: string;
   comments: string;
   propertyId: string;
+  budget?: string;
+  timeframe?: string;
 }
 
 export interface PropertyFilters {

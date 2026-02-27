@@ -80,7 +80,6 @@ export function useProperties(page = 0, pageSize = 10) {
         pageSize,
       );
     },
-    enabled: !!estadoMexico || radiusKm > 0 || !!searchTerm,
     placeholderData: (prev) => prev,
     staleTime: 30_000,
     refetchOnWindowFocus: false,

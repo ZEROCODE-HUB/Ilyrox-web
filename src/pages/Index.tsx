@@ -7,7 +7,6 @@ import { PropertyDetail } from "@/components/PropertyDetails/PropertyDetail";
 import { MainTabs } from "@/components/MainTabs";
 import { AuthPopup } from "@/components/AuthPopup";
 import { RentSellPopup } from "@/components/RentSellPopup";
-import { useNavigate } from "react-router-dom";
 import "react-loading-skeleton/dist/skeleton.css";
 // Import Location Data
 import { COORDENADAS_ESTADO } from "@/constants/locations";
@@ -51,7 +50,6 @@ const Index = () => {
     19.4326, -99.1332,
   ]);
 
-  const navigate = useNavigate();
   const filtersPanelRef = useRef<ImperativePanelHandle>(null);
   const mapPanelRef = useRef<ImperativePanelHandle>(null);
   const propertiesPanelRef = useRef<ImperativePanelHandle>(null);

@@ -19,7 +19,7 @@ const sizes = {
   md: "max-w-lg",
   lg: "max-w-2xl",
   xl: "max-w-4xl",
-  full: "max-w-[95vw] h-[95vh]",
+  full: "w-full max-w-[95vw] xl:max-w-6xl max-h-[95vh] md:h-auto",
 };
 
 export const Modal: React.FC<ModalProps> = ({
@@ -46,7 +46,7 @@ export const Modal: React.FC<ModalProps> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-20 flex items-center justify-center p-4">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}

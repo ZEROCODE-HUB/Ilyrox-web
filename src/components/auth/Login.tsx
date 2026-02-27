@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { useAuthForm } from "@/hooks/useAuthForm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,12 +15,13 @@ import {
 } from "@/components/ui/card";
 import { supabase } from "@/lib/supabase";
 import { Eye, EyeOff } from "lucide-react";
-import { sileo } from "sileo";
 
-export const Login = () => {
+export function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const { signOut } = useAuth();
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,17 +39,16 @@ export const Login = () => {
 
       if (error) throw error;
 
-      sileo.success({
+      toast({
         title: "¡Bienvenido de vuelta!",
         description: "Has iniciado sesión correctamente.",
-        position: "top-center",
       });
       navigate("/");
     } catch (error: any) {
-      sileo.error({
+      toast({
+        variant: "destructive",
         title: "Error al iniciar sesión",
         description: error.message || "Por favor verifica tus credenciales.",
-        position: "top-center",
       });
     } finally {
       setIsLoading(false);
@@ -80,11 +83,10 @@ export const Login = () => {
                 type="button"
                 className="text-sm text-primary hover:underline"
                 onClick={() =>
-                  sileo.info({
+                  toast({
                     title: "Próximamente",
                     description:
                       "La recuperación de contraseña estará disponible pronto.",
-                    position: "top-center",
                   })
                 }
               >
@@ -127,4 +129,4 @@ export const Login = () => {
       </CardContent>
     </Card>
   );
-};
+}

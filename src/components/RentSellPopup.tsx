@@ -18,10 +18,10 @@ import {
 } from "@/components/ui/select";
 import { Home } from "lucide-react";
 
+import { useToast } from "@/hooks/use-toast";
 import { propertyRequestService } from "@/services/propertyRequestService";
 import { solicitudes_propiedad } from "@/types/types";
 import { formatPriceInput, parseCurrency } from "@/utils/propertyUtils";
-import { sileo } from "sileo";
 import { MUNICIPIOS_ESTADO } from "@/constants/MexLocations/municipios";
 import { COLONIAS_POR_MUNICIPIO } from "@/constants/MexLocations/colonias";
 import { ESTADOS_MEXICO } from "@/constants/MexLocations/estados";
@@ -32,6 +32,7 @@ interface RentSellPopupProps {
 }
 
 export function RentSellPopup({ isOpen, onClose }: RentSellPopupProps) {
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -98,10 +99,9 @@ export function RentSellPopup({ isOpen, onClose }: RentSellPopupProps) {
         usuario_id: null, // This is handled by the service
       } as any);
 
-      sileo.success({
-        title: "Su solicitud se envió con éxito",
-        description: "Nos pondremos en contacto contigo pronto.",
-        position: "top-right",
+      toast({
+        title: "Solicitud enviada",
+        description: "Uno de nuestros expertos te contactará pronto.",
       });
 
       setFormData({
@@ -118,13 +118,12 @@ export function RentSellPopup({ isOpen, onClose }: RentSellPopupProps) {
         otraColonia: "",
       });
       onClose();
-      setShowSuccessPopup(true);
     } catch (error: any) {
       console.error("Error submitting property request:", error);
-      sileo.error({
+      toast({
+        variant: "destructive",
         title: "Error",
-        description: "No se pudo enviar la solicitud. Intenta nuevamente.",
-        position: "top-right",
+        description: "Hubo un error al enviar tu solicitud.",
       });
     } finally {
       setIsSubmitting(false);

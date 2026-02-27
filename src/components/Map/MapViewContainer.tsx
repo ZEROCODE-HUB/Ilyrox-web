@@ -6,7 +6,7 @@ import {
   Circle,
 } from "@react-google-maps/api";
 import { PropertyView } from "@/types/types";
-import { EyeOff, MapPin } from "lucide-react";
+import { EyeOff, MapPin, Map as MapIcon, Globe } from "lucide-react";
 import { Button } from "../ui/button";
 
 const containerStyle = {
@@ -45,6 +45,9 @@ const MapViewContainer: React.FC<MapViewContainerProps> = ({
   });
 
   const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [mapTypeId, setMapTypeId] = useState<"roadmap" | "satellite">(
+    "roadmap",
+  );
 
   const onLoad = useCallback((map: google.maps.Map) => {
     setMap(map);
@@ -125,6 +128,7 @@ const MapViewContainer: React.FC<MapViewContainerProps> = ({
         zoom={4}
         onLoad={onLoad}
         onUnmount={onUnmount}
+        mapTypeId={mapTypeId}
         options={{
           disableDefaultUI: false,
           zoomControl: true,
@@ -189,25 +193,46 @@ const MapViewContainer: React.FC<MapViewContainerProps> = ({
       <div className="absolute top-0 left-0 right-0 bg-white/90 backdrop-blur-sm px-4 py-4 text-sm font-semibold z-10 text-gray-800">
         {properties ? (
           <>
-            <p className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <MapPin className="w-4 h-4 text-primary" />
               Mapa de Propiedades{" "}
-              <p className="rounded-full bg-gray-100 px-2">
+              <span className="rounded-full bg-gray-100 px-2">
                 {properties.length}
-              </p>
-            </p>
+              </span>
+            </div>
           </>
         ) : (
           "Aplica filtros para ver propiedades"
         )}
-        <Button
-          variant={"outline"}
-          size="icon"
-          className="absolute top-1 right-0 bg-white/90 backdrop-blur-sm px-4 py-4 text-sm font-semibold z-10 text-gray-800 border-none"
-          onClick={handleToggleMap}
-        >
-          <EyeOff className="w-4 h-4" />
-        </Button>
+        <div className="flex absolute top-1 right-1 gap-2">
+          <Button
+            variant={"outline"}
+            size="sm"
+            className="bg-white/90 backdrop-blur-sm px-3 text-xs font-semibold z-10 text-gray-800 border-border hover:bg-white shadow-sm flex items-center gap-2"
+            onClick={() =>
+              setMapTypeId(mapTypeId === "roadmap" ? "satellite" : "roadmap")
+            }
+          >
+            {mapTypeId === "roadmap" ? (
+              <>
+                <Globe className="w-3.5 h-3.5" /> Satélite
+              </>
+            ) : (
+              <>
+                <MapIcon className="w-3.5 h-3.5" /> Mapa
+              </>
+            )}
+          </Button>
+
+          <Button
+            variant={"outline"}
+            size="icon"
+            className="bg-white/90 backdrop-blur-sm text-gray-800 border-border hover:bg-white shadow-sm"
+            onClick={handleToggleMap}
+          >
+            <EyeOff className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );
