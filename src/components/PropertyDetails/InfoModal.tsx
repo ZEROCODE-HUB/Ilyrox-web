@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Modal } from "../ui/Modal";
 // Removed duplicate Label import
 import {
@@ -35,7 +35,7 @@ interface InfoModalProps {
 
 export function InfoModal({ isOpen, onClose, propertyId }: InfoModalProps) {
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [contactForm, setContactForm] = useState<ContactForm>({
@@ -48,6 +48,62 @@ export function InfoModal({ isOpen, onClose, propertyId }: InfoModalProps) {
     propertyId: propertyId || "",
   });
 
+  // Load from localStorage on mount (initial load)
+  useEffect(() => {
+    const savedInfo = localStorage.getItem("i360_contact_info");
+    if (savedInfo) {
+      try {
+        const parsed = JSON.parse(savedInfo);
+        setContactForm((prev) => ({
+          ...prev,
+          name: parsed.name || prev.name,
+          email: parsed.email || prev.email,
+          phone: parsed.phone || prev.phone,
+          budget: parsed.budget || prev.budget,
+          timeframe: parsed.timeframe || prev.timeframe,
+        }));
+      } catch (e) {
+        console.error("Error reading cached contact info:", e);
+      }
+    }
+  }, []);
+
+  // Sync with profile whenever modal opens and update propertyId
+  useEffect(() => {
+    if (isOpen) {
+      setContactForm((prev) => ({
+        ...prev,
+        propertyId: propertyId,
+        ...(profile
+          ? {
+              name: profile.full_name || prev.name,
+              email: profile.email || prev.email,
+              phone: profile.celular || prev.phone,
+            }
+          : {}),
+      }));
+    }
+  }, [isOpen, profile, propertyId]);
+
+  // Save changes to localStorage for future use (excluding comments)
+  useEffect(() => {
+    const dataToSave = {
+      name: contactForm.name,
+      email: contactForm.email,
+      phone: contactForm.phone,
+      budget: contactForm.budget,
+      timeframe: contactForm.timeframe,
+    };
+    if (Object.values(dataToSave).some((val) => val !== "")) {
+      localStorage.setItem("i360_contact_info", JSON.stringify(dataToSave));
+    }
+  }, [
+    contactForm.name,
+    contactForm.email,
+    contactForm.phone,
+    contactForm.budget,
+    contactForm.timeframe,
+  ]);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -85,15 +141,11 @@ Comentarios: ${contactForm.comments || "Sin comentarios adicionales"}`;
           "Gracias por tu interés. Uno de nuestros asesores te contactarán pronto.",
       });
 
-      setContactForm({
-        name: "",
-        email: "",
-        phone: "",
+      // Clear only property-specific data (comments)
+      setContactForm((prev) => ({
+        ...prev,
         comments: "",
-        budget: "",
-        timeframe: "",
-        propertyId: propertyId,
-      });
+      }));
       onClose();
     } catch (error: any) {
       console.error("Error submitting contact form:", error);

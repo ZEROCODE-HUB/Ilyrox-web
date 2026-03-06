@@ -82,7 +82,15 @@ export const propertyService = {
     if (filters.type && filters.type !== "Otros")
       query = query.eq("tipo", filters.type);
 
-    if (filters.subtype) query = query.eq("subtipo", filters.subtype);
+    if (filters.subtype) {
+      if (Array.isArray(filters.subtype)) {
+        if (filters.subtype.length > 0) {
+          query = query.in("subtipo", filters.subtype);
+        }
+      } else {
+        query = query.eq("subtipo", filters.subtype);
+      }
+    }
 
     if (filters.operationType && filters.operationType !== "todas") {
       // Use ilike because now it's a comma separated string in the view

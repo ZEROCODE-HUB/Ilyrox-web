@@ -135,6 +135,7 @@ const MapViewContainer: React.FC<MapViewContainerProps> = ({
           streetViewControl: false,
           mapTypeControl: false,
           fullscreenControl: false,
+          gestureHandling: "cooperative",
           styles: [
             {
               featureType: "poi",

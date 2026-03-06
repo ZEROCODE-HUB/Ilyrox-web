@@ -6,6 +6,19 @@ export type Property = {
   createdAt?: string;
   price: number;
   currency: "USD" | "MXN";
+  area?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  parking?: number;
+  furnished?: boolean;
+  petFriendly?: boolean;
+  lien?: boolean;
+  age?: number;
+  ageMin?: number;
+  ageMax?: number;
+  financing?: string[];
+  distance?: number;
+  featured?: boolean;
   location: {
     address: string;
     country: string;
@@ -84,12 +97,13 @@ export interface ContactForm {
 
 export interface PropertyFilters {
   type?: string;
-  subtype?: string;
+  subtype?: string | string[];
   location?: string;
   priceMin?: number;
   priceMax?: number;
   areaMin?: number;
   areaMax?: number;
+  area?: number;
   bedrooms?: number;
   bathrooms?: number;
   parking?: number;

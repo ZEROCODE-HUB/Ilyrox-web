@@ -21,7 +21,7 @@ export function useProperties(page = 0, pageSize = 10) {
   const currency = useFilterStore((s) => s.currency);
   const operationType = useFilterStore((s) => s.operationType);
   const type = useFilterStore((s) => s.type);
-  const subtype = useFilterStore((s) => s.subtype);
+  const subtypeKey = useFilterStore((s) => JSON.stringify(s.subtype));
   const bedrooms = useFilterStore((s) => s.bedrooms);
   const bathrooms = useFilterStore((s) => s.bathrooms);
   const parking = useFilterStore((s) => s.parking);
@@ -41,7 +41,7 @@ export function useProperties(page = 0, pageSize = 10) {
       currency,
       operationType,
       type,
-      subtype,
+      subtypeKey,
       bedrooms,
       bathrooms,
       parking,

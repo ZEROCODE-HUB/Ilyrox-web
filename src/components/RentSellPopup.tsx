@@ -25,6 +25,7 @@ import { formatPriceInput, parseCurrency } from "@/utils/propertyUtils";
 import { MUNICIPIOS_ESTADO } from "@/constants/MexLocations/municipios";
 import { COLONIAS_POR_MUNICIPIO } from "@/constants/MexLocations/colonias";
 import { ESTADOS_MEXICO } from "@/constants/MexLocations/estados";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface RentSellPopupProps {
   isOpen: boolean;
@@ -32,11 +33,12 @@ interface RentSellPopupProps {
 }
 
 export function RentSellPopup({ isOpen, onClose }: RentSellPopupProps) {
+  const { profile } = useAuth();
   const { toast } = useToast();
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
+    name: profile?.full_name || "",
+    email: profile?.email || "",
+    phone: profile?.celular || "",
     description: "",
     propertyType: "" as solicitudes_propiedad["tipo"],
     priceMin: "",
@@ -46,6 +48,18 @@ export function RentSellPopup({ isOpen, onClose }: RentSellPopupProps) {
     colonia: "",
     otraColonia: "",
   });
+
+  // Re-sync with profile data whenever the modal opens
+  useEffect(() => {
+    if (isOpen && profile) {
+      setFormData((prev) => ({
+        ...prev,
+        name: profile.full_name || prev.name,
+        email: profile.email || prev.email,
+        phone: profile.celular || prev.phone,
+      }));
+    }
+  }, [isOpen, profile]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 

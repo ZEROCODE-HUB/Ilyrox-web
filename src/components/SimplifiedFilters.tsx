@@ -16,6 +16,7 @@ import { useSaveSearch } from "@/hooks/useSaveSearch";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { MarqueeText } from "@/components/ui/marquee-text";
 
 import {
   useFilterStore,
@@ -141,6 +142,7 @@ export function SimplifiedFilters({
     setLevels,
     setLandAreaMin,
     setConstructionAreaMin,
+    toggleSubtype,
     resetFilters,
   } = useFilterStore();
 
@@ -257,6 +259,7 @@ export function SimplifiedFilters({
     if (success) {
       toast({
         title: "Búsqueda guardada con éxito",
+        position: "bottom-left",
       });
     }
   };
@@ -378,39 +381,56 @@ export function SimplifiedFilters({
                   key={pt.value}
                   type="button"
                   onClick={() => setType(isSelected ? undefined : pt.value)}
-                  className={`flex flex-col items-center justify-center p-4 rounded-xl text-sm font-medium transition-all border-2 ${
+                  className={`flex flex-col items-center justify-center p-4 rounded-xl text-sm font-medium transition-all border-2 group overflow-hidden ${
                     isSelected
                       ? "border-primary text-foreground bg-primary/5"
                       : "border-input text-muted-foreground bg-background hover:border-primary/50"
                   }`}
                 >
                   <span className="mb-2">{pt.icon}</span>
-                  <span>{pt.label}</span>
+                  <MarqueeText className="truncate text-center">
+                    {pt.label}
+                  </MarqueeText>
                 </button>
               );
             })}
           </div>
 
           {type && subtiposDisponibles.length > 0 && (
-            <div className="space-y-1.5 mt-2">
-              <Label className="text-xs font-medium text-muted-foreground uppercase">
-                Subtipo
-              </Label>
-              <Select
-                value={subtype || ""}
-                onValueChange={(val) => setSubtype(val)}
-              >
-                <SelectTrigger className="h-11">
-                  <SelectValue placeholder="Selecciona un subtipo" />
-                </SelectTrigger>
-                <SelectContent className="max-h-[300px]">
-                  {subtiposDisponibles.map((sub) => (
-                    <SelectItem key={sub.value} value={sub.value}>
-                      {sub.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="space-y-3 mt-4">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-semibold text-foreground">
+                  Subtipos disponibles
+                </Label>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary uppercase">
+                  Múltiple
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {subtiposDisponibles.map((sub) => {
+                  const isSelected = subtype.includes(sub.value);
+                  return (
+                    <button
+                      key={sub.value}
+                      type="button"
+                      onClick={() => toggleSubtype(sub.value)}
+                      className={cn(
+                        "px-3 py-2.5 rounded-lg text-xs font-medium transition-all text-left flex items-center justify-between overflow-hidden group",
+                        isSelected
+                          ? "bg-primary text-white shadow-sm ring-2 ring-primary/20"
+                          : "bg-muted/40 text-muted-foreground hover:bg-muted border border-transparent",
+                      )}
+                    >
+                      <MarqueeText className="flex-1 mr-2 text-inherit group-hover/marquee:text-white transition-colors duration-200">
+                        {sub.label}
+                      </MarqueeText>
+                      {isSelected && (
+                        <div className="w-1.5 h-1.5 rounded-full bg-white ml-2 flex-shrink-0" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>
@@ -567,12 +587,21 @@ export function SimplifiedFilters({
         {/* Botón Guardar */}
         <div className="pt-4">
           <Button
-            className="w-full h-12 bg-white hover:bg-slate-50 text-foreground border border-input shadow-sm transition-all"
+            // 'group' es indispensable aquí para que el MarqueeText detecte el hover del botón
+            className="w-full h-12 bg-white hover:bg-slate-50 text-foreground border border-input shadow-sm transition-all group overflow-hidden"
             variant="outline"
             onClick={onSaveClick}
           >
-            <Bookmark className="w-5 h-5 mr-3" />
-            Guardar búsqueda
+            <div className="flex items-center justify-center w-full max-w-full px-2">
+              <Bookmark className="w-5 h-5 mr-3 flex-shrink-0" />
+
+              {/* El contenedor del Marquee debe tener un ancho flexible pero limitado */}
+              <div className="flex-1 min-w-0 overflow-hidden">
+                <MarqueeText className="font-semibold text-center" speed={12}>
+                  Avísame si encuentras algo
+                </MarqueeText>
+              </div>
+            </div>
           </Button>
         </div>
       </div>

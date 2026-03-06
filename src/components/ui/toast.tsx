@@ -9,17 +9,29 @@ const ToastProvider = ToastPrimitives.Provider;
 
 const ToastViewport = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Viewport>,
-  React.ComponentPropsWithoutRef<typeof ToastPrimitives.Viewport>
->(({ className, ...props }, ref) => (
-  <ToastPrimitives.Viewport
-    ref={ref}
-    className={cn(
-      "fixed bottom-0 right-0 z-[50000] flex max-h-screen w-full flex-col-reverse p-4 sm:flex-col md:max-w-[420px] pointer-events-none",
-      className,
-    )}
-    {...props}
-  />
-));
+  React.ComponentPropsWithoutRef<typeof ToastPrimitives.Viewport> & {
+    position?: "bottom-right" | "bottom-left" | "top-right" | "top-left";
+  }
+>(({ className, position = "bottom-right", ...props }, ref) => {
+  const positionClasses = {
+    "bottom-right": "bottom-0 right-0 sm:flex-col",
+    "bottom-left": "bottom-0 left-0 sm:flex-col",
+    "top-right": "top-0 right-0 sm:flex-col-reverse",
+    "top-left": "top-0 left-0 sm:flex-col-reverse",
+  };
+
+  return (
+    <ToastPrimitives.Viewport
+      ref={ref}
+      className={cn(
+        "fixed z-[50000] flex max-h-screen w-full flex-col p-4 md:max-w-[420px] pointer-events-none",
+        positionClasses[position],
+        className,
+      )}
+      {...props}
+    />
+  );
+});
 ToastViewport.displayName = ToastPrimitives.Viewport.displayName;
 
 const toastVariants = cva(
