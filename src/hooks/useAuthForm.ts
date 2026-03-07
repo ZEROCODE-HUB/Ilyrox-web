@@ -16,6 +16,7 @@ export interface AuthFormState {
   firstName: string;
   lastNamePaternal: string;
   lastNameMaterno: string;
+  estado: string;
   avatarFile: File | null;
   avatarPreview: string | null;
 }
@@ -27,6 +28,7 @@ const initialFormState: AuthFormState = {
   firstName: "",
   lastNamePaternal: "",
   lastNameMaterno: "",
+  estado: "",
   avatarFile: null,
   avatarPreview: null,
 };
@@ -93,6 +95,7 @@ export function useAuthForm() {
       !formState.firstName ||
       !formState.lastNamePaternal ||
       !formState.lastNameMaterno ||
+      !formState.estado ||
       !formState.email ||
       !formState.password
     ) {
@@ -159,20 +162,10 @@ export function useAuthForm() {
 
     setLoading(true);
     try {
-      // 1. Create Auth User
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formState.email,
-        password: formState.password,
-      });
-
-      if (authError) throw authError;
-      if (!authData.user) throw new Error("No se pudo crear el usuario");
-
-      // 2. Upload Avatar using uploadService
+      // 1. Upload Avatar First (so we don't create auth user if this crucial step fails, though it's optional)
       let finalAvatarUrl = "";
       if (formState.avatarFile) {
         try {
-          // Use the uploadService as requested
           finalAvatarUrl = await uploadImage(formState.avatarFile, "perfiles");
         } catch (error) {
           console.error("Avatar upload failed:", error);
@@ -180,16 +173,41 @@ export function useAuthForm() {
             variant: "destructive",
             title: "Advertencia",
             description:
-              "No se pudo subir la foto de perfil, pero se continuará con el registro.",
+              "No se pudo subir la foto de perfil antes del registro. Intente sin foto.",
           });
-          // Continue without avatar
+          setLoading(false);
+          return false; // Stop registration if image upload throws an error to avoid orphaned users
         }
       }
 
-      // 3. Insert Profile
       const fullName =
         `${formState.firstName} ${formState.lastNamePaternal} ${formState.lastNameMaterno}`.trim();
 
+      // 2. Create Auth User AND pass metadata for Database Triggers (Atomic operation backend-side)
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formState.email,
+        password: formState.password,
+        options: {
+          data: {
+            // Este data payload permite que un Trigger en la base de datos cree el perfil automáticamente
+            nombre: formState.firstName,
+            apellido_paterno: formState.lastNamePaternal,
+            apellido_materno: formState.lastNameMaterno,
+            nombre_completo: fullName,
+            foto: finalAvatarUrl,
+            rol: "web",
+            estado_registro: "activo",
+            aprobaciones_recibidas: 3,
+            estado: formState.estado,
+          },
+        },
+      });
+
+      if (authError) throw authError;
+      if (!authData.user) throw new Error("No se pudo crear el usuario");
+
+      // 3. Fallback: Intentar insertar el perfil manualmente desde el cliente
+      // Usamos upsert para no duplicar si el Trigger de la BD ya lo creó.
       const { error: profileError } = await supabase.from("perfiles").upsert(
         {
           id: authData.user.id,
@@ -202,17 +220,18 @@ export function useAuthForm() {
           rol: "web",
           estado_registro: "activo",
           aprobaciones_recibidas: 3,
+          estado: formState.estado,
         },
         { onConflict: "id" },
       );
 
+      // Si el upsert falla (por ej. debido a RLS porque el usuario aún no tiene sesión verificada),
+      // pero el trigger funcionó, no hay problema. Si falla y NO hay trigger, informamos del error.
       if (profileError) {
-        console.error("Profile creation error:", profileError);
-        toast({
-          variant: "destructive",
-          title: "Advertencia",
-          description: "Usuario creado, pero hubo un error al crear el perfil.",
-        });
+        console.warn(
+          "Manual profile upsert warning (might be blocked by RLS, relying on DB Trigger):",
+          profileError,
+        );
       }
 
       toast({

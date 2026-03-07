@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Modal } from "../ui/Modal";
 import { Avatar } from "../shared/Avatar";
 import {
@@ -8,8 +9,21 @@ import {
   Globe,
   Shield,
   MapPin,
+  Pen,
+  Check,
+  X,
 } from "lucide-react";
 import { Badge } from "../ui/badge";
+import { Input } from "../ui/input";
+import { useProfileEdit } from "@/hooks/useProfileEdit";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { ESTADOS_MEXICO } from "@/constants/locations";
 
 interface ConfigModalProps {
   open: boolean;
@@ -31,6 +45,57 @@ export const ConfigModal = ({
   onOpenChange,
   profile,
 }: ConfigModalProps) => {
+  const { updateProfileField, isUpdating } = useProfileEdit();
+  const [editingField, setEditingField] = useState<"celular" | "estado" | null>(
+    null,
+  );
+  const [editValue, setEditValue] = useState("");
+  // Estado local para actualizaciones optimistas (refleja los cambios al instante en UI)
+  const [localOverrides, setLocalOverrides] = useState<Partial<typeof profile>>(
+    {},
+  );
+
+  // Reset local form states when modal opens/closes
+  useEffect(() => {
+    if (!open) {
+      setEditingField(null);
+      setEditValue("");
+    }
+  }, [open]);
+
+  const handleEditClick = (
+    field: "celular" | "estado",
+    currentValue: string,
+  ) => {
+    setEditingField(field);
+    setEditValue(currentValue);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingField(null);
+    setEditValue("");
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingField) return;
+    const success = await updateProfileField(editingField, editValue);
+    if (success) {
+      // Optimistic update
+      setLocalOverrides((prev) => ({ ...prev, [editingField]: editValue }));
+      setEditingField(null);
+    }
+  };
+
+  // Values merged with optimistic updates
+  const displayCelular =
+    localOverrides.celular !== undefined
+      ? localOverrides.celular
+      : profile.celular || "No especificado";
+  const displayEstado =
+    localOverrides.estado !== undefined
+      ? localOverrides.estado
+      : profile.estado || "No especificado";
+
   return (
     <Modal isOpen={open} onClose={() => onOpenChange(false)} title="Mi Perfil">
       <div className="flex flex-col gap-6 py-4">
@@ -76,17 +141,66 @@ export const ConfigModal = ({
           </div>
 
           <div className="flex items-center gap-3 p-3 rounded-2xl bg-muted/30 border border-border/50">
-            <div className="bg-primary/10 p-2 rounded-lg text-primary">
-              <Phone className="h-4 w-4" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">
-                Celular
-              </p>
-              <p className="text-sm font-semibold truncate">
-                {profile.celular || "No especificado"}
-              </p>
-            </div>
+            {editingField === "celular" ? (
+              // Modo de edición
+              <div className="flex-1 flex flex-col gap-2 w-full animate-in fade-in slide-in-from-top-1">
+                <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">
+                  Editar Celular
+                </p>
+                <div className="flex gap-2">
+                  <Input
+                    value={editValue}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    className="h-8 text-sm"
+                    disabled={isUpdating}
+                    autoFocus
+                    placeholder="Ejem. 5512345678"
+                  />
+                  <button
+                    onClick={handleSaveEdit}
+                    disabled={isUpdating}
+                    className="p-1.5 bg-green-500/10 text-green-600 rounded-md hover:bg-green-500/20 transition-colors"
+                  >
+                    <Check className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={handleCancelEdit}
+                    disabled={isUpdating}
+                    className="p-1.5 bg-red-500/10 text-red-600 rounded-md hover:bg-red-500/20 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              // Modo vista
+              <>
+                <div
+                  className="bg-primary/10 p-2 rounded-lg text-primary cursor-pointer"
+                  onClick={() =>
+                    handleEditClick(
+                      "celular",
+                      displayCelular === "No especificado"
+                        ? ""
+                        : displayCelular,
+                    )
+                  }
+                >
+                  <button className="group relative flex items-center justify-center rounded-lg transition-colors">
+                    <Phone className="h-4 w-4 opacity-100 group-hover:opacity-0 transition-opacity duration-200" />
+                    <Pen className="absolute w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                  </button>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">
+                    Celular
+                  </p>
+                  <p className="text-sm font-semibold truncate">
+                    {displayCelular}
+                  </p>
+                </div>
+              </>
+            )}
           </div>
 
           <div className="flex items-center gap-3 p-3 rounded-2xl bg-muted/30 border border-border/50">
@@ -102,19 +216,74 @@ export const ConfigModal = ({
               </p>
             </div>
           </div>
-
           <div className="flex items-center gap-3 p-3 rounded-2xl bg-muted/30 border border-border/50">
-            <div className="bg-primary/10 p-2 rounded-lg text-primary">
-              <MapPin className="h-4 w-4" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">
-                Estado
-              </p>
-              <p className="text-sm font-semibold truncate">
-                {profile.estado || "No especificado"}
-              </p>
-            </div>
+            {editingField === "estado" ? (
+              // Modo de edición
+              <div className="flex-1 flex flex-col gap-2 w-full animate-in fade-in slide-in-from-top-1">
+                <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">
+                  Editar Estado
+                </p>
+                <div className="flex gap-2">
+                  <Select
+                    value={editValue}
+                    onValueChange={setEditValue}
+                    disabled={isUpdating}
+                  >
+                    <SelectTrigger className="h-8 text-sm flex-1">
+                      <SelectValue placeholder="Selecciona Estado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ESTADOS_MEXICO.map((estado) => (
+                        <SelectItem key={estado} value={estado}>
+                          {estado}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <button
+                    onClick={handleSaveEdit}
+                    disabled={isUpdating}
+                    className="p-1.5 bg-green-500/10 text-green-600 rounded-md hover:bg-green-500/20 transition-colors"
+                  >
+                    <Check className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={handleCancelEdit}
+                    disabled={isUpdating}
+                    className="p-1.5 bg-red-500/10 text-red-600 rounded-md hover:bg-red-500/20 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              // Modo vista
+              <>
+                <div
+                  className="bg-primary/10 p-2 rounded-lg text-primary cursor-pointer"
+                  onClick={() =>
+                    handleEditClick(
+                      "estado",
+                      displayEstado === "No especificado" ? "" : displayEstado,
+                    )
+                  }
+                >
+                  <button className="group relative flex items-center justify-center rounded-lg transition-colors">
+                    <MapPin className="h-4 w-4 opacity-100 group-hover:opacity-0 transition-opacity duration-200" />
+                    <Pen className="absolute w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                  </button>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">
+                    Estado
+                  </p>
+                  <p className="text-sm font-semibold truncate">
+                    {displayEstado}
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         </div>
 

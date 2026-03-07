@@ -13,6 +13,15 @@ import {
 import { Camera, Eye, EyeOff, User as UserIcon, X } from "lucide-react";
 import { useAuthForm } from "@/hooks/useAuthForm";
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ESTADOS_MEXICO } from "@/constants/MexLocations/estados";
+
 export const Register = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -32,6 +41,10 @@ export const Register = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     updateField(id as any, value);
+  };
+
+  const handleEstadoChange = (value: string) => {
+    updateField("estado", value);
   };
 
   const onAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -141,6 +154,27 @@ export const Register = () => {
                 disabled={loading}
               />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Estado</Label>
+            <Select
+              value={formState.estado}
+              onValueChange={handleEstadoChange}
+              required
+              disabled={loading}
+            >
+              <SelectTrigger className="h-11">
+                <SelectValue placeholder="Selecciona tu estado" />
+              </SelectTrigger>
+              <SelectContent>
+                {ESTADOS_MEXICO.map((estado) => (
+                  <SelectItem key={estado} value={estado}>
+                    {estado}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">

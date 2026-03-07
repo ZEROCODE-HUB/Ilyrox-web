@@ -225,6 +225,7 @@ export function RentSellPopup({ isOpen, onClose }: RentSellPopupProps) {
                 placeholder="Describe brevemente tu inmueble (tamaño, características)..."
                 rows={3}
                 required
+                className="max-h-[200px] overflow-y-auto"
               />
             </div>
 

@@ -203,11 +203,17 @@ Comentarios: ${contactForm.comments || "Sin comentarios adicionales"}`;
               <SelectValue placeholder="Selecciona un rango" />
             </SelectTrigger>
             <SelectContent className="z-[110]">
-              <SelectItem value="no-definido">No lo tengo definido</SelectItem>
-              <SelectItem value="hasta-500k">Hasta $500,000</SelectItem>
-              <SelectItem value="500k-1m">De $500,000 a $1,000,000</SelectItem>
-              <SelectItem value="1m-3m">De $1,000,000 a $3,000,000</SelectItem>
-              <SelectItem value="3m+">Más de $3,000,000</SelectItem>
+              <SelectItem value="No definido">No lo tengo definido</SelectItem>
+              <SelectItem value="Hasta $500,000">Hasta $500,000</SelectItem>
+              <SelectItem value="De $500,000 a $1,000,000">
+                De $500,000 a $1,000,000
+              </SelectItem>
+              <SelectItem value="De $1,000,000 a $3,000,000">
+                De $1,000,000 a $3,000,000
+              </SelectItem>
+              <SelectItem value="Más de $3,000,000">
+                Más de $3,000,000
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -236,12 +242,18 @@ Comentarios: ${contactForm.comments || "Sin comentarios adicionales"}`;
               <SelectValue placeholder="Selecciona un plazo" />
             </SelectTrigger>
             <SelectContent className="z-[110]">
-              <SelectItem value="inmediato">Inmediato (0–3 meses)</SelectItem>
-              <SelectItem value="corto">Corto plazo (3–6 meses)</SelectItem>
-              <SelectItem value="mediano">
+              <SelectItem value="Inmediato (0–3 meses)">
+                Inmediato (0–3 meses)
+              </SelectItem>
+              <SelectItem value="Corto plazo (3–6 meses)">
+                Corto plazo (3–6 meses)
+              </SelectItem>
+              <SelectItem value="Mediano plazo (6–12 meses)">
                 Mediano plazo (6–12 meses)
               </SelectItem>
-              <SelectItem value="comparando">Solo estoy comparando</SelectItem>
+              <SelectItem value="Solo estoy comparando">
+                Solo estoy comparando
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
