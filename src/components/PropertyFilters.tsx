@@ -1,16 +1,26 @@
-import { useState } from 'react';
-import { PropertyFilters as FilterType } from '@/types/property';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Slider } from '@/components/ui/slider';
-import { Badge } from '@/components/ui/badge';
-import { X, Filter, ChevronDown, ChevronUp } from 'lucide-react';
-import { AMENITIES_OPTIONS, FINANCING_OPTIONS } from '@/data/mockData';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { useState } from "react";
+import { PropertyFilters as FilterType } from "@/types/property";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Slider } from "@/components/ui/slider";
+import { Badge } from "@/components/ui/badge";
+import { X, Filter, ChevronDown, ChevronUp } from "lucide-react";
+import { AMENITIES_OPTIONS, FINANCING_OPTIONS } from "@/data/mockData";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 interface PropertyFiltersProps {
   filters: FilterType;
@@ -18,19 +28,23 @@ interface PropertyFiltersProps {
   onClearFilters: () => void;
 }
 
-export function PropertyFilters({ filters, onFiltersChange, onClearFilters }: PropertyFiltersProps) {
+export function PropertyFilters({
+  filters,
+  onFiltersChange,
+  onClearFilters,
+}: PropertyFiltersProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [priceRange, setPriceRange] = useState([
     filters.priceMin || 0,
-    filters.priceMax || 10000000
+    filters.priceMax || 10000000,
   ]);
   const [areaRange, setAreaRange] = useState([
     filters.areaMin || 0,
-    filters.areaMax || 1000
+    filters.areaMax || 1000,
   ]);
   const [ageRange, setAgeRange] = useState([
     filters.ageMin || 0,
-    filters.ageMax || 50
+    filters.ageMax || 50,
   ]);
 
   const updateFilter = (key: keyof FilterType, value: any) => {
@@ -40,33 +54,39 @@ export function PropertyFilters({ filters, onFiltersChange, onClearFilters }: Pr
   const toggleAmenity = (amenity: string) => {
     const currentAmenities = filters.amenities || [];
     const newAmenities = currentAmenities.includes(amenity)
-      ? currentAmenities.filter(a => a !== amenity)
+      ? currentAmenities.filter((a) => a !== amenity)
       : [...currentAmenities, amenity];
-    updateFilter('amenities', newAmenities);
+    updateFilter("amenities", newAmenities);
   };
 
   const toggleFinancing = (financing: string) => {
     const currentFinancing = filters.financing || [];
     const newFinancing = currentFinancing.includes(financing)
-      ? currentFinancing.filter(f => f !== financing)
+      ? currentFinancing.filter((f) => f !== financing)
       : [...currentFinancing, financing];
-    updateFilter('financing', newFinancing);
+    updateFilter("financing", newFinancing);
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('es-MX', {
-      style: 'currency',
-      currency: 'MXN',
+    return new Intl.NumberFormat("es-MX", {
+      style: "currency",
+      currency: "MXN",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-      notation: 'compact'
+      notation: "compact",
     }).format(price);
   };
 
   const getActiveFiltersCount = () => {
     let count = 0;
     if (filters.type) count++;
-    if (filters.subtype) count++;
+    if (
+      filters.subtype &&
+      (Array.isArray(filters.subtype)
+        ? filters.subtype.length > 0
+        : !!filters.subtype)
+    )
+      count++;
     if (filters.location) count++;
     if (filters.priceMin || filters.priceMax) count++;
     if (filters.areaMin || filters.areaMax) count++;
@@ -105,7 +125,11 @@ export function PropertyFilters({ filters, onFiltersChange, onClearFilters }: Pr
             <Collapsible open={isOpen} onOpenChange={setIsOpen}>
               <CollapsibleTrigger asChild>
                 <Button variant="ghost" size="sm">
-                  {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                  {isOpen ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
                 </Button>
               </CollapsibleTrigger>
             </Collapsible>
@@ -120,33 +144,70 @@ export function PropertyFilters({ filters, onFiltersChange, onClearFilters }: Pr
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Tipo de Propiedad</Label>
-                <Select value={filters.type || 'all'} onValueChange={(value) => updateFilter('type', value === 'all' ? undefined : value)}>
+                <Select
+                  value={filters.type || "all"}
+                  onValueChange={(value) =>
+                    updateFilter("type", value === "all" ? undefined : value)
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccionar tipo" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Todos los tipos</SelectItem>
-                    <SelectItem value="Habitacional">Habitacional</SelectItem>
-                    <SelectItem value="Comercial">Comercial</SelectItem>
-                    <SelectItem value="Industrial">Industrial</SelectItem>
-                    <SelectItem value="Otros">Otros</SelectItem>
+                    <SelectItem value="habitacional">Habitacional</SelectItem>
+                    <SelectItem value="comercial">Comercial</SelectItem>
+                    <SelectItem value="industrial">Industrial</SelectItem>
+                    <SelectItem value="agricola">Agrícola</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label>Subtipo</Label>
-                <Select value={filters.subtype || 'all'} onValueChange={(value) => updateFilter('subtype', value === 'all' ? undefined : value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar subtipo" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todos los subtipos</SelectItem>
-                    <SelectItem value="Casa">Casa</SelectItem>
-                    <SelectItem value="Departamento">Departamento</SelectItem>
-                    <SelectItem value="Terreno">Terreno</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="grid grid-cols-2 gap-2 mt-2">
+                  {[
+                    { value: "Casa", label: "Casa" },
+                    { value: "Departamento", label: "Departamento" },
+                    { value: "Terreno", label: "Terreno" },
+                  ].map((sub) => {
+                    const isSelected = Array.isArray(filters.subtype)
+                      ? filters.subtype.includes(sub.value)
+                      : filters.subtype === sub.value;
+
+                    return (
+                      <div
+                        key={sub.value}
+                        className="flex items-center space-x-2"
+                      >
+                        <Checkbox
+                          id={`subtype-${sub.value}`}
+                          checked={isSelected}
+                          onCheckedChange={(checked) => {
+                            const currentSubtypes = Array.isArray(
+                              filters.subtype,
+                            )
+                              ? filters.subtype
+                              : filters.subtype
+                                ? [filters.subtype]
+                                : [];
+                            const newSubtypes = checked
+                              ? [...currentSubtypes, sub.value]
+                              : currentSubtypes.filter((s) => s !== sub.value);
+                            updateFilter(
+                              "subtype",
+                              newSubtypes.length > 0 ? newSubtypes : undefined,
+                            );
+                          }}
+                        />
+                        <Label
+                          htmlFor={`subtype-${sub.value}`}
+                          className="text-sm font-normal cursor-pointer"
+                        >
+                          {sub.label}
+                        </Label>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
@@ -155,8 +216,10 @@ export function PropertyFilters({ filters, onFiltersChange, onClearFilters }: Pr
               <Label>Ubicación</Label>
               <Input
                 placeholder="Ciudad, estado o dirección"
-                value={filters.location || ''}
-                onChange={(e) => updateFilter('location', e.target.value || undefined)}
+                value={filters.location || ""}
+                onChange={(e) =>
+                  updateFilter("location", e.target.value || undefined)
+                }
               />
             </div>
 
@@ -168,8 +231,8 @@ export function PropertyFilters({ filters, onFiltersChange, onClearFilters }: Pr
                   value={priceRange}
                   onValueChange={(value) => {
                     setPriceRange(value);
-                    updateFilter('priceMin', value[0]);
-                    updateFilter('priceMax', value[1]);
+                    updateFilter("priceMin", value[0]);
+                    updateFilter("priceMax", value[1]);
                   }}
                   max={10000000}
                   min={0}
@@ -191,8 +254,8 @@ export function PropertyFilters({ filters, onFiltersChange, onClearFilters }: Pr
                   value={areaRange}
                   onValueChange={(value) => {
                     setAreaRange(value);
-                    updateFilter('areaMin', value[0]);
-                    updateFilter('areaMax', value[1]);
+                    updateFilter("areaMin", value[0]);
+                    updateFilter("areaMax", value[1]);
                   }}
                   max={1000}
                   min={0}
@@ -210,7 +273,15 @@ export function PropertyFilters({ filters, onFiltersChange, onClearFilters }: Pr
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label>Habitaciones</Label>
-                <Select value={filters.bedrooms?.toString() || 'all'} onValueChange={(value) => updateFilter('bedrooms', value === 'all' ? undefined : parseInt(value))}>
+                <Select
+                  value={filters.bedrooms?.toString() || "all"}
+                  onValueChange={(value) =>
+                    updateFilter(
+                      "bedrooms",
+                      value === "all" ? undefined : parseInt(value),
+                    )
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Cualquiera" />
                   </SelectTrigger>
@@ -227,7 +298,15 @@ export function PropertyFilters({ filters, onFiltersChange, onClearFilters }: Pr
 
               <div className="space-y-2">
                 <Label>Baños</Label>
-                <Select value={filters.bathrooms?.toString() || 'all'} onValueChange={(value) => updateFilter('bathrooms', value === 'all' ? undefined : parseInt(value))}>
+                <Select
+                  value={filters.bathrooms?.toString() || "all"}
+                  onValueChange={(value) =>
+                    updateFilter(
+                      "bathrooms",
+                      value === "all" ? undefined : parseInt(value),
+                    )
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Cualquiera" />
                   </SelectTrigger>
@@ -243,7 +322,15 @@ export function PropertyFilters({ filters, onFiltersChange, onClearFilters }: Pr
 
               <div className="space-y-2">
                 <Label>Estacionamientos</Label>
-                <Select value={filters.parking?.toString() || 'all'} onValueChange={(value) => updateFilter('parking', value === 'all' ? undefined : parseInt(value))}>
+                <Select
+                  value={filters.parking?.toString() || "all"}
+                  onValueChange={(value) =>
+                    updateFilter(
+                      "parking",
+                      value === "all" ? undefined : parseInt(value),
+                    )
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Cualquiera" />
                   </SelectTrigger>
@@ -264,7 +351,12 @@ export function PropertyFilters({ filters, onFiltersChange, onClearFilters }: Pr
                 <Checkbox
                   id="furnished"
                   checked={filters.furnished === true}
-                  onCheckedChange={(checked) => updateFilter('furnished', checked === true ? true : undefined)}
+                  onCheckedChange={(checked) =>
+                    updateFilter(
+                      "furnished",
+                      checked === true ? true : undefined,
+                    )
+                  }
                 />
                 <Label htmlFor="furnished">Amoblado</Label>
               </div>
@@ -273,7 +365,12 @@ export function PropertyFilters({ filters, onFiltersChange, onClearFilters }: Pr
                 <Checkbox
                   id="petFriendly"
                   checked={filters.petFriendly === true}
-                  onCheckedChange={(checked) => updateFilter('petFriendly', checked === true ? true : undefined)}
+                  onCheckedChange={(checked) =>
+                    updateFilter(
+                      "petFriendly",
+                      checked === true ? true : undefined,
+                    )
+                  }
                 />
                 <Label htmlFor="petFriendly">Pet-friendly</Label>
               </div>
@@ -282,7 +379,9 @@ export function PropertyFilters({ filters, onFiltersChange, onClearFilters }: Pr
                 <Checkbox
                   id="lien"
                   checked={filters.lien === false}
-                  onCheckedChange={(checked) => updateFilter('lien', checked === true ? false : undefined)}
+                  onCheckedChange={(checked) =>
+                    updateFilter("lien", checked === true ? false : undefined)
+                  }
                 />
                 <Label htmlFor="lien">Sin gravamen</Label>
               </div>
@@ -296,8 +395,8 @@ export function PropertyFilters({ filters, onFiltersChange, onClearFilters }: Pr
                   value={ageRange}
                   onValueChange={(value) => {
                     setAgeRange(value);
-                    updateFilter('ageMin', value[0]);
-                    updateFilter('ageMax', value[1]);
+                    updateFilter("ageMin", value[0]);
+                    updateFilter("ageMax", value[1]);
                   }}
                   max={50}
                   min={0}
@@ -341,7 +440,10 @@ export function PropertyFilters({ filters, onFiltersChange, onClearFilters }: Pr
                       checked={filters.financing?.includes(financing) || false}
                       onCheckedChange={() => toggleFinancing(financing)}
                     />
-                    <Label htmlFor={`financing-${financing}`} className="text-sm">
+                    <Label
+                      htmlFor={`financing-${financing}`}
+                      className="text-sm"
+                    >
                       {financing}
                     </Label>
                   </div>

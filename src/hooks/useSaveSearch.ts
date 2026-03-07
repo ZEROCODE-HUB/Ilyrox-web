@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { sileo } from "sileo";
+import { useToast } from "@/hooks/use-toast";
 
-export const useSaveSearch = (userId?: string) => {
+export function useSaveSearch(userId?: string) {
+  const { toast } = useToast();
+  const [savedSearches, setSavedSearches] = useState<any[]>([]);
   const [createLead, setCreateLead] = useState(false);
   const [leadName, setLeadName] = useState("");
   const [leadPhone, setLeadPhone] = useState("");
@@ -270,7 +272,11 @@ export const useSaveSearch = (userId?: string) => {
       .maybeSingle();
 
     if (searchError) {
-      sileo.error({ title: "Error al guardar la búsqueda" });
+      toast({
+        variant: "destructive",
+        title: "Error al guardar",
+        description: searchError.message || "Inténtalo de nuevo más tarde",
+      });
       throw searchError;
     }
 
@@ -279,8 +285,12 @@ export const useSaveSearch = (userId?: string) => {
 
   const handleSaveSearch = async (filters: any, onClose: () => void) => {
     if (!userId) {
-      sileo.warning({ title: "Debes iniciar sesión para guardar búsquedas" });
-      return false;
+      toast({
+        variant: "destructive",
+        title: "Iniciar Sesión",
+        description: "Debes iniciar sesión para guardar filtros",
+      });
+      return { success: false };
     }
 
     if (!validateLeadFields()) {
@@ -299,7 +309,10 @@ export const useSaveSearch = (userId?: string) => {
 
       await saveSearchToDatabase(filters, leadId);
 
-      sileo.success({ title: "Búsqueda guardada correctamente" });
+      toast({
+        title: "Filtros guardados",
+        description: "Podrás encontrarlos en tu perfil",
+      });
 
       // Limpiar formulario
       setCreateLead(false);
@@ -310,7 +323,10 @@ export const useSaveSearch = (userId?: string) => {
       return true;
     } catch (error: any) {
       console.log(error);
-      sileo.error({ title: "Error al procesar el guardado" });
+      toast({
+        variant: "destructive",
+        title: "Error al procesar el guardado",
+      });
       return false;
     }
   };
@@ -327,4 +343,4 @@ export const useSaveSearch = (userId?: string) => {
     errors,
     handleSaveSearch,
   };
-};
+}

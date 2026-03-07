@@ -10,7 +10,7 @@ import { getCurrentLocation } from "@/utils/geolocation";
 import { useState } from "react";
 import { UserLocation } from "@/types/property";
 import { useFilterStore } from "@/stores/useFilterStore";
-import { sileo } from "sileo";
+import { useToast } from "@/hooks/use-toast";
 
 interface MobileHeaderProps {
   user: any;
@@ -29,6 +29,7 @@ export const MobileHeader = ({
   setShowFilters,
   showFilters,
 }: MobileHeaderProps) => {
+  const { toast } = useToast();
   const navigate = useNavigate();
   const setRadiusKm = useFilterStore((s) => s.setRadiusKm);
 
@@ -38,17 +39,15 @@ export const MobileHeader = ({
       setUserLocation(location);
       setCenterLocation([location.lat, location.lng]);
       setRadiusKm(5);
-      sileo.success({
+      toast({
         title: "Ubicación detectada",
-        description: "Mostrando propiedades cercanas a tu ubicación.",
-        position: "top-right",
+        description: "Buscando propiedades cerca de ti.",
       });
-    } catch {
-      sileo.error({
+    } catch (error) {
+      toast({
+        variant: "destructive",
         title: "Error de ubicación",
-        description:
-          "No se pudo obtener tu ubicación. Verifica los permisos del navegador.",
-        position: "top-right",
+        description: "No se pudo obtener tu ubicación actual.",
       });
     }
   };
@@ -62,7 +61,7 @@ export const MobileHeader = ({
         >
           <div className="flex items-end">
             <div className="flex flex-col items-center mr-0.5">
-              <img src={logo360} alt="360" className="h-[60px] w-auto" />
+              <img src={logo360} alt="360" className="h-12 w-12" />
             </div>
           </div>
         </Link>

@@ -10,11 +10,12 @@ import { savePropertyService } from "@/services/savePropertyService";
 import { UserProfile } from "@/components/Header/UserProfile";
 import { useAuth } from "@/contexts/AuthContext";
 import { SkeletonCard } from "@/components/shared/SkeletonCard";
-import { sileo } from "sileo";
+import { useToast } from "@/hooks/use-toast";
 
 const SavedProperties = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { toast } = useToast();
 
   const {
     data: savedProperties = [],
@@ -28,13 +29,13 @@ const SavedProperties = () => {
 
   useEffect(() => {
     if (isError) {
-      sileo.error({
-        title: "Error",
-        description: "No se pudieron cargar las propiedades guardadas",
-        position: "top-right",
+      toast({
+        variant: "destructive",
+        title: "Error al cargar",
+        description: "No pudimos obtener tus propiedades guardadas.",
       });
     }
-  }, [isError]);
+  }, [isError, toast]);
 
   const [selectedProperty, setSelectedProperty] = useState<PropertyView | null>(
     null,
@@ -48,7 +49,7 @@ const SavedProperties = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="h-16 bg-card border-b sticky top-0 z-20">
-        <div className="container mx-auto px-4 h-full flex items-center">
+        <div className="container mx-auto px-2 h-full flex items-center">
           <Button
             variant="ghost"
             size="sm"
@@ -56,11 +57,12 @@ const SavedProperties = () => {
             className="mr-4"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Volver
           </Button>
           <div className="flex items-center gap-2">
-            <Bookmark className="h-5 w-5 text-primary" />
-            <span className="text-xl font-bold text-primary">
+            <div className="bg-primary/10 p-2 rounded-lg ">
+              <Bookmark className="h-5 w-5 text-primary" />
+            </div>
+            <span className="text-xl font-bold text-primary whitespace-nowrap -ml-1">
               Propiedades Guardadas
             </span>
           </div>

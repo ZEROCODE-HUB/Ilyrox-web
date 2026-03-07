@@ -36,9 +36,9 @@ const Auth = () => {
             className="hidden lg:flex items-center justify-center gap-2 mb-6 hover:opacity-90 transition-opacity"
           >
             <img
-              src="/icon.png"
+              src="/Logo.jpeg"
               alt="ilyrox"
-              className="w-10 h-10 object-contain"
+              className="w-20 h-20 object-contain"
             />
             <span className="text-3xl font-bold text-foreground">ilyrox</span>
           </Link>

@@ -18,13 +18,14 @@ import {
 } from "@/components/ui/select";
 import { Home } from "lucide-react";
 
+import { useToast } from "@/hooks/use-toast";
 import { propertyRequestService } from "@/services/propertyRequestService";
 import { solicitudes_propiedad } from "@/types/types";
 import { formatPriceInput, parseCurrency } from "@/utils/propertyUtils";
-import { sileo } from "sileo";
 import { MUNICIPIOS_ESTADO } from "@/constants/MexLocations/municipios";
 import { COLONIAS_POR_MUNICIPIO } from "@/constants/MexLocations/colonias";
 import { ESTADOS_MEXICO } from "@/constants/MexLocations/estados";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface RentSellPopupProps {
   isOpen: boolean;
@@ -32,10 +33,12 @@ interface RentSellPopupProps {
 }
 
 export function RentSellPopup({ isOpen, onClose }: RentSellPopupProps) {
+  const { profile } = useAuth();
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
+    name: profile?.full_name || "",
+    email: profile?.email || "",
+    phone: profile?.celular || "",
     description: "",
     propertyType: "" as solicitudes_propiedad["tipo"],
     priceMin: "",
@@ -45,6 +48,18 @@ export function RentSellPopup({ isOpen, onClose }: RentSellPopupProps) {
     colonia: "",
     otraColonia: "",
   });
+
+  // Re-sync with profile data whenever the modal opens
+  useEffect(() => {
+    if (isOpen && profile) {
+      setFormData((prev) => ({
+        ...prev,
+        name: profile.full_name || prev.name,
+        email: profile.email || prev.email,
+        phone: profile.celular || prev.phone,
+      }));
+    }
+  }, [isOpen, profile]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
@@ -98,10 +113,9 @@ export function RentSellPopup({ isOpen, onClose }: RentSellPopupProps) {
         usuario_id: null, // This is handled by the service
       } as any);
 
-      sileo.success({
-        title: "Su solicitud se envió con éxito",
-        description: "Nos pondremos en contacto contigo pronto.",
-        position: "top-right",
+      toast({
+        title: "Solicitud enviada",
+        description: "Uno de nuestros expertos te contactará pronto.",
       });
 
       setFormData({
@@ -118,13 +132,12 @@ export function RentSellPopup({ isOpen, onClose }: RentSellPopupProps) {
         otraColonia: "",
       });
       onClose();
-      setShowSuccessPopup(true);
     } catch (error: any) {
       console.error("Error submitting property request:", error);
-      sileo.error({
+      toast({
+        variant: "destructive",
         title: "Error",
-        description: "No se pudo enviar la solicitud. Intenta nuevamente.",
-        position: "top-right",
+        description: "Hubo un error al enviar tu solicitud.",
       });
     } finally {
       setIsSubmitting(false);
@@ -212,6 +225,7 @@ export function RentSellPopup({ isOpen, onClose }: RentSellPopupProps) {
                 placeholder="Describe brevemente tu inmueble (tamaño, características)..."
                 rows={3}
                 required
+                className="max-h-[200px] overflow-y-auto"
               />
             </div>
 

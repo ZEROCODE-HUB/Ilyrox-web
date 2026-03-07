@@ -9,7 +9,8 @@ import { Button } from "../ui/button";
 import { getCurrentLocation } from "@/utils/geolocation";
 import { UserLocation } from "@/types/property";
 import { useFilterStore } from "@/stores/useFilterStore";
-import { sileo } from "sileo";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface DesktopHeaderProps {
   user: any;
@@ -28,6 +29,7 @@ export const DesktopHeader = ({
   setUserLocation,
   setCenterLocation,
 }: DesktopHeaderProps) => {
+  const { toast } = useToast();
   const navigate = useNavigate();
   const setRadiusKm = useFilterStore((s) => s.setRadiusKm);
 
@@ -37,17 +39,15 @@ export const DesktopHeader = ({
       setUserLocation(location);
       setCenterLocation([location.lat, location.lng]);
       setRadiusKm(5);
-      sileo.success({
+      toast({
         title: "Ubicación detectada",
-        description: "Mostrando propiedades cercanas a tu ubicación.",
-        position: "top-right",
+        description: "Buscando propiedades cerca de ti.",
       });
-    } catch {
-      sileo.error({
+    } catch (error) {
+      toast({
+        variant: "destructive",
         title: "Error de ubicación",
-        description:
-          "No se pudo obtener tu ubicación. Verifica los permisos del navegador.",
-        position: "top-right",
+        description: "No se pudo obtener tu ubicación actual.",
       });
     }
   };
@@ -69,7 +69,7 @@ export const DesktopHeader = ({
                 <img
                   src={logo360}
                   alt="360"
-                  className="h-14 lg:h-16 w-auto object-contain hover:scale-110 transition-transform"
+                  className="h-16 lg:h-14 w-12 lg:w-12 object-contain hover:scale-110 transition-transform pr-2"
                 />
               </Link>
               <div className="w-full max-w-2xl">

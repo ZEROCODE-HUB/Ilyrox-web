@@ -68,7 +68,10 @@ export const MobileLayout = ({
             </div> */}
           </div>
           <div className="p-5">
-            <SimplifiedFilters setShowFilters={() => setShowFilters(false)} />
+            <SimplifiedFilters
+              setShowFilters={() => setShowFilters(false)}
+              onClearAll={handleClearFilters}
+            />
           </div>
         </div>
       )}

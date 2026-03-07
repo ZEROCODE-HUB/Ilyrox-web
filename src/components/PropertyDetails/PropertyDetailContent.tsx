@@ -29,15 +29,17 @@ import { useSavedProperties } from "@/hooks/useSavedProperties";
 import { useAuth } from "@/contexts/AuthContext";
 import { MapModal } from "./MapModal";
 import { InfoModal } from "./InfoModal";
-import { sileo } from "sileo";
+import { useToast } from "@/hooks/use-toast";
 import { useResenas } from "@/hooks/useResenas";
 
 interface PropertyDetailContentProps {
   property: PropertyView;
+  onAuthRequired?: () => void;
 }
 
 export function PropertyDetailContent({
   property,
+  onAuthRequired,
 }: PropertyDetailContentProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isContactFormOpen, setIsContactFormOpen] = useState(false);
@@ -54,7 +56,7 @@ export function PropertyDetailContent({
   }, [property]);
 
   const { reviewsData } = useResenas(displayProperty?.asesor_id);
-
+  const { toast } = useToast();
   const { user } = useAuth();
   const {
     isSaved,
@@ -72,10 +74,10 @@ export function PropertyDetailContent({
     if (!displayProperty) return;
 
     if (!user) {
-      sileo.error({
+      toast({
+        variant: "destructive",
         title: "Inicia sesión",
-        description: "Debes estar logueado para guardar propiedades",
-        position: "top-center",
+        description: "Debes iniciar sesión para guardar propiedades",
       });
       return;
     }
@@ -125,19 +127,40 @@ export function PropertyDetailContent({
       <div className="p-6 space-y-6">
         {/* Galería de imágenes */}
         <div className="relative">
-          <div className="aspect-video rounded-lg overflow-hidden bg-muted relative">
-            <AnimatePresence mode="wait">
+          <div className="relative w-full aspect-[4/3] md:aspect-video max-h-[600px] rounded-xl overflow-hidden bg-slate-950 flex items-center justify-center group isolate shadow-md">
+            {/* Capa 1: Fondo Dinámico con Blur */}
+            <AnimatePresence mode="popLayout" initial={false}>
               <motion.img
-                key={currentImageIndex}
+                key={`bg-${currentImageIndex}`}
                 src={displayProperty.fotos?.[currentImageIndex] || ""}
-                alt={`${displayProperty.tipo} ${displayProperty.subtipo} - Imagen ${currentImageIndex + 1}`}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="w-full h-full object-cover absolute inset-0"
+                alt="Fondo decorativo"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.35 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.8, ease: "easeInOut" }}
+                className="absolute inset-0 w-full h-full object-cover blur-[80px] scale-125 select-none pointer-events-none opacity-50"
+                aria-hidden="true"
               />
             </AnimatePresence>
+
+            {/* Capa 2: Imagen Principal con Escalado Inteligente */}
+            <div className="relative z-10 w-full h-full flex items-center justify-center p-0 md:p-2">
+              <AnimatePresence mode="popLayout" initial={false}>
+                <motion.img
+                  key={`main-${currentImageIndex}`}
+                  src={displayProperty.fotos?.[currentImageIndex] || ""}
+                  alt={`${displayProperty.tipo} ${displayProperty.subtipo}`}
+                  initial={{ opacity: 0, scale: 0.98, filter: "blur(10px)" }}
+                  animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, scale: 1.02, filter: "blur(10px)" }}
+                  transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+                  className="w-full h-full object-cover md:object-contain rounded-lg shadow-2xl select-none relative z-10 pointer-events-none"
+                />
+              </AnimatePresence>
+            </div>
+
+            {/* Gradiente sutil para profundidad */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/40 z-0 pointer-events-none" />
           </div>
 
           {displayProperty.fotos && displayProperty.fotos.length > 1 && (
@@ -188,11 +211,10 @@ export function PropertyDetailContent({
               onClick={() => {
                 const propertyUrl = `${window.location.origin}/property/${displayProperty.id}`;
                 navigator.clipboard.writeText(propertyUrl).then(() => {
-                  sileo.success({
+                  toast({
                     title: "Enlace copiado",
                     description:
                       "El enlace de la propiedad se ha copiado al portapapeles",
-                    position: "top-right",
                   });
                 });
               }}
@@ -465,7 +487,18 @@ export function PropertyDetailContent({
                 <Separator className="my-4" />
 
                 <Button
-                  onClick={() => setIsContactFormOpen(true)}
+                  onClick={() => {
+                    if (!user) {
+                      toast({
+                        variant: "destructive",
+                        title: "Inicia sesión",
+                        description:
+                          "Debes iniciar sesión para solicitar información",
+                      });
+                      return;
+                    }
+                    setIsContactFormOpen(true);
+                  }}
                   className="w-full"
                   size="lg"
                 >
@@ -481,7 +514,7 @@ export function PropertyDetailContent({
       <InfoModal
         isOpen={isContactFormOpen}
         onClose={() => setIsContactFormOpen(false)}
-        property={displayProperty}
+        propertyId={displayProperty?.id || ""}
       />
 
       {/* Modal del mapa */}

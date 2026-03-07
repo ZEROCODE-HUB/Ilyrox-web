@@ -26,7 +26,18 @@ export function filterProperties(
     if (filters.type && property.type !== filters.type) return false;
 
     // Filtro por subtipo
-    if (filters.subtype && property.subtype !== filters.subtype) return false;
+    if (filters.subtype) {
+      if (Array.isArray(filters.subtype)) {
+        if (
+          filters.subtype.length > 0 &&
+          !filters.subtype.includes(property.subtype)
+        ) {
+          return false;
+        }
+      } else if (property.subtype !== filters.subtype) {
+        return false;
+      }
+    }
 
     // Filtro por ubicación
     if (filters.location) {

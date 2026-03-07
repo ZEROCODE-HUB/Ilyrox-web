@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { ConfigModal } from "./ConfigModal";
 import { Badge } from "../ui/badge";
+import { upperWord } from "@/utils/upperWord";
 
 export function UserProfile() {
   const { user, profile, signOut, isLoading } = useAuth();
@@ -62,12 +63,12 @@ export function UserProfile() {
                 </p>
               </div>
             </div>
-            {profile?.rol === "agente" && (
+            {profile?.rol && (
               <Badge
                 variant="secondary"
                 className="w-fit text-[10px] h-5 px-1.5 bg-primary/10 text-primary border-none"
               >
-                Agente Pro
+                {upperWord(profile.rol)}
               </Badge>
             )}
           </div>

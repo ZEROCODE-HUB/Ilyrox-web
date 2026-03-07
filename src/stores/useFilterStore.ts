@@ -24,7 +24,7 @@ export interface FilterState {
 
   // Property type
   type: string | undefined;
-  subtype: string | undefined;
+  subtype: string[];
 
   // Features
   bedrooms: number | undefined;
@@ -57,7 +57,8 @@ export interface FilterActions {
   setOperationType: (op: OperationType) => void;
 
   setType: (type: string | undefined) => void;
-  setSubtype: (subtype: string | undefined) => void;
+  setSubtype: (subtype: string[]) => void;
+  toggleSubtype: (subtype: string) => void;
 
   setBedrooms: (n: number | undefined) => void;
   setBathrooms: (n: number | undefined) => void;
@@ -92,7 +93,7 @@ const initialState: FilterState = {
   operationType: "todas",
 
   type: undefined,
-  subtype: undefined,
+  subtype: [],
 
   bedrooms: undefined,
   bathrooms: undefined,
@@ -145,8 +146,14 @@ export const useFilterStore = create<FilterStore>()(
     setOperationType: (op) => set({ operationType: op }),
 
     // ── Property type ─────────────────────────
-    setType: (type) => set({ type, subtype: undefined }),
+    setType: (type) => set({ type, subtype: [] }),
     setSubtype: (subtype) => set({ subtype }),
+    toggleSubtype: (sub) =>
+      set((s) => ({
+        subtype: s.subtype.includes(sub)
+          ? s.subtype.filter((t) => t !== sub)
+          : [...s.subtype, sub],
+      })),
 
     // ── Features ──────────────────────────────
     setBedrooms: (n) => set({ bedrooms: n }),
@@ -164,7 +171,7 @@ export const useFilterStore = create<FilterStore>()(
     setRadiusKm: (radius) => set({ radiusKm: radius }),
 
     // ── Reset ─────────────────────────────────
-    resetFilters: () => set(initialState),
+    resetFilters: () => set((state) => ({ ...initialState })),
   })),
 );
 

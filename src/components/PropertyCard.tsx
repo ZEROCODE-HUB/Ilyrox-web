@@ -18,7 +18,7 @@ import { useSavedProperties } from "@/hooks/useSavedProperties";
 import { useAuth } from "@/contexts/AuthContext";
 
 import { Avatar } from "@/components/shared/Avatar";
-import { sileo } from "sileo";
+import { useToast } from "@/hooks/use-toast";
 import { upperWord } from "@/utils/upperWord";
 
 interface PropertyCardProps {
@@ -34,6 +34,7 @@ export function PropertyCard({
   isLoggedIn,
   onAuthRequired,
 }: PropertyCardProps) {
+  const { toast } = useToast();
   const { user } = useAuth();
   const {
     isSaved,
@@ -88,7 +89,8 @@ export function PropertyCard({
       if (onAuthRequired) {
         onAuthRequired();
       } else {
-        sileo.error({
+        toast({
+          variant: "destructive",
           title: "Inicia sesión",
           description: "Debes iniciar sesión para guardar propiedades.",
         });
@@ -113,14 +115,15 @@ export function PropertyCard({
     navigator.clipboard
       .writeText(propertyUrl)
       .then(() => {
-        sileo.info({
+        toast({
           title: "Enlace copiado",
           description:
             "El enlace de la propiedad se ha copiado al portapapeles",
         });
       })
       .catch(() => {
-        sileo.error({
+        toast({
+          variant: "destructive",
           title: "Error",
           description: "No se pudo copiar el enlace",
         });
@@ -200,9 +203,10 @@ export function PropertyCard({
               : "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1073&q=80"
           }
           alt={property.tipo.charAt(0).toUpperCase() + property.tipo.slice(1)}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110 cursor-pointer"
           onError={handleImageError}
           loading="lazy"
+          onClick={() => onViewDetails(property)}
         />
 
         {/* Bottom Gradient */}
