@@ -136,15 +136,22 @@ export const propertyService = {
       query = query.ilike("tipo_operacion", `%${filters.operationType}%`);
     }
 
+    let priceColumn = "precio_usd_normalizado";
+    if (filters.operationType === "venta") {
+      priceColumn = "precio_usd_venta";
+    } else if (filters.operationType === "renta") {
+      priceColumn = "precio_usd_renta";
+    }
+
     if (filters.priceMin) {
       const minUSD = filters.priceMin / exchangeRateToUSD;
       // Subtract a small epsilon to account for potential floating-point inaccuracies
-      query = query.gte("precio_usd_normalizado", minUSD - 0.0001);
+      query = query.gte(priceColumn, minUSD - 0.0001);
     }
     if (filters.priceMax) {
       const maxUSD = filters.priceMax / exchangeRateToUSD;
       // Add a small epsilon to account for potential floating-point inaccuracies
-      query = query.lte("precio_usd_normalizado", maxUSD + 0.0001);
+      query = query.lte(priceColumn, maxUSD + 0.0001);
     }
 
     if (filters.bedrooms && filters.bedrooms > 0)
