@@ -2,26 +2,68 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { X, Check, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import {
   useFilterStore,
   useEstadoMexico,
-  useColonias,
+  useColonias as useSelectedColonias,
 } from "@/stores/useFilterStore";
+import { MAPA_ESTADO_ID } from "@/constants/MexLocations/estados";
 import { MUNICIPIOS_ESTADO } from "@/constants/MexLocations/municipios";
 import { COLONIAS_POR_MUNICIPIO } from "@/constants/MexLocations/colonias";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Modal } from "../ui/Modal";
 import { usePropertyColonias } from "@/hooks/usePropertyColonias";
+import { useColonias } from "@/hooks/locations/useColonias";
+import { useDebouncedCallback } from "use-debounce";
 
 export function ZoneSearch() {
   const estadoMexico = useEstadoMexico();
-  const selectedColonias = useColonias();
+  const selectedColonias = useSelectedColonias();
   const { toggleColonia } = useFilterStore();
   const [searchModal, setSearchModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const { colonias } = usePropertyColonias(estadoMexico);
+
+  const { colonias, loading, hasMore, fetchColonias, loadMore } = useColonias();
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  const estadoId = useMemo(() => {
+    if (!estadoMexico) return null;
+    const cleanEstado = estadoMexico.replace(" (CDMX)", "");
+    return MAPA_ESTADO_ID[estadoMexico] || MAPA_ESTADO_ID[cleanEstado] || null;
+  }, [estadoMexico]);
+
+  useEffect(() => {
+    if (!hasMore || loading || !searchModal) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMore({ estadoId: estadoId as number });
+        }
+      },
+      { threshold: 0.1 },
+    );
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasMore, loading, searchModal, estadoId]);
+
+  useEffect(() => {
+    if (estadoId) {
+      fetchColonias({ estadoId, reset: true });
+    }
+  }, [estadoId]);
+
+  const handleSearch = useDebouncedCallback((value: string) => {
+    if (estadoId) {
+      fetchColonias({ estadoId, busqueda: value, reset: true });
+    }
+  }, 300);
 
   const normalizeEstado = (estado: string) => {
     if (!estado) return "";
@@ -34,41 +76,47 @@ export function ZoneSearch() {
       .replace(" de Ignacio de la Llave", "");
   };
 
-  const allStateColonias = useMemo(() => {
+  const uniqueColonyNames = useMemo(() => {
     if (!estadoMexico) return [];
 
-    const normalized = normalizeEstado(estadoMexico);
-    // Get all municipalities for this state
-    const municipios = MUNICIPIOS_ESTADO[normalized] || [];
+    const namesSet = new Set<string>();
 
-    // Aggregate all colonies from those municipalities
-    const coloniesSet = new Set<string>();
-    municipios.forEach((muni) => {
-      const cols = COLONIAS_POR_MUNICIPIO[muni] || [];
-      cols.forEach((c) => coloniesSet.add(c));
-    });
-
-    // Add colonias from Supabase
+    // Add from Supabase
     if (Array.isArray(colonias)) {
-      colonias.forEach((item: any) => {
-        if (item.colonia) {
-          coloniesSet.add(item.colonia);
-        }
+      colonias.forEach((c: any) => {
+        if (c.nombre) namesSet.add(c.nombre);
       });
     }
 
-    return Array.from(coloniesSet).sort();
+    // Fallback/Fallback to constants if needed
+    if (namesSet.size === 0) {
+      const normalized = normalizeEstado(estadoMexico);
+      const municipios = MUNICIPIOS_ESTADO[normalized] || [];
+      municipios.forEach((muni) => {
+        const cols = COLONIAS_POR_MUNICIPIO[muni] || [];
+        cols.forEach((c) => namesSet.add(c));
+      });
+    }
+
+    return Array.from(namesSet).sort();
   }, [estadoMexico, colonias]);
 
-  const filteredColonias = useMemo(() => {
-    if (!searchQuery.trim()) return allStateColonias;
-    const query = searchQuery.toLowerCase().trim();
-    return allStateColonias.filter((colony) =>
-      colony.toLowerCase().includes(query),
-    );
-  }, [allStateColonias, searchQuery]);
+  const modalItems = useMemo(() => {
+    if (!Array.isArray(colonias)) return [];
 
-  if (!estadoMexico || allStateColonias.length === 0) return null;
+    // Count occurrences to detect duplicates
+    const counts: Record<string, number> = {};
+    colonias.forEach((c: any) => {
+      counts[c.nombre] = (counts[c.nombre] || 0) + 1;
+    });
+
+    return colonias.map((c: any) => ({
+      ...c,
+      isDuplicate: counts[c.nombre] > 1,
+    }));
+  }, [colonias]);
+
+  if (!estadoMexico || uniqueColonyNames.length === 0) return null;
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-2">
@@ -86,32 +134,51 @@ export function ZoneSearch() {
             >
               <Search className="h-4 w-4" />
             </Button>
-            {allStateColonias.slice(0, 20).map((colony) => {
-              const isSelected = selectedColonias.includes(colony);
-              return (
-                <Badge
-                  key={colony}
-                  variant={isSelected ? "default" : "secondary"}
-                  className={cn(
-                    "cursor-pointer px-4 py-1.5 rounded-full text-sm transition-all border-none font-medium select-none whitespace-nowrap",
-                    isSelected
-                      ? "bg-white text-navbar scale-105 shadow-md hover:bg-white/90"
-                      : "bg-white/10 text-white/90 hover:bg-white/20",
-                  )}
-                  onClick={() => toggleColonia(colony)}
-                >
-                  {colony}
-                  {isSelected && <Check className="ml-1.5 h-3.5 w-3.5" />}
-                </Badge>
-              );
-            })}
-            {allStateColonias.length > 20 && (
+            {uniqueColonyNames
+              .sort((a, b) => {
+                const aSelected = selectedColonias.some(
+                  (sc) => sc === a || sc.startsWith(`${a} (`),
+                )
+                  ? 0
+                  : 1;
+                const bSelected = selectedColonias.some(
+                  (sc) => sc === b || sc.startsWith(`${b} (`),
+                )
+                  ? 0
+                  : 1;
+                if (aSelected !== bSelected) return aSelected - bSelected;
+                return a.localeCompare(b);
+              })
+              .slice(0, 20)
+              .map((colony) => {
+                // For badges, we check if ANY item with this colony name is selected
+                const isSelected = selectedColonias.some(
+                  (sc) => sc === colony || sc.startsWith(`${colony} (`),
+                );
+                return (
+                  <Badge
+                    key={`badge-${colony}`}
+                    variant={isSelected ? "default" : "secondary"}
+                    className={cn(
+                      "cursor-pointer px-4 py-1.5 rounded-full text-sm transition-all border-none font-medium select-none whitespace-nowrap",
+                      isSelected
+                        ? "bg-white text-navbar scale-105 shadow-md hover:bg-white/90"
+                        : "bg-white/10 text-white/90 hover:bg-white/20",
+                    )}
+                    onClick={() => toggleColonia(colony)}
+                  >
+                    {colony}
+                    {isSelected && <Check className="ml-1.5 h-3.5 w-3.5" />}
+                  </Badge>
+                );
+              })}
+            {uniqueColonyNames.length > 20 && (
               <Button
                 variant="ghost"
                 onClick={() => setSearchModal(true)}
                 className="text-white/70 hover:text-white hover:bg-white/10 text-xs px-3 h-9 rounded-full transition-all"
               >
-                +{allStateColonias.length - 20} más...
+                +{uniqueColonyNames.length - 20} más...
               </Button>
             )}
           </div>
@@ -134,7 +201,10 @@ export function ZoneSearch() {
             <Input
               placeholder="Escribe el nombre de la colonia..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                handleSearch(e.target.value);
+              }}
               className="pl-10 h-12 bg-slate-50 border-slate-200 focus:border-primary focus:ring-primary/20 transition-all rounded-xl"
               autoFocus
             />
@@ -156,36 +226,72 @@ export function ZoneSearch() {
             </p>
             <ScrollArea className="h-[350px] pr-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {filteredColonias.map((colony) => {
-                  const isSelected = selectedColonias.includes(colony);
-                  return (
-                    <div
-                      key={colony}
-                      onClick={() => toggleColonia(colony)}
-                      className={cn(
-                        "flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all border-2 select-none group",
-                        isSelected
-                          ? "bg-primary/5 border-primary text-primary shadow-sm"
-                          : "bg-white border-slate-100 hover:border-primary/30 hover:bg-slate-50",
-                      )}
-                    >
-                      <span className="text-sm font-medium leading-tight">
-                        {colony}
-                      </span>
+                {[...modalItems]
+                  .sort((a, b) => {
+                    const aId = (a as any).municipio_nombre
+                      ? `${(a as any).nombre} (${(a as any).municipio_nombre})`
+                      : (a as any).nombre;
+                    const bId = (b as any).municipio_nombre
+                      ? `${(b as any).nombre} (${(b as any).municipio_nombre})`
+                      : (b as any).nombre;
+                    const aSelected = selectedColonias.includes(aId) ? 0 : 1;
+                    const bSelected = selectedColonias.includes(bId) ? 0 : 1;
+                    if (aSelected !== bSelected) return aSelected - bSelected;
+                    return (a as any).nombre.localeCompare((b as any).nombre);
+                  })
+                  .map((item) => {
+                    const identifier = item.municipio_nombre
+                      ? `${item.nombre} (${item.municipio_nombre})`
+                      : item.nombre;
+                    const isSelected = selectedColonias.includes(identifier);
+                    return (
                       <div
+                        key={`modal-col-${item.id}`}
+                        onClick={() =>
+                          toggleColonia(item.nombre, item.municipio_nombre)
+                        }
                         className={cn(
-                          "h-5 w-5 rounded-md flex items-center justify-center transition-all",
+                          "flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all border-2 select-none group",
                           isSelected
-                            ? "bg-primary text-white scale-110"
-                            : "bg-slate-100 border border-slate-200 group-hover:border-primary/50",
+                            ? "bg-primary/5 border-primary text-primary shadow-sm focus:border-primary focus:ring-primary/20"
+                            : "bg-white border-slate-100 hover:border-primary/30 hover:bg-slate-50",
                         )}
                       >
-                        {isSelected && <Check className="h-3.5 w-3.5" />}
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium leading-tight">
+                            {item.nombre}
+                          </span>
+                          {item.isDuplicate && item.municipio_nombre && (
+                            <span className="text-[10px] text-slate-400 mt-0.5">
+                              {item.municipio_nombre}
+                            </span>
+                          )}
+                        </div>
+                        <div
+                          className={cn(
+                            "h-5 w-5 rounded-md flex items-center justify-center transition-all",
+                            isSelected
+                              ? "bg-primary text-white scale-110"
+                              : "bg-slate-100 border border-slate-200 group-hover:border-primary/50",
+                          )}
+                        >
+                          {isSelected && <Check className="h-3.5 w-3.5" />}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
-                {filteredColonias.length === 0 && (
+                    );
+                  })}
+
+                <div ref={loadMoreRef} className="h-4 w-full" />
+
+                {loading && (
+                  <div className="col-span-full py-8 text-center animate-in fade-in">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                    <p className="text-slate-400 text-xs mt-2 font-medium">
+                      Cargando colonias...
+                    </p>
+                  </div>
+                )}
+                {modalItems.length === 0 && (
                   <div className="col-span-full py-12 text-center space-y-3">
                     <div className="bg-slate-50 h-16 w-16 rounded-full flex items-center justify-center mx-auto">
                       <Search className="h-6 w-6 text-slate-300" />

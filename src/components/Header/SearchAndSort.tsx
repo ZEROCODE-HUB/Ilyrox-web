@@ -9,17 +9,16 @@ import {
 } from "@/components/ui/popover";
 import { useState, useMemo } from "react";
 import { ESTADOS_MEXICO } from "@/constants/MexLocations/estados";
-import { MUNICIPIOS_ESTADO } from "@/constants/MexLocations/municipios";
-import { COLONIAS_POR_MUNICIPIO } from "@/constants/MexLocations/colonias";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 
 import {
   useFilterStore,
   useEstadoMexico,
-  useColonias,
   useSearchTerm,
+  useColonias as useSelectedColonias,
 } from "@/stores/useFilterStore";
+import { useColonias } from "@/hooks/locations/useColonias";
+import { MAPA_ESTADO_ID } from "@/constants/MexLocations/estados";
+import { useEffect } from "react";
 
 interface SearchAndSortProps {
   onLocationSearch?: () => void;
@@ -34,10 +33,22 @@ export function SearchAndSort({
 
   // ── Store state (granular selectors) ────────
   const estadoMexico = useEstadoMexico();
-  const selectedColonias = useColonias();
   const searchTerm = useSearchTerm();
 
-  const { setSearchTerm, setEstadoMexico } = useFilterStore();
+  const { setSearchTerm, setEstadoMexico, toggleColonia } = useFilterStore();
+  const selectedColonias = useSelectedColonias();
+
+  const { colonias, fetchColonias, loading } = useColonias();
+
+  useEffect(() => {
+    if (estadoMexico && open) {
+      const cleanEstado = estadoMexico.replace(" (CDMX)", "");
+      const estadoId = MAPA_ESTADO_ID[estadoMexico] || MAPA_ESTADO_ID[cleanEstado];
+      if (estadoId) {
+        fetchColonias({ estadoId, reset: true });
+      }
+    }
+  }, [estadoMexico, open]);
 
   // ── Derived Data ────────────────────────────
 
@@ -49,6 +60,20 @@ export function SearchAndSort({
       state.toLowerCase().includes(term),
     ).slice(0, 5);
   }, [searchTerm]);
+
+  const colonyItems = useMemo(() => {
+    if (!Array.isArray(colonias)) return [];
+
+    const counts: Record<string, number> = {};
+    colonias.forEach((c) => {
+      counts[c.nombre] = (counts[c.nombre] || 0) + 1;
+    });
+
+    return colonias.map((c) => ({
+      ...c,
+      isDuplicate: counts[c.nombre] > 1,
+    }));
+  }, [colonias]);
 
   // ── Handlers ────────────────────────────────
 
@@ -173,6 +198,61 @@ export function SearchAndSort({
                 )}
 
                 {/* Colonies SECTION (only if state selected) */}
+                {estadoMexico && (
+                  <>
+                    <div className="px-3 py-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wider bg-slate-50/50 flex justify-between items-center">
+                      <span>Colonias en {estadoMexico}</span>
+                      {loading && (
+                        <div className="h-3 w-3 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                      )}
+                    </div>
+                    <div className="max-h-[250px] overflow-y-auto">
+                      {colonyItems.slice(0, 10).map((col) => {
+                        const identifier = col.municipio_nombre
+                          ? `${col.nombre} (${col.municipio_nombre})`
+                          : col.nombre;
+                        const isSelected = selectedColonias.includes(identifier);
+                        return (
+                          <CommandItem
+                            key={`quick-col-${col.id}`}
+                            value={`colonia-${col.nombre}-${col.id}`}
+                            onSelect={() => {
+                              toggleColonia(col.nombre, col.municipio_nombre);
+                            }}
+                            className="cursor-pointer mx-1 my-0.5 rounded-lg hover:bg-primary/5 transition-colors py-2 px-3 flex items-center justify-between group"
+                          >
+                            <div className="flex items-center">
+                              <MapPinned className="mr-3 h-4 w-4 text-slate-400 group-hover:text-primary transition-colors" />
+                              <div className="flex flex-col">
+                                <span className="text-sm font-medium">
+                                  {col.nombre}
+                                </span>
+                                {col.isDuplicate && col.municipio_nombre && (
+                                  <span className="text-[10px] text-muted-foreground">
+                                    {col.municipio_nombre}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            {isSelected && (
+                              <Check className="h-4 w-4 text-primary" />
+                            )}
+                          </CommandItem>
+                        );
+                      })}
+                      {colonias.length > 10 && (
+                        <div className="px-3 py-2 text-[10px] text-muted-foreground text-center italic">
+                          Usa el buscador de colonias para ver más...
+                        </div>
+                      )}
+                      {!loading && colonias.length === 0 && (
+                        <div className="px-3 py-4 text-center text-xs text-muted-foreground">
+                          No se encontraron colonias
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
               </CommandList>
             </Command>
           </PopoverContent>

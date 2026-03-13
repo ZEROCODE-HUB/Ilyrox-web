@@ -47,7 +47,7 @@ export interface FilterActions {
   // Individual setters
   setEstadoMexico: (estado: string) => void;
   setColonias: (colonias: string[]) => void;
-  toggleColonia: (colonia: string) => void;
+  toggleColonia: (colonia: string, municipio?: string) => void;
   removeColonia: (colonia: string) => void;
 
   setPriceMin: (value: number | undefined) => void;
@@ -125,12 +125,34 @@ export const useFilterStore = create<FilterStore>()(
 
     setColonias: (colonias) => set({ colonias }),
 
-    toggleColonia: (colonia) =>
-      set((s) => ({
-        colonias: s.colonias.includes(colonia)
-          ? s.colonias.filter((c) => c !== colonia)
-          : [...s.colonias, colonia],
-      })),
+    toggleColonia: (colonia, municipio) =>
+      set((s) => {
+        if (municipio) {
+          const identifier = `${colonia} (${municipio})`;
+          return {
+            colonias: s.colonias.includes(identifier)
+              ? s.colonias.filter((c) => c !== identifier)
+              : [...s.colonias, identifier],
+          };
+        } else {
+          // Si no hay municipio (click desde pastilla), 
+          // quitamos TODAS las colonias que coincidan con ese nombre
+          const hasAny = s.colonias.some(
+            (c) => c === colonia || c.startsWith(`${colonia} (`),
+          );
+          if (hasAny) {
+            return {
+              colonias: s.colonias.filter(
+                (c) => c !== colonia && !c.startsWith(`${colonia} (`),
+              ),
+            };
+          } else {
+            return {
+              colonias: [...s.colonias, colonia],
+            };
+          }
+        }
+      }),
 
     removeColonia: (colonia) =>
       set((s) => ({
