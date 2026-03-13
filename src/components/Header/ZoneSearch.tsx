@@ -81,14 +81,20 @@ export function ZoneSearch() {
 
     const namesSet = new Set<string>();
 
-    // Add from Supabase
+    // Always include selected colonies names so they can be deselected
+    selectedColonias.forEach((sc) => {
+      const name = sc.includes(" (") ? sc.split(" (")[0] : sc;
+      namesSet.add(name);
+    });
+
+    // Add from Supabase results
     if (Array.isArray(colonias)) {
       colonias.forEach((c: any) => {
         if (c.nombre) namesSet.add(c.nombre);
       });
     }
 
-    // Fallback/Fallback to constants if needed
+    // Fallback to constants if needed
     if (namesSet.size === 0) {
       const normalized = normalizeEstado(estadoMexico);
       const municipios = MUNICIPIOS_ESTADO[normalized] || [];
@@ -98,23 +104,50 @@ export function ZoneSearch() {
       });
     }
 
-    return Array.from(namesSet).sort();
-  }, [estadoMexico, colonias]);
+    return Array.from(namesSet);
+  }, [estadoMexico, colonias, selectedColonias]);
 
   const modalItems = useMemo(() => {
-    if (!Array.isArray(colonias)) return [];
+    const items = Array.isArray(colonias) ? [...colonias] : [];
+
+    // Ensure all selected colonias are in the list even if not in current fetch/scroll
+    selectedColonias.forEach((sc) => {
+      const isAlreadyInList = items.some((item: any) => {
+        const identifier = item.municipio_nombre
+          ? `${item.nombre} (${item.municipio_nombre})`
+          : item.nombre;
+        return identifier === sc;
+      });
+
+      if (!isAlreadyInList) {
+        let nombre = sc;
+        let municipio_nombre = "";
+
+        if (sc.includes(" (") && sc.endsWith(")")) {
+          const parts = sc.split(" (");
+          nombre = parts[0];
+          municipio_nombre = parts[1].slice(0, -1);
+        }
+
+        items.push({
+          id: `selected-${sc}`,
+          nombre,
+          municipio_nombre,
+        });
+      }
+    });
 
     // Count occurrences to detect duplicates
     const counts: Record<string, number> = {};
-    colonias.forEach((c: any) => {
+    items.forEach((c: any) => {
       counts[c.nombre] = (counts[c.nombre] || 0) + 1;
     });
 
-    return colonias.map((c: any) => ({
+    return items.map((c: any) => ({
       ...c,
       isDuplicate: counts[c.nombre] > 1,
     }));
-  }, [colonias]);
+  }, [colonias, selectedColonias]);
 
   if (!estadoMexico || uniqueColonyNames.length === 0) return null;
 
