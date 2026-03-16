@@ -35,7 +35,6 @@ export const ESTADOS_MEXICO = [
 
 export type EstadoMexico = (typeof ESTADOS_MEXICO)[number];
 
-
 // ============================================
 // COORDENADAS: Estado
 // ============================================
@@ -75,3 +74,38 @@ export const COORDENADAS_ESTADO: Record<string, { lat: number; lng: number }> =
     Yucatán: { lat: 20.7099, lng: -89.0943 },
     Zacatecas: { lat: 22.7709, lng: -102.5832 },
   };
+
+export const MAPA_ESTADO_ID: Record<string, number> = {
+  Aguascalientes: 1,
+  "Baja California": 2,
+  "Baja California Sur": 3,
+  Campeche: 4,
+  "Coahuila de Zaragoza": 5,
+  Colima: 6,
+  Chiapas: 7,
+  Chihuahua: 8,
+  "Ciudad de México (CDMX)": 9,
+  Durango: 10,
+  Guanajuato: 11,
+  Guerrero: 12,
+  Hidalgo: 13,
+  Jalisco: 14,
+  "Estado de México": 15,
+  "Michoacán de Ocampo": 16,
+  Morelos: 17,
+  Nayarit: 18,
+  "Nuevo León": 19,
+  Oaxaca: 20,
+  Puebla: 21,
+  Querétaro: 22,
+  "Quintana Roo": 23,
+  "San Luis Potosí": 24,
+  Sinaloa: 25,
+  Sonora: 26,
+  Tabasco: 27,
+  Tamaulipas: 28,
+  Tlaxcala: 29,
+  "Veracruz de Ignacio de la Llave": 30,
+  Yucatán: 31,
+  Zacatecas: 32,
+};
