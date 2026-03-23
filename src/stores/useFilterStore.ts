@@ -27,14 +27,16 @@ export interface FilterState {
   subtype: string[];
 
   // Features
-  bedrooms: number | undefined;
-  bathrooms: number | undefined;
-  parking: number | undefined;
-  levels: number | undefined;
+  bedrooms: string | undefined;
+  bathrooms: string | undefined;
+  parking: string | undefined;
+  levels: string | undefined;
 
   // Area
   landAreaMin: number | undefined;
   constructionAreaMin: number | undefined;
+  landAreaMax: number | undefined;
+  constructionAreaMax: number | undefined;
 
   // Search
   searchTerm: string;
@@ -60,13 +62,15 @@ export interface FilterActions {
   setSubtype: (subtype: string[]) => void;
   toggleSubtype: (subtype: string) => void;
 
-  setBedrooms: (n: number | undefined) => void;
-  setBathrooms: (n: number | undefined) => void;
-  setParking: (n: number | undefined) => void;
-  setLevels: (n: number | undefined) => void;
+  setBedrooms: (n: string | undefined) => void;
+  setBathrooms: (n: string | undefined) => void;
+  setParking: (n: string | undefined) => void;
+  setLevels: (n: string | undefined) => void;
 
   setLandAreaMin: (n: number | undefined) => void;
   setConstructionAreaMin: (n: number | undefined) => void;
+  setLandAreaMax: (n: number | undefined) => void;
+  setConstructionAreaMax: (n: number | undefined) => void;
 
   setSearchTerm: (term: string) => void;
 
@@ -102,6 +106,8 @@ const initialState: FilterState = {
 
   landAreaMin: undefined,
   constructionAreaMin: undefined,
+  landAreaMax: undefined,
+  constructionAreaMax: undefined,
 
   searchTerm: "",
 
@@ -135,7 +141,7 @@ export const useFilterStore = create<FilterStore>()(
               : [...s.colonias, identifier],
           };
         } else {
-          // Si no hay municipio (click desde pastilla), 
+          // Si no hay municipio (click desde pastilla),
           // quitamos TODAS las colonias que coincidan con ese nombre
           const hasAny = s.colonias.some(
             (c) => c === colonia || c.startsWith(`${colonia} (`),
@@ -186,6 +192,8 @@ export const useFilterStore = create<FilterStore>()(
     // ── Area ──────────────────────────────────
     setLandAreaMin: (n) => set({ landAreaMin: n }),
     setConstructionAreaMin: (n) => set({ constructionAreaMin: n }),
+    setLandAreaMax: (n) => set({ landAreaMax: n }),
+    setConstructionAreaMax: (n) => set({ constructionAreaMax: n }),
 
     // ── Search ────────────────────────────────
     setSearchTerm: (term) => set({ searchTerm: term }),
@@ -234,6 +242,8 @@ export const useAreaFilters = () =>
     useShallow((s) => ({
       landAreaMin: s.landAreaMin,
       constructionAreaMin: s.constructionAreaMin,
+      landAreaMax: s.landAreaMax,
+      constructionAreaMax: s.constructionAreaMax,
     })),
   );
 
@@ -259,6 +269,8 @@ export const useFilterSnapshot = () =>
       levels: s.levels,
       landAreaMin: s.landAreaMin,
       constructionAreaMin: s.constructionAreaMin,
+      landAreaMax: s.landAreaMax,
+      constructionAreaMax: s.constructionAreaMax,
       searchTerm: s.searchTerm,
       radiusKm: s.radiusKm,
     })),

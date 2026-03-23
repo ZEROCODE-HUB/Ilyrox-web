@@ -27,7 +27,9 @@ export function useProperties(page = 0, pageSize = 10) {
   const parking = useFilterStore((s) => s.parking);
   const levels = useFilterStore((s) => s.levels);
   const landAreaMin = useFilterStore((s) => s.landAreaMin);
+  const landAreaMax = useFilterStore((s) => s.landAreaMax);
   const constructionAreaMin = useFilterStore((s) => s.constructionAreaMin);
+  const constructionAreaMax = useFilterStore((s) => s.constructionAreaMax);
   const searchTerm = useFilterStore((s) => s.searchTerm);
 
   return useQuery<PropertyView[]>({
@@ -47,7 +49,9 @@ export function useProperties(page = 0, pageSize = 10) {
       parking,
       levels,
       landAreaMin,
+      landAreaMax,
       constructionAreaMin,
+      constructionAreaMax,
       searchTerm,
       page,
       pageSize,
@@ -74,7 +78,9 @@ export function useProperties(page = 0, pageSize = 10) {
           parking: s.parking,
           levels: s.levels,
           landAreaMin: s.landAreaMin,
+          landAreaMax: s.landAreaMax,
           constructionAreaMin: s.constructionAreaMin,
+          constructionAreaMax: s.constructionAreaMax,
         },
         page,
         pageSize,

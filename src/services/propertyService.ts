@@ -154,21 +154,35 @@ export const propertyService = {
       query = query.lte(priceColumn, maxUSD + 0.0001);
     }
 
-    if (filters.bedrooms && filters.bedrooms > 0)
-      query = query.gte("habitaciones", filters.bedrooms);
-    if (filters.bathrooms && filters.bathrooms > 0)
-      query = query.gte("banos", filters.bathrooms);
-    if (filters.parking && filters.parking > 0)
-      query = query.gte("estacionamientos", filters.parking);
-    if (filters.levels && filters.levels > 0)
-      query = query.gte("pisos", filters.levels);
+    const applyFeatureFilter = (column: string, value?: string) => {
+      if (!value) return;
+      if (value.endsWith("+")) {
+        const num = parseInt(value.slice(0, -1));
+        if (!isNaN(num)) query = query.gte(column, num);
+      } else {
+        const num = parseInt(value);
+        if (!isNaN(num)) query = query.eq(column, num);
+      }
+    };
+
+    applyFeatureFilter("habitaciones", filters.bedrooms);
+    applyFeatureFilter("banos", filters.bathrooms);
+    applyFeatureFilter("estacionamientos", filters.parking);
+    applyFeatureFilter("pisos", filters.levels);
     if (filters.constructionAreaMin)
       query = query.gte(
         "metros_cuadrados_construccion",
         filters.constructionAreaMin,
       );
+    if (filters.constructionAreaMax)
+      query = query.lte(
+        "metros_cuadrados_construccion",
+        filters.constructionAreaMax,
+      );
     if (filters.landAreaMin)
       query = query.gte("metros_cuadrados_terreno", filters.landAreaMin);
+    if (filters.landAreaMax)
+      query = query.lte("metros_cuadrados_terreno", filters.landAreaMax);
 
     const from = page * pageSize;
     const to = from + pageSize - 1;

@@ -1,7 +1,15 @@
 import { upperWord } from "@/utils/upperWord";
 import { SkeletonCard } from "../shared/SkeletonCard";
 import { NotificationItem } from "./NotificationItem";
-import { BellOff, Search, Bell, MapPin } from "lucide-react";
+import {
+  BellOff,
+  Search,
+  Bell,
+  MapPin,
+  MoveDiagonal,
+  Home,
+  Bed,
+} from "lucide-react";
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -123,9 +131,30 @@ export const NotificationList = ({
                   {group.busqueda.habitaciones && (
                     <div className="flex items-center gap-1.5">
                       <span className="font-semibold text-foreground/70">
-                        🛏️ Hab:
+                        <Bed className="h-5 w-5" /> Hab:
                       </span>{" "}
                       {group.busqueda.habitaciones}
+                    </div>
+                  )}
+                  {(group.busqueda.metros_terreno ||
+                    group.busqueda.metros_terreno_max) && (
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-semibold text-foreground/70">
+                        <MoveDiagonal className="h-5 w-5" />
+                        Terreno:
+                      </span>{" "}
+                      {group.busqueda.metros_terreno || 0}-
+                      {group.busqueda.metros_terreno_max || "∞"} m²
+                    </div>
+                  )}
+                  {(group.busqueda.metros_construccion ||
+                    group.busqueda.metros_construccion_max) && (
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-semibold text-foreground/70">
+                        <Home className="h-5 w-5" /> Constr:
+                      </span>{" "}
+                      {group.busqueda.metros_construccion || 0}-
+                      {group.busqueda.metros_construccion_max || "∞"} m²
                     </div>
                   )}
                 </div>

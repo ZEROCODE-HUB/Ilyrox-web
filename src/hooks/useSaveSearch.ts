@@ -127,11 +127,17 @@ export function useSaveSearch(userId?: string) {
         },
         superficies: {
           m2_terreno_min: filters.m2TerrenoMin
-            ? parseFloat(filters.m2TerrenoMin.replace(/,/g, ""))
+            ? parseFloat(filters.m2TerrenoMin.toString().replace(/,/g, ""))
             : 0,
+          m2_terreno_max: filters.m2TerrenoMax
+            ? parseFloat(filters.m2TerrenoMax.toString().replace(/,/g, ""))
+            : null,
           m2_construccion_min: filters.m2ConstruccionMin
-            ? parseFloat(filters.m2ConstruccionMin.replace(/,/g, ""))
+            ? parseFloat(filters.m2ConstruccionMin.toString().replace(/,/g, ""))
             : 0,
+          m2_construccion_max: filters.m2ConstruccionMax
+            ? parseFloat(filters.m2ConstruccionMax.toString().replace(/,/g, ""))
+            : null,
           icon: "resize-outline",
         },
       },
@@ -164,13 +170,13 @@ export function useSaveSearch(userId?: string) {
       criterios_busqueda.precio_max = parseFloat(
         filters.precioMax.toString().replace(/,/g, ""),
       );
-    if (filters.habitaciones && filters.habitaciones !== "No indicado")
+    if (filters.habitaciones && filters.habitaciones !== "any" && filters.habitaciones !== "No indicado")
       criterios_busqueda.habitaciones = filters.habitaciones;
-    if (filters.banos && filters.banos !== "No indicado")
+    if (filters.banos && filters.banos !== "any" && filters.banos !== "No indicado")
       criterios_busqueda.banos = filters.banos;
-    if (filters.estacionamientos && filters.estacionamientos !== "No indicado")
+    if (filters.estacionamientos && filters.estacionamientos !== "any" && filters.estacionamientos !== "No indicado")
       criterios_busqueda.estacionamientos = filters.estacionamientos;
-    if (filters.niveles && filters.niveles !== "No indicado")
+    if (filters.niveles && filters.niveles !== "any" && filters.niveles !== "No indicado")
       criterios_busqueda.niveles = filters.niveles;
     if (filters.antiguedad && filters.antiguedad !== "No indicado")
       criterios_busqueda.antiguedad = filters.antiguedad;
@@ -178,9 +184,17 @@ export function useSaveSearch(userId?: string) {
       criterios_busqueda.m2_terreno_min = parseFloat(
         filters.m2TerrenoMin.toString().replace(/,/g, ""),
       );
+    if (filters.m2TerrenoMax)
+      criterios_busqueda.m2_terreno_max = parseFloat(
+        filters.m2TerrenoMax.toString().replace(/,/g, ""),
+      );
     if (filters.m2ConstruccionMin)
       criterios_busqueda.m2_construccion_min = parseFloat(
         filters.m2ConstruccionMin.toString().replace(/,/g, ""),
+      );
+    if (filters.m2ConstruccionMax)
+      criterios_busqueda.m2_construccion_max = parseFloat(
+        filters.m2ConstruccionMax.toString().replace(/,/g, ""),
       );
     if (filters.locationFilter.estado)
       criterios_busqueda.estado = filters.locationFilter.estado;
@@ -233,20 +247,25 @@ export function useSaveSearch(userId?: string) {
     )
       insertData.colonias = filters.locationFilter.colonias;
 
-    if (filters.habitaciones && filters.habitaciones !== "No indicado") {
-      const habNum = parseInt(filters.habitaciones);
+    if (filters.habitaciones && filters.habitaciones !== "any" && filters.habitaciones !== "No indicado") {
+      const habNum = parseInt(filters.habitaciones.toString());
       if (!isNaN(habNum)) insertData.habitaciones = habNum;
     }
-    if (filters.banos && filters.banos !== "No indicado") {
-      const banosNum = parseInt(filters.banos);
+    if (filters.banos && filters.banos !== "any" && filters.banos !== "No indicado") {
+      const banosNum = parseInt(filters.banos.toString());
       if (!isNaN(banosNum)) insertData.banos = banosNum;
     }
     if (
       filters.estacionamientos &&
+      filters.estacionamientos !== "any" &&
       filters.estacionamientos !== "No indicado"
     ) {
-      const estNum = parseInt(filters.estacionamientos);
+      const estNum = parseInt(filters.estacionamientos.toString());
       if (!isNaN(estNum)) insertData.estacionamientos = estNum;
+    }
+    if (filters.niveles && filters.niveles !== "any" && filters.niveles !== "No indicado") {
+      const nivelesNum = parseInt(filters.niveles.toString());
+      if (!isNaN(nivelesNum)) insertData.pisos = nivelesNum;
     }
     if (filters.m2ConstruccionMin) {
       const m2Cons = parseFloat(
@@ -254,11 +273,23 @@ export function useSaveSearch(userId?: string) {
       );
       if (!isNaN(m2Cons)) insertData.metros_construccion = m2Cons;
     }
+    if (filters.m2ConstruccionMax) {
+      const m2ConsMax = parseFloat(
+        filters.m2ConstruccionMax.toString().replace(/,/g, ""),
+      );
+      if (!isNaN(m2ConsMax)) insertData.metros_construccion_max = m2ConsMax;
+    }
     if (filters.m2TerrenoMin) {
       const m2Terr = parseFloat(
         filters.m2TerrenoMin.toString().replace(/,/g, ""),
       );
       if (!isNaN(m2Terr)) insertData.metros_terreno = m2Terr;
+    }
+    if (filters.m2TerrenoMax) {
+      const m2TerrMax = parseFloat(
+        filters.m2TerrenoMax.toString().replace(/,/g, ""),
+      );
+      if (!isNaN(m2TerrMax)) insertData.metros_terreno_max = m2TerrMax;
     }
 
     if (filters.moneda) {
