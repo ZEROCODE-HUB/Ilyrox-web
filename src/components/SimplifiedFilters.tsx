@@ -125,7 +125,8 @@ export function SimplifiedFilters({
   const operationType = useOperationType();
   const { type, subtype } = usePropertyType();
   const { bedrooms, bathrooms, parking, levels } = useFeatures();
-  const { landAreaMin, constructionAreaMin } = useAreaFilters();
+  const { landAreaMin, constructionAreaMin, landAreaMax, constructionAreaMax } =
+    useAreaFilters();
 
   // ── Store actions (stable references) ───────
   const {
@@ -142,6 +143,8 @@ export function SimplifiedFilters({
     setLevels,
     setLandAreaMin,
     setConstructionAreaMin,
+    setLandAreaMax,
+    setConstructionAreaMax,
     toggleSubtype,
     resetFilters,
   } = useFilterStore();
@@ -246,7 +249,9 @@ export function SimplifiedFilters({
         estacionamientos: parking,
         pisos: levels,
         m2TerrenoMin: landAreaMin,
+        m2TerrenoMax: landAreaMax,
         m2ConstruccionMin: constructionAreaMin,
+        m2ConstruccionMax: constructionAreaMax,
         locationFilter: {
           estado: estadoMexico,
           municipio: "",
@@ -449,9 +454,9 @@ export function SimplifiedFilters({
                   Recámaras
                 </Label>
                 <Select
-                  value={bedrooms?.toString() || "any"}
+                  value={bedrooms || "any"}
                   onValueChange={(val) =>
-                    setBedrooms(val === "any" ? undefined : parseInt(val))
+                    setBedrooms(val === "any" ? undefined : val)
                   }
                 >
                   <SelectTrigger className="h-10">
@@ -459,12 +464,22 @@ export function SimplifiedFilters({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="any">Cualquiera</SelectItem>
-                    {["1", "2", "3", "4", "5"].map((n) => (
-                      <SelectItem key={n} value={n}>
-                        {n}
-                        {n === "5" ? "+" : ""}
-                      </SelectItem>
-                    ))}
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-1 gap-1 border-r pr-2">
+                        {["1", "2", "3", "4", "5"].map((n) => (
+                          <SelectItem key={n} value={n}>
+                            {n}
+                          </SelectItem>
+                        ))}
+                      </div>
+                      <div className="grid grid-cols-1 gap-1">
+                        {["1+", "2+", "3+", "4+", "5+"].map((n) => (
+                          <SelectItem key={n} value={n}>
+                            {n}
+                          </SelectItem>
+                        ))}
+                      </div>
+                    </div>
                   </SelectContent>
                 </Select>
               </div>
@@ -475,9 +490,9 @@ export function SimplifiedFilters({
                   Baños
                 </Label>
                 <Select
-                  value={bathrooms?.toString() || "any"}
+                  value={bathrooms || "any"}
                   onValueChange={(val) =>
-                    setBathrooms(val === "any" ? undefined : parseInt(val))
+                    setBathrooms(val === "any" ? undefined : val)
                   }
                 >
                   <SelectTrigger className="h-10">
@@ -485,12 +500,22 @@ export function SimplifiedFilters({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="any">Cualquiera</SelectItem>
-                    {["1", "2", "3", "4", "5"].map((n) => (
-                      <SelectItem key={n} value={n}>
-                        {n}
-                        {n === "5" ? "+" : ""}
-                      </SelectItem>
-                    ))}
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-1 gap-1 border-r pr-2">
+                        {["1", "2", "3", "4", "5"].map((n) => (
+                          <SelectItem key={n} value={n}>
+                            {n}
+                          </SelectItem>
+                        ))}
+                      </div>
+                      <div className="grid grid-cols-1 gap-1">
+                        {["1+", "2+", "3+", "4+", "5+"].map((n) => (
+                          <SelectItem key={n} value={n}>
+                            {n}
+                          </SelectItem>
+                        ))}
+                      </div>
+                    </div>
                   </SelectContent>
                 </Select>
               </div>
@@ -501,9 +526,9 @@ export function SimplifiedFilters({
                   Estacionamiento
                 </Label>
                 <Select
-                  value={parking?.toString() || "any"}
+                  value={parking || "any"}
                   onValueChange={(val) =>
-                    setParking(val === "any" ? undefined : parseInt(val))
+                    setParking(val === "any" ? undefined : val)
                   }
                 >
                   <SelectTrigger className="h-10">
@@ -511,12 +536,22 @@ export function SimplifiedFilters({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="any">Cualquiera</SelectItem>
-                    {["1", "2", "3", "4"].map((n) => (
-                      <SelectItem key={n} value={n}>
-                        {n}
-                        {n === "4" ? "+" : ""}
-                      </SelectItem>
-                    ))}
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-1 gap-1 border-r pr-2">
+                        {["1", "2", "3", "4", "5"].map((n) => (
+                          <SelectItem key={n} value={n}>
+                            {n}
+                          </SelectItem>
+                        ))}
+                      </div>
+                      <div className="grid grid-cols-1 gap-1">
+                        {["1+", "2+", "3+", "4+", "5+"].map((n) => (
+                          <SelectItem key={n} value={n}>
+                            {n}
+                          </SelectItem>
+                        ))}
+                      </div>
+                    </div>
                   </SelectContent>
                 </Select>
               </div>
@@ -527,9 +562,9 @@ export function SimplifiedFilters({
                   Niveles
                 </Label>
                 <Select
-                  value={levels?.toString() || "any"}
+                  value={levels || "any"}
                   onValueChange={(val) =>
-                    setLevels(val === "any" ? undefined : parseInt(val))
+                    setLevels(val === "any" ? undefined : val)
                   }
                 >
                   <SelectTrigger className="h-10">
@@ -537,12 +572,22 @@ export function SimplifiedFilters({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="any">Cualquiera</SelectItem>
-                    {["1", "2", "3", "4"].map((n) => (
-                      <SelectItem key={n} value={n}>
-                        {n}
-                        {n === "4" ? "+" : ""}
-                      </SelectItem>
-                    ))}
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-1 gap-1 border-r pr-2">
+                        {["1", "2", "3", "4", "5"].map((n) => (
+                          <SelectItem key={n} value={n}>
+                            {n}
+                          </SelectItem>
+                        ))}
+                      </div>
+                      <div className="grid grid-cols-1 gap-1">
+                        {["1+", "2+", "3+", "4+", "5+"].map((n) => (
+                          <SelectItem key={n} value={n}>
+                            {n}
+                          </SelectItem>
+                        ))}
+                      </div>
+                    </div>
                   </SelectContent>
                 </Select>
               </div>
@@ -563,6 +608,18 @@ export function SimplifiedFilters({
                   }
                   className="h-10"
                 />
+                <Label className="text-xs font-medium text-muted-foreground">
+                  m² Terreno Max.
+                </Label>
+                <Input
+                  type="number"
+                  placeholder="0"
+                  value={landAreaMax || ""}
+                  onChange={(e) =>
+                    setLandAreaMax(parseInt(e.target.value) || undefined)
+                  }
+                  className="h-10"
+                />
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium text-muted-foreground">
@@ -574,6 +631,20 @@ export function SimplifiedFilters({
                   value={constructionAreaMin || ""}
                   onChange={(e) =>
                     setConstructionAreaMin(
+                      parseInt(e.target.value) || undefined,
+                    )
+                  }
+                  className="h-10"
+                />
+                <Label className="text-xs font-medium text-muted-foreground">
+                  m² Constr. Max.
+                </Label>
+                <Input
+                  type="number"
+                  placeholder="0"
+                  value={constructionAreaMax || ""}
+                  onChange={(e) =>
+                    setConstructionAreaMax(
                       parseInt(e.target.value) || undefined,
                     )
                   }

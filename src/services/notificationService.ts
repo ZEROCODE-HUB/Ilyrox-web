@@ -76,7 +76,7 @@ export const notificationService = {
     const { data, error } = await supabase
       .from("busquedas_guardadas")
       .select(
-        "tipo_propiedad, tipo_operacion, precio_min, precio_max, moneda,habitaciones, estado, subtipo, habitaciones, banos, estacionamientos, metros_construccion, metros_terreno, colonias",
+        "tipo_propiedad, tipo_operacion, precio_min, precio_max, moneda,habitaciones, estado, subtipo, habitaciones, banos, estacionamientos, metros_construccion, metros_construccion_max, metros_terreno, metros_terreno_max, colonias",
       )
       .eq("id", busquedaId)
       .single();
