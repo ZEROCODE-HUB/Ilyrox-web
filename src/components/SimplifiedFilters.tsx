@@ -23,6 +23,7 @@ import {
   useFilterStore,
   useEstadoMexico,
   useColonias,
+  useMunicipios,
   usePriceRange,
   useOperationType,
   usePropertyType,
@@ -122,6 +123,7 @@ export function SimplifiedFilters({
   // ── Granular store selectors ────────────────
   const estadoMexico = useEstadoMexico();
   const colonias = useColonias();
+  const municipios = useMunicipios();
   const { priceMin, priceMax, currency } = usePriceRange();
   const operationType = useOperationType();
   const { type, subtype } = usePropertyType();
@@ -249,13 +251,14 @@ export function SimplifiedFilters({
         banos: bathrooms,
         estacionamientos: parking,
         pisos: levels,
+        niveles: levels,
         m2TerrenoMin: landAreaMin,
         m2TerrenoMax: landAreaMax,
         m2ConstruccionMin: constructionAreaMin,
         m2ConstruccionMax: constructionAreaMax,
         locationFilter: {
           estado: estadoMexico,
-          municipio: "",
+          municipio: municipios,
           colonias: colonias,
         },
       },

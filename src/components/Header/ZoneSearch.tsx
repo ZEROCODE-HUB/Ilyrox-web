@@ -151,7 +151,8 @@ export function ZoneSearch() {
     }));
   }, [colonias, selectedColonias]);
 
-  const hasSelections = selectedColonias.length > 0 || selectedMunicipios.length > 0;
+  const hasSelections =
+    selectedColonias.length > 0 || selectedMunicipios.length > 0;
   if (!estadoMexico || !hasSelections) return null;
 
   return (
@@ -161,7 +162,7 @@ export function ZoneSearch() {
           Zona seleccionada
         </p>
         <ScrollArea className="w-full whitespace-nowrap pb-3">
-          <div className="flex gap-2 px-1">
+          <div className="flex gap-4 px-1">
             {/* Municipio badges */}
             {selectedMunicipios.map((muni) => (
               <Badge
@@ -169,11 +170,11 @@ export function ZoneSearch() {
                 variant="default"
                 className={cn(
                   "cursor-pointer px-4 py-1.5 rounded-full text-sm transition-all border-none font-medium select-none whitespace-nowrap",
-                  "bg-amber-400 text-white scale-105 shadow-md hover:bg-amber-400/90 flex items-center gap-1.5",
+                  "bg-primary text-white scale-105 shadow-md hover:bg-primary/90 flex items-center gap-1.5",
                 )}
                 onClick={() => toggleMunicipio(muni)}
               >
-                <span className="text-[10px] opacity-75 font-normal">mun</span>
+                <span className="text-[12px] font-normal">Mun.</span>
                 {muni}
                 <X className="h-3 w-3 opacity-60" />
               </Badge>
@@ -190,12 +191,13 @@ export function ZoneSearch() {
                     "bg-white text-navbar scale-105 shadow-md hover:bg-white/90 flex items-center gap-1.5",
                   )}
                   onClick={() => {
-                    const parts = sc.includes(" (") && sc.endsWith(")")
-                      ? (() => {
-                          const idx = sc.lastIndexOf(" (");
-                          return [sc.slice(0, idx), sc.slice(idx + 2, -1)];
-                        })()
-                      : [sc, undefined];
+                    const parts =
+                      sc.includes(" (") && sc.endsWith(")")
+                        ? (() => {
+                            const idx = sc.lastIndexOf(" (");
+                            return [sc.slice(0, idx), sc.slice(idx + 2, -1)];
+                          })()
+                        : [sc, undefined];
                     toggleColonia(parts[0], parts[1]);
                   }}
                 >

@@ -120,6 +120,7 @@ export function SearchAndSort({
     ) {
       setPendingSuggestion(s);
       setShowStateWarning(true);
+      setOpen(false); // Close suggestions popover
       return;
     }
 
@@ -173,12 +174,12 @@ export function SearchAndSort({
         >
           <PopoverAnchor asChild>
             <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 ref={inputRef}
                 placeholder={
                   hasActiveFilter
-                    ? `${selectionCount} zona${selectionCount !== 1 ? "s" : ""} seleccionada${selectionCount !== 1 ? "s" : ""} · Buscar otra...`
+                    ? `${estadoMexico} seleccionada · Buscar otra...`
                     : "Busca por colonia, municipio o estado..."
                 }
                 value={inputValue}

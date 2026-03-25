@@ -46,7 +46,12 @@ export const Modal: React.FC<ModalProps> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-20 flex items-center justify-center p-4">
+        <div
+          className={cn(
+            "fixed inset-0 z-[100] flex items-center justify-center p-4",
+            className,
+          )}
+        >
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -65,7 +70,6 @@ export const Modal: React.FC<ModalProps> = ({
             className={cn(
               "relative w-full bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col",
               sizes[size],
-              className,
             )}
           >
             {/* Header */}
