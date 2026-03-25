@@ -10,11 +10,11 @@ const supabaseAnonKeyGeo = (
 if (!supabaseUrlGeo || !supabaseAnonKeyGeo) {
   console.error("Geo config missing!");
 } else {
-  console.log("Geo config loaded:", {
-    urlLength: supabaseUrlGeo.length,
-    keyLength: supabaseAnonKeyGeo.length,
-    urlStart: supabaseUrlGeo.substring(0, 8) + "...",
-  });
+  // console.log("Geo config loaded:", {
+  //   urlLength: supabaseUrlGeo.length,
+  //   keyLength: supabaseAnonKeyGeo.length,
+  //   urlStart: supabaseUrlGeo.substring(0, 8) + "...",
+  // });
 }
 
 export const supabaseGeo = createClient(supabaseUrlGeo, supabaseAnonKeyGeo, {

@@ -17,6 +17,7 @@ export interface AuthFormState {
   lastNamePaternal: string;
   lastNameMaterno: string;
   estado: string;
+  phone: string;
   avatarFile: File | null;
   avatarPreview: string | null;
 }
@@ -29,6 +30,7 @@ const initialFormState: AuthFormState = {
   lastNamePaternal: "",
   lastNameMaterno: "",
   estado: "",
+  phone: "",
   avatarFile: null,
   avatarPreview: null,
 };
@@ -99,6 +101,7 @@ export function useAuthForm() {
       !formState.email ||
       !formState.password
     ) {
+      console.log(formState);
       toast({
         variant: "destructive",
         title: "Error",
@@ -199,6 +202,7 @@ export function useAuthForm() {
             estado_registro: "activo",
             aprobaciones_recibidas: 3,
             estado: formState.estado,
+            celular: formState.phone,
           },
         },
       });
@@ -221,6 +225,7 @@ export function useAuthForm() {
           estado_registro: "activo",
           aprobaciones_recibidas: 3,
           estado: formState.estado,
+          celular: formState.phone,
         },
         { onConflict: "id" },
       );

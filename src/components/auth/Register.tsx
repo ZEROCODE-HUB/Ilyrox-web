@@ -117,7 +117,9 @@ export const Register = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="firstName">Nombre(s)</Label>
+            <Label htmlFor="firstName">
+              Nombre(s) <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="firstName"
               value={formState.firstName}
@@ -131,7 +133,9 @@ export const Register = () => {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="lastNamePaternal">Apellido Paterno</Label>
+              <Label htmlFor="lastNamePaternal">
+                Apellido Paterno <span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="lastNamePaternal"
                 value={formState.lastNamePaternal}
@@ -143,7 +147,9 @@ export const Register = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="lastNameMaterno">Apellido Materno</Label>
+              <Label htmlFor="lastNameMaterno">
+                Apellido Materno <span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="lastNameMaterno"
                 value={formState.lastNameMaterno}
@@ -157,7 +163,9 @@ export const Register = () => {
           </div>
 
           <div className="space-y-2">
-            <Label>Estado</Label>
+            <Label>
+              Estado <span className="text-red-500">*</span>
+            </Label>
             <Select
               value={formState.estado}
               onValueChange={handleEstadoChange}
@@ -178,7 +186,25 @@ export const Register = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Correo electrónico</Label>
+            <Label htmlFor="phone">
+              Número de teléfono <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="phone"
+              type="tel"
+              placeholder="5512345678"
+              value={formState.phone}
+              onChange={handleInputChange}
+              required
+              className="h-11"
+              disabled={loading}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email">
+              Correo electrónico <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="email"
               type="email"
@@ -192,7 +218,9 @@ export const Register = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Contraseña</Label>
+            <Label htmlFor="password">
+              Contraseña <span className="text-red-500">*</span>
+            </Label>
             <div className="relative">
               <Input
                 id="password"
@@ -223,7 +251,9 @@ export const Register = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirmar contraseña</Label>
+            <Label htmlFor="confirmPassword">
+              Confirmar contraseña <span className="text-red-500">*</span>
+            </Label>
             <div className="relative">
               <Input
                 id="confirmPassword"
