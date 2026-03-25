@@ -13,6 +13,7 @@ export interface FilterState {
   // Location
   estadoMexico: string;
   colonias: string[];
+  municipios: string[];
 
   // Price
   priceMin: number | undefined;
@@ -51,6 +52,9 @@ export interface FilterActions {
   setColonias: (colonias: string[]) => void;
   toggleColonia: (colonia: string, municipio?: string) => void;
   removeColonia: (colonia: string) => void;
+  setMunicipios: (municipios: string[]) => void;
+  toggleMunicipio: (municipio: string, estado?: string) => void;
+  removeMunicipio: (municipio: string) => void;
 
   setPriceMin: (value: number | undefined) => void;
   setPriceMax: (value: number | undefined) => void;
@@ -89,6 +93,7 @@ export type FilterStore = FilterState & FilterActions;
 const initialState: FilterState = {
   estadoMexico: "",
   colonias: [],
+  municipios: [],
 
   priceMin: undefined,
   priceMax: undefined,
@@ -124,9 +129,15 @@ export const useFilterStore = create<FilterStore>()(
 
     // ── Location ──────────────────────────────
     setEstadoMexico: (estado) =>
-      set({
-        estadoMexico: estado,
-        colonias: [], // Reset colonias on state change
+      set((s) => {
+        // Si el estado es el mismo, no hacemos nada (evita resetear colonias/municipios al añadir más)
+        if (s.estadoMexico === estado && estado !== "") return s;
+        
+        return {
+          estadoMexico: estado,
+          colonias: [],    // Reset colonias on state change
+          municipios: [],  // Reset municipios on state change
+        };
       }),
 
     setColonias: (colonias) => set({ colonias }),
@@ -163,6 +174,20 @@ export const useFilterStore = create<FilterStore>()(
     removeColonia: (colonia) =>
       set((s) => ({
         colonias: s.colonias.filter((c) => c !== colonia),
+      })),
+
+    setMunicipios: (municipios) => set({ municipios }),
+
+    toggleMunicipio: (municipio) =>
+      set((s) => ({
+        municipios: s.municipios.includes(municipio)
+          ? s.municipios.filter((m) => m !== municipio)
+          : [...s.municipios, municipio],
+      })),
+
+    removeMunicipio: (municipio) =>
+      set((s) => ({
+        municipios: s.municipios.filter((m) => m !== municipio),
       })),
 
     // ── Price ─────────────────────────────────
@@ -213,6 +238,8 @@ export const useEstadoMexico = () => useFilterStore((s) => s.estadoMexico);
 
 export const useColonias = () => useFilterStore((s) => s.colonias);
 
+export const useMunicipios = () => useFilterStore((s) => s.municipios);
+
 export const usePriceRange = () =>
   useFilterStore(
     useShallow((s) => ({
@@ -257,6 +284,7 @@ export const useFilterSnapshot = () =>
     useShallow((s) => ({
       estadoMexico: s.estadoMexico,
       colonias: s.colonias,
+      municipios: s.municipios,
       priceMin: s.priceMin,
       priceMax: s.priceMax,
       currency: s.currency,

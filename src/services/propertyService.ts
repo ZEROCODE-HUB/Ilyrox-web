@@ -27,6 +27,7 @@ export const propertyService = {
       state?: string;
       municipality?: string;
       colony?: string;
+      municipios?: string[];
     },
     page: number = 0,
     pageSize: number = 10,
@@ -71,12 +72,11 @@ export const propertyService = {
       );
     }
 
-    if (filters.state) query = query.eq("estado", filters.state);
-    if (filters.municipality)
-      query = query.eq("municipio", filters.municipality);
-    if (filters.colony) query = query.eq("colonia", filters.colony);
+    // Filtro por zonas (colonias y municipios combinados en un OR)
+    const locationOrConditions: string[] = [];
+
+    // Colonias
     if (filters.colonias && filters.colonias.length > 0) {
-      // Separamos las que tienen municipio de las que no
       const withMunicipio: string[] = [];
       const withoutMunicipio: string[] = [];
 
@@ -90,33 +90,42 @@ export const propertyService = {
       });
 
       if (withMunicipio.length > 0) {
-        // Para las que tienen municipio, usamos OR con condiciones anidadas
-        const conditions = withMunicipio
-          .map((c) => {
-            const match = c.match(/(.+) \((.+)\)/);
-            if (match) {
-              const colName = match[1].replace(/"/g, '""');
-              const muniName = match[2].replace(/"/g, '""');
-              return `and(colonia.eq."${colName}",municipio.eq."${muniName}")`;
-            }
-            return "";
-          })
-          .filter(Boolean);
+        withMunicipio.forEach((c) => {
+          const match = c.match(/(.+) \((.+)\)/);
+          if (match) {
+            const colName = match[1].replace(/"/g, '""');
+            const muniName = match[2].replace(/"/g, '""');
+            locationOrConditions.push(`and(colonia.eq."${colName}",municipio.eq."${muniName}")`);
+          }
+        });
+      }
 
-        // Si también hay sin municipio, las agregamos al OR
-        if (withoutMunicipio.length > 0) {
-          const list = withoutMunicipio
-            .map((c) => `"${c.replace(/"/g, '""')}"`)
-            .join(",");
-          conditions.push(`colonia.in.(${list})`);
-        }
-
-        query = query.or(conditions.join(","));
-      } else {
-        // Si ninguna tiene municipio, usamos el .in normal
-        query = query.in("colonia", withoutMunicipio);
+      if (withoutMunicipio.length > 0) {
+        const list = withoutMunicipio
+          .map((c) => `"${c.replace(/"/g, '""')}"`)
+          .join(",");
+        locationOrConditions.push(`colonia.in.(${list})`);
       }
     }
+
+    // Municipios
+    if (filters.municipios && filters.municipios.length > 0) {
+      const muniList = filters.municipios
+        .map((m) => `"${m.replace(/"/g, '""')}"`)
+        .join(",");
+      locationOrConditions.push(`municipio.in.(${muniList})`);
+    }
+
+    // Aplicar el OR de todas las zonas si existen
+    if (locationOrConditions.length > 0) {
+      query = query.or(locationOrConditions.join(","));
+    }
+
+    // El filtro de estado se mantiene como base si está presente
+    if (filters.state) query = query.eq("estado", filters.state);
+    if (filters.municipality)
+      query = query.eq("municipio", filters.municipality);
+    if (filters.colony) query = query.eq("colonia", filters.colony);
 
     if (filters.type && filters.type !== "Otros")
       query = query.eq("tipo", filters.type);

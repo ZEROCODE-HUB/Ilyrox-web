@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Camera, Eye, EyeOff, User as UserIcon, X } from "lucide-react";
 import { useAuthForm } from "@/hooks/useAuthForm";
+import { resetNumber } from "@/utils/resetNumber";
 
 import {
   Select,
@@ -39,7 +40,10 @@ export const Register = () => {
   } = useAuthForm();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
+    let { id, value } = e.target;
+    if (id === "phone") {
+      value = resetNumber(value).slice(0, 10);
+    }
     updateField(id as any, value);
   };
 
@@ -191,13 +195,14 @@ export const Register = () => {
             </Label>
             <Input
               id="phone"
-              type="tel"
+              type="text"
               placeholder="5512345678"
               value={formState.phone}
               onChange={handleInputChange}
               required
               className="h-11"
               disabled={loading}
+              maxLength={10}
             />
           </div>
 

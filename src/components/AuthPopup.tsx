@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Camera, X, User as UserIcon, Eye, EyeOff } from "lucide-react";
 import { useAuthForm } from "@/hooks/useAuthForm";
+import { resetNumber } from "@/utils/resetNumber";
+
 import {
   Select,
   SelectContent,
@@ -49,9 +51,8 @@ export function AuthPopup({ isOpen, onClose }: AuthPopupProps) {
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    if (value.length > 10) return;
-    if (!/^[0-9]*$/.test(value)) return;
-    updateField("phone", value);
+    const cleanValue = resetNumber(value).slice(0, 10);
+    updateField("phone", cleanValue);
   };
 
   const handleEstadoChange = (value: string) => {
@@ -203,6 +204,7 @@ export function AuthPopup({ isOpen, onClose }: AuthPopupProps) {
                 </Label>
                 <Input
                   id="phone"
+                  type="text"
                   value={formState.phone}
                   onChange={handlePhoneChange}
                   placeholder="Teléfono"

@@ -17,6 +17,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { MarqueeText } from "@/components/ui/marquee-text";
+import { resetNumber } from "@/utils/resetNumber";
 
 import {
   useFilterStore,
@@ -600,11 +601,11 @@ export function SimplifiedFilters({
                   m² Terreno Mín.
                 </Label>
                 <Input
-                  type="number"
+                  type="text"
                   placeholder="0"
                   value={landAreaMin || ""}
                   onChange={(e) =>
-                    setLandAreaMin(parseInt(e.target.value) || undefined)
+                    setLandAreaMin(parseInt(resetNumber(e.target.value)) || undefined)
                   }
                   className="h-10"
                 />
@@ -612,11 +613,11 @@ export function SimplifiedFilters({
                   m² Terreno Max.
                 </Label>
                 <Input
-                  type="number"
+                  type="text"
                   placeholder="0"
                   value={landAreaMax || ""}
                   onChange={(e) =>
-                    setLandAreaMax(parseInt(e.target.value) || undefined)
+                    setLandAreaMax(parseInt(resetNumber(e.target.value)) || undefined)
                   }
                   className="h-10"
                 />
@@ -626,12 +627,12 @@ export function SimplifiedFilters({
                   m² Constr. Mín.
                 </Label>
                 <Input
-                  type="number"
+                  type="text"
                   placeholder="0"
                   value={constructionAreaMin || ""}
                   onChange={(e) =>
                     setConstructionAreaMin(
-                      parseInt(e.target.value) || undefined,
+                      parseInt(resetNumber(e.target.value)) || undefined,
                     )
                   }
                   className="h-10"
@@ -640,12 +641,12 @@ export function SimplifiedFilters({
                   m² Constr. Max.
                 </Label>
                 <Input
-                  type="number"
+                  type="text"
                   placeholder="0"
                   value={constructionAreaMax || ""}
                   onChange={(e) =>
                     setConstructionAreaMax(
-                      parseInt(e.target.value) || undefined,
+                      parseInt(resetNumber(e.target.value)) || undefined,
                     )
                   }
                   className="h-10"

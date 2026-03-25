@@ -1,12 +1,13 @@
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { X, Check, Search } from "lucide-react";
+import { X, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useMemo, useState, useRef } from "react";
 import {
   useFilterStore,
   useEstadoMexico,
   useColonias as useSelectedColonias,
+  useMunicipios as useSelectedMunicipios,
 } from "@/stores/useFilterStore";
 import { MAPA_ESTADO_ID } from "@/constants/MexLocations/estados";
 import { MUNICIPIOS_ESTADO } from "@/constants/MexLocations/municipios";
@@ -21,7 +22,8 @@ import { useDebouncedCallback } from "use-debounce";
 export function ZoneSearch() {
   const estadoMexico = useEstadoMexico();
   const selectedColonias = useSelectedColonias();
-  const { toggleColonia } = useFilterStore();
+  const selectedMunicipios = useSelectedMunicipios();
+  const { toggleColonia, toggleMunicipio } = useFilterStore();
   const [searchModal, setSearchModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -149,71 +151,59 @@ export function ZoneSearch() {
     }));
   }, [colonias, selectedColonias]);
 
-  if (!estadoMexico || uniqueColonyNames.length === 0) return null;
+  const hasSelections = selectedColonias.length > 0 || selectedMunicipios.length > 0;
+  if (!estadoMexico || !hasSelections) return null;
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-2">
       <div className="flex flex-col animate-in fade-in slide-in-from-left-2 duration-300">
         <p className="text-white/90 text-md font-bold pb-2">
-          Búsqueda por colonias
+          Zona seleccionada
         </p>
         <ScrollArea className="w-full whitespace-nowrap pb-3">
           <div className="flex gap-2 px-1">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setSearchModal(true)}
-              className="bg-white/10 border-none text-white/90 hover:bg-white/20 sticky left-0 z-10 rounded-full h-9 w-9 min-w-[36px]"
-            >
-              <Search className="h-4 w-4" />
-            </Button>
-            {uniqueColonyNames
-              .sort((a, b) => {
-                const aSelected = selectedColonias.some(
-                  (sc) => sc === a || sc.startsWith(`${a} (`),
-                )
-                  ? 0
-                  : 1;
-                const bSelected = selectedColonias.some(
-                  (sc) => sc === b || sc.startsWith(`${b} (`),
-                )
-                  ? 0
-                  : 1;
-                if (aSelected !== bSelected) return aSelected - bSelected;
-                return a.localeCompare(b);
-              })
-              .slice(0, 20)
-              .map((colony) => {
-                // For badges, we check if ANY item with this colony name is selected
-                const isSelected = selectedColonias.some(
-                  (sc) => sc === colony || sc.startsWith(`${colony} (`),
-                );
-                return (
-                  <Badge
-                    key={`badge-${colony}`}
-                    variant={isSelected ? "default" : "secondary"}
-                    className={cn(
-                      "cursor-pointer px-4 py-1.5 rounded-full text-sm transition-all border-none font-medium select-none whitespace-nowrap",
-                      isSelected
-                        ? "bg-white text-navbar scale-105 shadow-md hover:bg-white/90"
-                        : "bg-white/10 text-white/90 hover:bg-white/20",
-                    )}
-                    onClick={() => toggleColonia(colony)}
-                  >
-                    {colony}
-                    {isSelected && <Check className="ml-1.5 h-3.5 w-3.5" />}
-                  </Badge>
-                );
-              })}
-            {uniqueColonyNames.length > 20 && (
-              <Button
-                variant="ghost"
-                onClick={() => setSearchModal(true)}
-                className="text-white/70 hover:text-white hover:bg-white/10 text-xs px-3 h-9 rounded-full transition-all"
+            {/* Municipio badges */}
+            {selectedMunicipios.map((muni) => (
+              <Badge
+                key={`muni-badge-${muni}`}
+                variant="default"
+                className={cn(
+                  "cursor-pointer px-4 py-1.5 rounded-full text-sm transition-all border-none font-medium select-none whitespace-nowrap",
+                  "bg-amber-400 text-white scale-105 shadow-md hover:bg-amber-400/90 flex items-center gap-1.5",
+                )}
+                onClick={() => toggleMunicipio(muni)}
               >
-                +{uniqueColonyNames.length - 20} más...
-              </Button>
-            )}
+                <span className="text-[10px] opacity-75 font-normal">mun</span>
+                {muni}
+                <X className="h-3 w-3 opacity-60" />
+              </Badge>
+            ))}
+            {/* Colonia badges */}
+            {selectedColonias.map((sc) => {
+              const displayName = sc.includes(" (") ? sc.split(" (")[0] : sc;
+              return (
+                <Badge
+                  key={`col-badge-${sc}`}
+                  variant="default"
+                  className={cn(
+                    "cursor-pointer px-4 py-1.5 rounded-full text-sm transition-all border-none font-medium select-none whitespace-nowrap",
+                    "bg-white text-navbar scale-105 shadow-md hover:bg-white/90 flex items-center gap-1.5",
+                  )}
+                  onClick={() => {
+                    const parts = sc.includes(" (") && sc.endsWith(")")
+                      ? (() => {
+                          const idx = sc.lastIndexOf(" (");
+                          return [sc.slice(0, idx), sc.slice(idx + 2, -1)];
+                        })()
+                      : [sc, undefined];
+                    toggleColonia(parts[0], parts[1]);
+                  }}
+                >
+                  {displayName}
+                  <X className="h-3 w-3 opacity-60" />
+                </Badge>
+              );
+            })}
           </div>
           <ScrollBar orientation="horizontal" className="bg-white/10" />
         </ScrollArea>
@@ -308,7 +298,20 @@ export function ZoneSearch() {
                               : "bg-slate-100 border border-slate-200 group-hover:border-primary/50",
                           )}
                         >
-                          {isSelected && <Check className="h-3.5 w-3.5" />}
+                          {isSelected && (
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="3"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="h-3.5 w-3.5"
+                            >
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                          )}
                         </div>
                       </div>
                     );

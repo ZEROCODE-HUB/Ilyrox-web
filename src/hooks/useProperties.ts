@@ -16,6 +16,7 @@ export function useProperties(page = 0, pageSize = 10) {
   const estadoMexico = useFilterStore((s) => s.estadoMexico);
   const radiusKm = useFilterStore((s) => s.radiusKm);
   const coloniasKey = useFilterStore((s) => JSON.stringify(s.colonias));
+  const municipiosKey = useFilterStore((s) => JSON.stringify(s.municipios));
   const priceMin = useFilterStore((s) => s.priceMin);
   const priceMax = useFilterStore((s) => s.priceMax);
   const currency = useFilterStore((s) => s.currency);
@@ -38,6 +39,7 @@ export function useProperties(page = 0, pageSize = 10) {
       estadoMexico,
       radiusKm,
       coloniasKey,
+      municipiosKey,
       priceMin,
       priceMax,
       currency,
@@ -66,6 +68,7 @@ export function useProperties(page = 0, pageSize = 10) {
           searchText: s.searchTerm,
           state: s.estadoMexico || undefined,
           colonias: s.colonias.length > 0 ? s.colonias : undefined,
+          municipios: s.municipios.length > 0 ? s.municipios : undefined,
           type: s.type,
           subtype: s.subtype,
           operationType:
