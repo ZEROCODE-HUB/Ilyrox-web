@@ -659,8 +659,7 @@ export function SimplifiedFilters({
         <div className="pt-4">
           <Button
             // 'group' es indispensable aquí para que el MarqueeText detecte el hover del botón
-            className="w-full h-12 bg-white hover:bg-slate-50 text-foreground border border-input shadow-sm transition-all group overflow-hidden"
-            variant="outline"
+            className="w-full h-12 bg-primary hover:bg-primary/90 text-white border border-input shadow-sm transition-all group overflow-hidden"
             onClick={onSaveClick}
           >
             <div className="flex items-center justify-center w-full max-w-full px-2">

@@ -21,6 +21,7 @@ import {
   Star,
   Home,
   MoveDiagonal,
+  Building2,
 } from "lucide-react";
 import { PropertyComments } from "@/components/PropertyComments";
 import { Avatar } from "@/components/shared/Avatar";
@@ -329,6 +330,20 @@ export function PropertyDetailContent({
                     <div className="text-sm text-muted-foreground">
                       Estacionamientos
                     </div>
+                  </div>
+                </div>
+              )}
+
+              {(displayProperty.pisos || 0) > 0 && (
+                <div className="flex items-center gap-2 p-3 bg-accent rounded-lg">
+                  <Building2 className="h-5 w-5 text-primary" />
+                  <div>
+                    <div className="font-semibold">
+                      {displayProperty.pisos < 2
+                        ? displayProperty.pisos + " piso"
+                        : displayProperty.pisos + " pisos"}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Nivel</div>
                   </div>
                 </div>
               )}

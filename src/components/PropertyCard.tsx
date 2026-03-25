@@ -11,6 +11,8 @@ import {
   Share2,
   Home,
   MoveDiagonal,
+  Building2,
+  MoveUp,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -247,7 +249,7 @@ export function PropertyCard({
 
           {/* Features Grid */}
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1 border-t border-border/50">
-            {property.habitaciones ? (
+            {property.habitaciones && (
               <div
                 className="flex items-center gap-1.5 text-muted-foreground"
                 title={`${property.habitaciones} Recámaras`}
@@ -257,8 +259,8 @@ export function PropertyCard({
                   {property.habitaciones || 0}
                 </span>
               </div>
-            ) : null}
-            {property.banos ? (
+            )}
+            {property.banos && (
               <div
                 className="flex items-center gap-1.5 text-muted-foreground"
                 title={`${property.banos} Baños`}
@@ -268,8 +270,8 @@ export function PropertyCard({
                   {property.banos || 0}
                 </span>
               </div>
-            ) : null}
-            {property.estacionamientos ? (
+            )}
+            {property.estacionamientos && (
               <div
                 className="flex items-center gap-1.5 text-muted-foreground"
                 title={`${property.estacionamientos} Estacionamientos`}
@@ -279,8 +281,8 @@ export function PropertyCard({
                   {property.estacionamientos || 0}
                 </span>
               </div>
-            ) : null}
-            {property.metros_cuadrados_construccion ? (
+            )}
+            {property.metros_cuadrados_construccion && (
               <div
                 className="flex items-center gap-1.5 text-muted-foreground"
                 title={`${property.metros_cuadrados_construccion} m²`}
@@ -293,8 +295,8 @@ export function PropertyCard({
                   </span>
                 </span>
               </div>
-            ) : null}
-            {property.metros_cuadrados_terreno ? (
+            )}
+            {property.metros_cuadrados_terreno && (
               <div
                 className="flex items-center gap-1.5 text-muted-foreground"
                 title={`${property.metros_cuadrados_terreno} m²`}
@@ -307,7 +309,20 @@ export function PropertyCard({
                   </span>
                 </span>
               </div>
-            ) : null}
+            )}
+            {property.pisos && (
+              <div
+                className="flex items-center gap-1.5 text-muted-foreground"
+                title={`${property.pisos}`}
+              >
+                <Building2 className="h-5 w-5" />
+                <span className="text-sm font-semibold whitespace-nowrap">
+                  {property.pisos < 2
+                    ? property.pisos + " piso"
+                    : property.pisos + " pisos"}
+                </span>
+              </div>
+            )}
           </div>
           {/* Amenidades */}
           {property.amenidades && property.amenidades.length > 0 && (
