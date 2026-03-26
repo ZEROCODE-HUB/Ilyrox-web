@@ -100,8 +100,7 @@ export function SearchAndSort({
       toggleColonia(nombre, municipio_nombre);
     }
 
-    // Permitir selección múltiple manteniendo el texto, los resultados y el foco.
-    clear();
+    // Mantenemos el input intacto para que no desaparezca la lista y se cierre el popover
     inputRef.current?.focus();
   };
 
@@ -179,10 +178,7 @@ export function SearchAndSort({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleClearAll();
-                  }}
+                  onClick={() => setInputValue("")}
                   className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 hover:bg-slate-100 rounded-full"
                 >
                   <X className="h-4 w-4 text-muted-foreground" />
@@ -261,6 +257,10 @@ export function SearchAndSort({
                       key={`loc-${s.tipo}-${s.id}-${idx}`}
                       value={`loc-${s.tipo}-${s.id}-${s.nombre}`}
                       onSelect={() => handleSelectSuggestion(s)}
+                      onMouseDown={(e) => {
+                        // Previene que el click robe el foco del input y cierre el Popover espontáneamente
+                        e.preventDefault();
+                      }}
                       className="cursor-pointer mx-1 my-0.5 rounded-lg hover:bg-primary/5 transition-colors py-3 px-3 flex items-center gap-3 group"
                     >
                       {/* Icon */}
