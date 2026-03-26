@@ -23,6 +23,9 @@ import { DesktopResizableLayout } from "@/components/layout/DesktopResizableLayo
 const Index = () => {
   // ── Store state ─────────────────────────────
   const estadoMexico = useEstadoMexico();
+  const colonias = useFilterStore((s) => s.colonias);
+  const municipios = useFilterStore((s) => s.municipios);
+  const searchTerm = useFilterStore((s) => s.searchTerm);
   const resetFilters = useFilterStore((s) => s.resetFilters);
 
   // ── React Query (replaces manual fetching) ──
@@ -117,7 +120,13 @@ const Index = () => {
     }
   };
 
-  const hasActiveFilters = Boolean(estadoMexico.length > 0 || radiusKm > 0);
+  const hasActiveFilters = Boolean(
+    estadoMexico.length > 0 ||
+    radiusKm > 0 ||
+    colonias.length > 0 ||
+    municipios.length > 0 ||
+    searchTerm
+  );
 
   // ── Render ──────────────────────────────────
 

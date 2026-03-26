@@ -40,10 +40,11 @@ export function useColonias() {
       const offset = reset ? 0 : offsetRef.current;
       searchRef.current = busqueda;
 
+      const cleanBusqueda = busqueda.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
       const { data, error } = await supabaseGeo.rpc("obtener_colonias", {
         p_estado_id: estadoId ?? null,
         p_municipio_id: municipioId ?? null,
-        p_nombre_busqueda: busqueda,
+        p_nombre_busqueda: cleanBusqueda,
         p_limit: PAGE_SIZE,
         p_offset: offset,
       });

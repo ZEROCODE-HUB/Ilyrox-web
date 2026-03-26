@@ -20,6 +20,7 @@ import {
   type LocationSuggestion,
 } from "@/hooks/locations/useLocationSearch";
 import Skeleton from "react-loading-skeleton";
+import { SkeletonSearch } from "./SkeletonSearch";
 
 interface SearchAndSortProps {
   onLocationSearch?: () => void;
@@ -99,10 +100,9 @@ export function SearchAndSort({
       toggleColonia(nombre, municipio_nombre);
     }
 
-    setInputValue("");
+    // Permitir selección múltiple manteniendo el texto, los resultados y el foco.
     clear();
-    setOpen(false);
-    inputRef.current?.blur();
+    inputRef.current?.focus();
   };
 
   const handleSelectSuggestion = (s: LocationSuggestion) => {
@@ -215,20 +215,13 @@ export function SearchAndSort({
             <Command className="max-h-[420px]">
               <CommandList className="max-h-none overflow-y-auto">
                 {loading && suggestions.length === 0 && (
-                  <div className="py-3 px-3 flex items-center gap-3 group">
-                    <div className="">
-                      <Skeleton className="rounded-full w-9 h-9 ml-1" />
-                    </div>
-                    <div className="flex-1 space-y-2">
-                      <Skeleton height={12} width="50%" />
-                      <Skeleton height={10} width="30%" />
-                    </div>
-                    <Skeleton
-                      height={15}
-                      width="10%"
-                      className="flex-shrink-0 w-10 px-7 py-1 rounded-full"
-                    />
-                  </div>
+                  <>
+                    {Array(2)
+                      .fill(0)
+                      .map((_, i) => (
+                        <SkeletonSearch key={i} />
+                      ))}
+                  </>
                 )}
 
                 {!loading &&
@@ -326,14 +319,12 @@ export function SearchAndSort({
 
                 {/* Sentinel for infinite scroll */}
                 {hasMore && (
-                  <div
-                    ref={loadMoreRef}
-                    className="py-4 flex flex-col items-center gap-2"
-                  >
-                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                    <span className="text-[10px] text-muted-foreground font-medium">
-                      Cargando más resultados...
-                    </span>
+                  <div ref={loadMoreRef}>
+                    {Array(2)
+                      .fill(0)
+                      .map((_, i) => (
+                        <SkeletonSearch key={i} />
+                      ))}
                   </div>
                 )}
               </CommandList>
