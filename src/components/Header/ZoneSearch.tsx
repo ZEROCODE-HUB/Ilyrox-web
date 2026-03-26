@@ -174,7 +174,7 @@ export function ZoneSearch() {
                 variant="default"
                 className={cn(
                   "cursor-pointer px-4 py-1.5 rounded-full text-sm transition-all border-none font-medium select-none whitespace-nowrap",
-                  "bg-green-500 text-white scale-105 shadow-md hover:bg-green-500/90 flex items-center gap-1.5",
+                  "bg-white text-navbar scale-105 shadow-md hover:bg-white/90 flex items-center gap-1.5",
                 )}
                 onClick={() => toggleEstado(est)}
               >
@@ -190,7 +190,7 @@ export function ZoneSearch() {
                 variant="default"
                 className={cn(
                   "cursor-pointer px-4 py-1.5 rounded-full text-sm transition-all border-none font-medium select-none whitespace-nowrap",
-                  "bg-primary text-white scale-105 shadow-md hover:bg-primary/90 flex items-center gap-1.5",
+                  "bg-white text-navbar scale-105 shadow-md hover:bg-white/90 flex items-center gap-1.5",
                 )}
                 onClick={() => toggleMunicipio(muni)}
               >

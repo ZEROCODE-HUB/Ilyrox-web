@@ -54,17 +54,16 @@ const subtiposPorTipo: Record<string, { value: string; label: string }[]> = {
     { value: "Villa", label: "Villa" },
   ],
   comercial: [
-    { value: "Bodega Comercial", label: "Bodega Comercial" },
+    { value: "Local", label: "Local" },
     {
-      value: "Casa con uso de suelo comercial",
-      label: "Casa con Uso de Suelo Comercial",
+      value: "Oficina",
+      label: "Oficina",
     },
+    { value: "Plaza", label: "Plaza" },
+    { value: "Bodega", label: "Bodega" },
     { value: "Edificio", label: "Edificio" },
-    { value: "Huerta", label: "Huerta" },
-    { value: "Local comercial", label: "Local Comercial" },
-    { value: "Local en centro comercial", label: "Local en Centro Comercial" },
-    { value: "Oficina", label: "Oficina" },
     { value: "Terreno Comercial", label: "Terreno Comercial" },
+    { value: "Casa con uso comercial", label: "Casa con uso comercial" },
   ],
   industrial: [
     { value: "Bodega Industrial", label: "Bodega Industrial" },
