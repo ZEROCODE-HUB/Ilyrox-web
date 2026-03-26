@@ -2,7 +2,14 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Home, Building2, Factory, Sprout, Bookmark } from "lucide-react";
+import {
+  Home,
+  Building2,
+  Factory,
+  Sprout,
+  Bookmark,
+  Store,
+} from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -17,11 +24,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { MarqueeText } from "@/components/ui/marquee-text";
+import { resetNumber } from "@/utils/resetNumber";
 
 import {
   useFilterStore,
   useEstadoMexico,
   useColonias,
+  useMunicipios,
   usePriceRange,
   useOperationType,
   usePropertyType,
@@ -45,17 +54,16 @@ const subtiposPorTipo: Record<string, { value: string; label: string }[]> = {
     { value: "Villa", label: "Villa" },
   ],
   comercial: [
-    { value: "Bodega Comercial", label: "Bodega Comercial" },
+    { value: "Local", label: "Local" },
     {
-      value: "Casa con uso de suelo comercial",
-      label: "Casa con Uso de Suelo Comercial",
+      value: "Oficina",
+      label: "Oficina",
     },
+    { value: "Plaza", label: "Plaza" },
+    { value: "Bodega", label: "Bodega" },
     { value: "Edificio", label: "Edificio" },
-    { value: "Huerta", label: "Huerta" },
-    { value: "Local comercial", label: "Local Comercial" },
-    { value: "Local en centro comercial", label: "Local en Centro Comercial" },
-    { value: "Oficina", label: "Oficina" },
     { value: "Terreno Comercial", label: "Terreno Comercial" },
+    { value: "Casa con uso comercial", label: "Casa con uso comercial" },
   ],
   industrial: [
     { value: "Bodega Industrial", label: "Bodega Industrial" },
@@ -79,7 +87,7 @@ const propertyTypes = [
   {
     value: "comercial",
     label: "Comercial",
-    icon: <Building2 className="w-5 h-5" />,
+    icon: <Store className="w-5 h-5" />,
   },
   {
     value: "industrial",
@@ -121,6 +129,7 @@ export function SimplifiedFilters({
   // ── Granular store selectors ────────────────
   const estadoMexico = useEstadoMexico();
   const colonias = useColonias();
+  const municipios = useMunicipios();
   const { priceMin, priceMax, currency } = usePriceRange();
   const operationType = useOperationType();
   const { type, subtype } = usePropertyType();
@@ -154,12 +163,14 @@ export function SimplifiedFilters({
 
   // ── Derived data ────────────────────────────
   const availableColonias = useMemo(() => {
-    if (!estadoMexico) return [];
-    const municipios = MUNICIPIOS_ESTADO[estadoMexico] || [];
+    if (!estadoMexico || estadoMexico.length === 0) return [];
     const allCols: string[] = [];
-    municipios.forEach((muni) => {
-      const cols = COLONIAS_POR_MUNICIPIO[muni] || [];
-      allCols.push(...cols);
+    estadoMexico.forEach((est) => {
+      const munis = MUNICIPIOS_ESTADO[est] || [];
+      munis.forEach((muni) => {
+        const cols = COLONIAS_POR_MUNICIPIO[muni] || [];
+        allCols.push(...cols);
+      });
     });
     return Array.from(new Set(allCols)).sort();
   }, [estadoMexico]);
@@ -227,7 +238,7 @@ export function SimplifiedFilters({
       return;
     }
 
-    if (!estadoMexico) {
+    if (!estadoMexico || estadoMexico.length === 0) {
       toast({
         variant: "destructive",
         title: "Información faltante",
@@ -248,13 +259,14 @@ export function SimplifiedFilters({
         banos: bathrooms,
         estacionamientos: parking,
         pisos: levels,
+        niveles: levels,
         m2TerrenoMin: landAreaMin,
         m2TerrenoMax: landAreaMax,
         m2ConstruccionMin: constructionAreaMin,
         m2ConstruccionMax: constructionAreaMax,
         locationFilter: {
           estado: estadoMexico,
-          municipio: "",
+          municipio: municipios,
           colonias: colonias,
         },
       },
@@ -451,7 +463,9 @@ export function SimplifiedFilters({
               {/* Recámaras */}
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium text-muted-foreground">
-                  Recámaras
+                  {type === "comercial" || type === "industrial"
+                    ? "Espacios"
+                    : "Recámaras"}
                 </Label>
                 <Select
                   value={bedrooms || "any"}
@@ -600,11 +614,13 @@ export function SimplifiedFilters({
                   m² Terreno Mín.
                 </Label>
                 <Input
-                  type="number"
+                  type="text"
                   placeholder="0"
                   value={landAreaMin || ""}
                   onChange={(e) =>
-                    setLandAreaMin(parseInt(e.target.value) || undefined)
+                    setLandAreaMin(
+                      parseInt(resetNumber(e.target.value)) || undefined,
+                    )
                   }
                   className="h-10"
                 />
@@ -612,11 +628,13 @@ export function SimplifiedFilters({
                   m² Terreno Max.
                 </Label>
                 <Input
-                  type="number"
+                  type="text"
                   placeholder="0"
                   value={landAreaMax || ""}
                   onChange={(e) =>
-                    setLandAreaMax(parseInt(e.target.value) || undefined)
+                    setLandAreaMax(
+                      parseInt(resetNumber(e.target.value)) || undefined,
+                    )
                   }
                   className="h-10"
                 />
@@ -626,12 +644,12 @@ export function SimplifiedFilters({
                   m² Constr. Mín.
                 </Label>
                 <Input
-                  type="number"
+                  type="text"
                   placeholder="0"
                   value={constructionAreaMin || ""}
                   onChange={(e) =>
                     setConstructionAreaMin(
-                      parseInt(e.target.value) || undefined,
+                      parseInt(resetNumber(e.target.value)) || undefined,
                     )
                   }
                   className="h-10"
@@ -640,12 +658,12 @@ export function SimplifiedFilters({
                   m² Constr. Max.
                 </Label>
                 <Input
-                  type="number"
+                  type="text"
                   placeholder="0"
                   value={constructionAreaMax || ""}
                   onChange={(e) =>
                     setConstructionAreaMax(
-                      parseInt(e.target.value) || undefined,
+                      parseInt(resetNumber(e.target.value)) || undefined,
                     )
                   }
                   className="h-10"
@@ -659,8 +677,7 @@ export function SimplifiedFilters({
         <div className="pt-4">
           <Button
             // 'group' es indispensable aquí para que el MarqueeText detecte el hover del botón
-            className="w-full h-12 bg-white hover:bg-slate-50 text-foreground border border-input shadow-sm transition-all group overflow-hidden"
-            variant="outline"
+            className="w-full h-12 bg-primary hover:bg-primary/90 text-white border border-input shadow-sm transition-all group overflow-hidden"
             onClick={onSaveClick}
           >
             <div className="flex items-center justify-center w-full max-w-full px-2">

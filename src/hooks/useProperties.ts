@@ -13,9 +13,10 @@ import type { PropertyView } from "@/types/types";
  */
 export function useProperties(page = 0, pageSize = 10) {
   // Primitive selectors – only re-render when the actual value changes
-  const estadoMexico = useFilterStore((s) => s.estadoMexico);
+  const estadoMexicoKey = useFilterStore((s) => JSON.stringify(s.estadoMexico));
   const radiusKm = useFilterStore((s) => s.radiusKm);
   const coloniasKey = useFilterStore((s) => JSON.stringify(s.colonias));
+  const municipiosKey = useFilterStore((s) => JSON.stringify(s.municipios));
   const priceMin = useFilterStore((s) => s.priceMin);
   const priceMax = useFilterStore((s) => s.priceMax);
   const currency = useFilterStore((s) => s.currency);
@@ -35,9 +36,10 @@ export function useProperties(page = 0, pageSize = 10) {
   return useQuery<PropertyView[]>({
     queryKey: [
       "properties",
-      estadoMexico,
+      estadoMexicoKey,
       radiusKm,
       coloniasKey,
+      municipiosKey,
       priceMin,
       priceMax,
       currency,
@@ -59,13 +61,14 @@ export function useProperties(page = 0, pageSize = 10) {
     queryFn: async () => {
       // Read latest state directly from the store (not from hook values)
       const s = useFilterStore.getState();
-      if (!s.estadoMexico && s.radiusKm === 0 && !s.searchTerm) return [];
+      if (s.estadoMexico.length === 0 && s.radiusKm === 0 && !s.searchTerm) return [];
 
       return propertyService.searchProperties(
         {
           searchText: s.searchTerm,
-          state: s.estadoMexico || undefined,
+          state: s.estadoMexico.length > 0 ? s.estadoMexico : undefined,
           colonias: s.colonias.length > 0 ? s.colonias : undefined,
+          municipios: s.municipios.length > 0 ? s.municipios : undefined,
           type: s.type,
           subtype: s.subtype,
           operationType:

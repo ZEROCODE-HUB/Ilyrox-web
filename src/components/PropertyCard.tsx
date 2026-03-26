@@ -11,6 +11,9 @@ import {
   Share2,
   Home,
   MoveDiagonal,
+  Building2,
+  MoveUp,
+  Container,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -20,6 +23,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Avatar } from "@/components/shared/Avatar";
 import { useToast } from "@/hooks/use-toast";
 import { upperWord } from "@/utils/upperWord";
+import { useShare } from "@/hooks/useShare";
 
 interface PropertyCardProps {
   property: PropertyView;
@@ -41,6 +45,7 @@ export function PropertyCard({
     toggleSave,
     isLoading: isSavedLoading,
   } = useSavedProperties();
+  const { handleShare } = useShare();
 
   // Use property.isLiked as initial state if loading, otherwise use the hook's state
   const isPropertySaved = isSavedLoading
@@ -109,27 +114,6 @@ export function PropertyCard({
     setLikesCount((prev) => (intendedState ? prev + 1 : Math.max(0, prev - 1)));
   };
 
-  const handleShareClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const propertyUrl = `${window.location.origin}/property/${property.id}`;
-    navigator.clipboard
-      .writeText(propertyUrl)
-      .then(() => {
-        toast({
-          title: "Enlace copiado",
-          description:
-            "El enlace de la propiedad se ha copiado al portapapeles",
-        });
-      })
-      .catch(() => {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "No se pudo copiar el enlace",
-        });
-      });
-  };
-
   // Construct location string
   const lineCalle = property.calle == null ? "" : property.calle + ", ";
   const lineColonia = property.colonia == null ? "" : property.colonia + ", ";
@@ -176,7 +160,9 @@ export function PropertyCard({
             size="icon"
             variant="secondary"
             className="h-8 w-8 rounded-md shadow-md backdrop-blur-sm hover:bg-white"
-            onClick={handleShareClick}
+            onClick={(e) =>
+              handleShare(e, "property", property.codigo_propiedad)
+            }
           >
             <Share2 className="h-4 w-4" />
           </Button>
@@ -247,40 +233,43 @@ export function PropertyCard({
 
           {/* Features Grid */}
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1 border-t border-border/50">
-            {property.habitaciones ? (
+            {Number(property.habitaciones) > 0 && (
               <div
                 className="flex items-center gap-1.5 text-muted-foreground"
                 title={`${property.habitaciones} Recámaras`}
               >
-                <Bed className="h-5 w-5" />
+                {property.tipo === "comercial" ||
+                property.tipo === "industrial" ? (
+                  <Container className="h-5 w-5" />
+                ) : (
+                  <Bed className="h-5 w-5" />
+                )}
                 <span className="text-sm font-semibold">
-                  {property.habitaciones || 0}
+                  {property.habitaciones}
                 </span>
               </div>
-            ) : null}
-            {property.banos ? (
+            )}
+            {Number(property.banos) > 0 && (
               <div
                 className="flex items-center gap-1.5 text-muted-foreground"
                 title={`${property.banos} Baños`}
               >
                 <Bath className="h-5 w-5" />
-                <span className="text-sm font-semibold">
-                  {property.banos || 0}
-                </span>
+                <span className="text-sm font-semibold">{property.banos}</span>
               </div>
-            ) : null}
-            {property.estacionamientos ? (
+            )}
+            {Number(property.estacionamientos) > 0 && (
               <div
                 className="flex items-center gap-1.5 text-muted-foreground"
                 title={`${property.estacionamientos} Estacionamientos`}
               >
                 <Car className="h-5 w-5" />
                 <span className="text-sm font-semibold">
-                  {property.estacionamientos || 0}
+                  {property.estacionamientos}
                 </span>
               </div>
-            ) : null}
-            {property.metros_cuadrados_construccion ? (
+            )}
+            {Number(property.metros_cuadrados_construccion) > 0 && (
               <div
                 className="flex items-center gap-1.5 text-muted-foreground"
                 title={`${property.metros_cuadrados_construccion} m²`}
@@ -293,8 +282,8 @@ export function PropertyCard({
                   </span>
                 </span>
               </div>
-            ) : null}
-            {property.metros_cuadrados_terreno ? (
+            )}
+            {Number(property.metros_cuadrados_terreno) > 0 && (
               <div
                 className="flex items-center gap-1.5 text-muted-foreground"
                 title={`${property.metros_cuadrados_terreno} m²`}
@@ -307,7 +296,20 @@ export function PropertyCard({
                   </span>
                 </span>
               </div>
-            ) : null}
+            )}
+            {Number(property.pisos) > 0 && (
+              <div
+                className="flex items-center gap-1.5 text-muted-foreground"
+                title={`${property.pisos}`}
+              >
+                <Building2 className="h-5 w-5" />
+                <span className="text-sm font-semibold whitespace-nowrap">
+                  {property.pisos < 2
+                    ? property.pisos + " piso"
+                    : property.pisos + " pisos"}
+                </span>
+              </div>
+            )}
           </div>
           {/* Amenidades */}
           {property.amenidades && property.amenidades.length > 0 && (

@@ -11,8 +11,9 @@ export type Currency = "MXN" | "USD";
 
 export interface FilterState {
   // Location
-  estadoMexico: string;
+  estadoMexico: string[];
   colonias: string[];
+  municipios: string[];
 
   // Price
   priceMin: number | undefined;
@@ -48,9 +49,14 @@ export interface FilterState {
 export interface FilterActions {
   // Individual setters
   setEstadoMexico: (estado: string) => void;
+  toggleEstado: (estado: string) => void;
+  removeEstado: (estado: string) => void;
   setColonias: (colonias: string[]) => void;
   toggleColonia: (colonia: string, municipio?: string) => void;
   removeColonia: (colonia: string) => void;
+  setMunicipios: (municipios: string[]) => void;
+  toggleMunicipio: (municipio: string, estado?: string) => void;
+  removeMunicipio: (municipio: string) => void;
 
   setPriceMin: (value: number | undefined) => void;
   setPriceMax: (value: number | undefined) => void;
@@ -87,8 +93,9 @@ export type FilterStore = FilterState & FilterActions;
 // ──────────────────────────────────────────────
 
 const initialState: FilterState = {
-  estadoMexico: "",
+  estadoMexico: [],
   colonias: [],
+  municipios: [],
 
   priceMin: undefined,
   priceMax: undefined,
@@ -123,11 +130,25 @@ export const useFilterStore = create<FilterStore>()(
     ...initialState,
 
     // ── Location ──────────────────────────────
+    // Legacy setter: replaces entire array with a single estado (backward compat)
     setEstadoMexico: (estado) =>
-      set({
-        estadoMexico: estado,
-        colonias: [], // Reset colonias on state change
-      }),
+      set(() =>
+        estado
+          ? { estadoMexico: [estado] }
+          : { estadoMexico: [], colonias: [], municipios: [] },
+      ),
+
+    toggleEstado: (estado) =>
+      set((s) => ({
+        estadoMexico: s.estadoMexico.includes(estado)
+          ? s.estadoMexico.filter((e) => e !== estado)
+          : [...s.estadoMexico, estado],
+      })),
+
+    removeEstado: (estado) =>
+      set((s) => ({
+        estadoMexico: s.estadoMexico.filter((e) => e !== estado),
+      })),
 
     setColonias: (colonias) => set({ colonias }),
 
@@ -163,6 +184,20 @@ export const useFilterStore = create<FilterStore>()(
     removeColonia: (colonia) =>
       set((s) => ({
         colonias: s.colonias.filter((c) => c !== colonia),
+      })),
+
+    setMunicipios: (municipios) => set({ municipios }),
+
+    toggleMunicipio: (municipio) =>
+      set((s) => ({
+        municipios: s.municipios.includes(municipio)
+          ? s.municipios.filter((m) => m !== municipio)
+          : [...s.municipios, municipio],
+      })),
+
+    removeMunicipio: (municipio) =>
+      set((s) => ({
+        municipios: s.municipios.filter((m) => m !== municipio),
       })),
 
     // ── Price ─────────────────────────────────
@@ -201,7 +236,7 @@ export const useFilterStore = create<FilterStore>()(
     setRadiusKm: (radius) => set({ radiusKm: radius }),
 
     // ── Reset ─────────────────────────────────
-    resetFilters: () => set((state) => ({ ...initialState })),
+    resetFilters: () => set(() => ({ ...initialState })),
   })),
 );
 
@@ -212,6 +247,8 @@ export const useFilterStore = create<FilterStore>()(
 export const useEstadoMexico = () => useFilterStore((s) => s.estadoMexico);
 
 export const useColonias = () => useFilterStore((s) => s.colonias);
+
+export const useMunicipios = () => useFilterStore((s) => s.municipios);
 
 export const usePriceRange = () =>
   useFilterStore(
@@ -257,6 +294,7 @@ export const useFilterSnapshot = () =>
     useShallow((s) => ({
       estadoMexico: s.estadoMexico,
       colonias: s.colonias,
+      municipios: s.municipios,
       priceMin: s.priceMin,
       priceMax: s.priceMax,
       currency: s.currency,

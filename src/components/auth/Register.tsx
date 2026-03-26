@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Camera, Eye, EyeOff, User as UserIcon, X } from "lucide-react";
 import { useAuthForm } from "@/hooks/useAuthForm";
+import { resetNumber } from "@/utils/resetNumber";
 
 import {
   Select,
@@ -39,7 +40,10 @@ export const Register = () => {
   } = useAuthForm();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
+    let { id, value } = e.target;
+    if (id === "phone") {
+      value = resetNumber(value).slice(0, 10);
+    }
     updateField(id as any, value);
   };
 
@@ -117,7 +121,9 @@ export const Register = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="firstName">Nombre(s)</Label>
+            <Label htmlFor="firstName">
+              Nombre(s) <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="firstName"
               value={formState.firstName}
@@ -131,7 +137,9 @@ export const Register = () => {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="lastNamePaternal">Apellido Paterno</Label>
+              <Label htmlFor="lastNamePaternal">
+                Apellido Paterno <span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="lastNamePaternal"
                 value={formState.lastNamePaternal}
@@ -143,7 +151,9 @@ export const Register = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="lastNameMaterno">Apellido Materno</Label>
+              <Label htmlFor="lastNameMaterno">
+                Apellido Materno <span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="lastNameMaterno"
                 value={formState.lastNameMaterno}
@@ -157,7 +167,9 @@ export const Register = () => {
           </div>
 
           <div className="space-y-2">
-            <Label>Estado</Label>
+            <Label>
+              Estado <span className="text-red-500">*</span>
+            </Label>
             <Select
               value={formState.estado}
               onValueChange={handleEstadoChange}
@@ -178,7 +190,26 @@ export const Register = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Correo electrónico</Label>
+            <Label htmlFor="phone">
+              Número de teléfono <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="phone"
+              type="text"
+              placeholder="5512345678"
+              value={formState.phone}
+              onChange={handleInputChange}
+              required
+              className="h-11"
+              disabled={loading}
+              maxLength={10}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email">
+              Correo electrónico <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="email"
               type="email"
@@ -192,7 +223,9 @@ export const Register = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Contraseña</Label>
+            <Label htmlFor="password">
+              Contraseña <span className="text-red-500">*</span>
+            </Label>
             <div className="relative">
               <Input
                 id="password"
@@ -223,7 +256,9 @@ export const Register = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirmar contraseña</Label>
+            <Label htmlFor="confirmPassword">
+              Confirmar contraseña <span className="text-red-500">*</span>
+            </Label>
             <div className="relative">
               <Input
                 id="confirmPassword"

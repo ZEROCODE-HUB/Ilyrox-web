@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { ESTADOS_MEXICO } from "@/constants/locations";
+import { resetNumber } from "@/utils/resetNumber";
 
 interface ConfigModalProps {
   open: boolean;
@@ -74,6 +75,14 @@ export const ConfigModal = ({
   const handleCancelEdit = () => {
     setEditingField(null);
     setEditValue("");
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let { id, value } = e.target;
+    if (id === "phone") {
+      value = resetNumber(value).slice(0, 10);
+    }
+    setEditValue(value);
   };
 
   const handleSaveEdit = async () => {
@@ -149,8 +158,9 @@ export const ConfigModal = ({
                 </p>
                 <div className="flex gap-2">
                   <Input
+                    id="phone"
                     value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
+                    onChange={(e) => handleInputChange(e)}
                     className="h-8 text-sm"
                     disabled={isUpdating}
                     autoFocus

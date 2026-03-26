@@ -196,7 +196,7 @@ export function useSaveSearch(userId?: string) {
       criterios_busqueda.m2_construccion_max = parseFloat(
         filters.m2ConstruccionMax.toString().replace(/,/g, ""),
       );
-    if (filters.locationFilter.estado)
+    if (filters.locationFilter.estado && filters.locationFilter.estado.length > 0)
       criterios_busqueda.estado = filters.locationFilter.estado;
     if (filters.locationFilter.municipio)
       criterios_busqueda.municipio = filters.locationFilter.municipio;
@@ -237,9 +237,9 @@ export function useSaveSearch(userId?: string) {
       if (!isNaN(pMax)) insertData.precio_max = pMax;
     }
 
-    if (filters.locationFilter.estado)
+    if (filters.locationFilter.estado && filters.locationFilter.estado.length > 0)
       insertData.estado = filters.locationFilter.estado;
-    if (filters.locationFilter.municipio)
+    if (filters.locationFilter.municipio && filters.locationFilter.municipio.length > 0)
       insertData.municipio = filters.locationFilter.municipio;
     if (
       filters.locationFilter.colonias &&

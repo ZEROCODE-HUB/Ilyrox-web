@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Modal } from "../ui/Modal";
 import { Textarea } from "../ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -184,21 +184,21 @@ Comentarios: ${contactForm.comments || "Sin comentarios adicionales"}`;
     { value: "Solo estoy comparando", label: "Solo estoy comparando" },
   ];
 
-  const nextStep = () => {
+  const nextStep = useCallback(() => {
     if (progressTab === "budget" && contactForm.budget) {
       setProgressTab("timeframe");
     } else if (progressTab === "timeframe" && contactForm.timeframe) {
       setProgressTab("comments");
     }
-  };
+  }, [progressTab, contactForm.budget, contactForm.timeframe]);
 
-  const prevStep = () => {
+  const prevStep = useCallback(() => {
     if (progressTab === "timeframe") {
       setProgressTab("budget");
     } else if (progressTab === "comments") {
       setProgressTab("timeframe");
     }
-  };
+  }, [progressTab]);
 
   const slideVariants = {
     enter: (direction: number) => ({
@@ -335,7 +335,7 @@ Comentarios: ${contactForm.comments || "Sin comentarios adicionales"}`;
                               ...prev,
                               budget: option.value,
                             }));
-                            setTimeout(nextStep, 300);
+                            setTimeout(() => setProgressTab("timeframe"), 300);
                           }}
                         >
                           {option.label}
@@ -375,7 +375,7 @@ Comentarios: ${contactForm.comments || "Sin comentarios adicionales"}`;
                               ...prev,
                               timeframe: option.value,
                             }));
-                            setTimeout(nextStep, 300);
+                            setTimeout(() => setProgressTab("comments"), 300);
                           }}
                         >
                           {option.label}

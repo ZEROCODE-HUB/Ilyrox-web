@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -10,6 +10,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Camera, X, User as UserIcon, Eye, EyeOff } from "lucide-react";
 import { useAuthForm } from "@/hooks/useAuthForm";
+import { resetNumber } from "@/utils/resetNumber";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ESTADOS_MEXICO } from "@/constants/MexLocations/estados";
 
 interface AuthPopupProps {
   isOpen: boolean;
@@ -37,6 +47,16 @@ export function AuthPopup({ isOpen, onClose }: AuthPopupProps) {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     updateField(id as any, value);
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    const cleanValue = resetNumber(value).slice(0, 10);
+    updateField("phone", cleanValue);
+  };
+
+  const handleEstadoChange = (value: string) => {
+    updateField("estado", value);
   };
 
   const onAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -133,7 +153,10 @@ export function AuthPopup({ isOpen, onClose }: AuthPopupProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="firstName">Nombre(s)</Label>
+                <Label htmlFor="firstName">
+                  Nombre(s)
+                  <span className="text-red-500">*</span>
+                </Label>
                 <Input
                   id="firstName"
                   value={formState.firstName}
@@ -146,7 +169,10 @@ export function AuthPopup({ isOpen, onClose }: AuthPopupProps) {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="lastNamePaternal">Apellido Paterno</Label>
+                  <Label htmlFor="lastNamePaternal">
+                    Apellido Paterno
+                    <span className="text-red-500">*</span>
+                  </Label>
                   <Input
                     id="lastNamePaternal"
                     value={formState.lastNamePaternal}
@@ -157,7 +183,9 @@ export function AuthPopup({ isOpen, onClose }: AuthPopupProps) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastNameMaterno">Apellido Materno</Label>
+                  <Label htmlFor="lastNameMaterno">
+                    Apellido Materno <span className="text-red-500">*</span>
+                  </Label>
                   <Input
                     id="lastNameMaterno"
                     value={formState.lastNameMaterno}
@@ -168,11 +196,55 @@ export function AuthPopup({ isOpen, onClose }: AuthPopupProps) {
                   />
                 </div>
               </div>
+
+              <div>
+                <Label htmlFor="phone">
+                  Teléfono
+                  <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="phone"
+                  type="text"
+                  value={formState.phone}
+                  onChange={handlePhoneChange}
+                  placeholder="Teléfono"
+                  required
+                  maxLength={10}
+                  disabled={loading}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>
+                  Estado
+                  <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  value={formState.estado}
+                  onValueChange={handleEstadoChange}
+                  required
+                  disabled={loading}
+                >
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder="Selecciona tu estado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ESTADOS_MEXICO.map((estado) => (
+                      <SelectItem key={estado} value={estado}>
+                        {estado}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </>
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="email">Correo electrónico</Label>
+            <Label htmlFor="email">
+              Correo electrónico
+              <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="email"
               type="email"
@@ -185,7 +257,10 @@ export function AuthPopup({ isOpen, onClose }: AuthPopupProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Contraseña</Label>
+            <Label htmlFor="password">
+              Contraseña
+              <span className="text-red-500">*</span>
+            </Label>
             <div className="relative">
               <Input
                 id="password"
@@ -217,7 +292,10 @@ export function AuthPopup({ isOpen, onClose }: AuthPopupProps) {
 
           {!isLogin && (
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirmar contraseña</Label>
+              <Label htmlFor="confirmPassword">
+                Confirmar contraseña
+                <span className="text-red-500">*</span>
+              </Label>
               <div className="relative">
                 <Input
                   id="confirmPassword"

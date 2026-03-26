@@ -21,6 +21,8 @@ import {
   Star,
   Home,
   MoveDiagonal,
+  Building2,
+  Container,
 } from "lucide-react";
 import { PropertyComments } from "@/components/PropertyComments";
 import { Avatar } from "@/components/shared/Avatar";
@@ -31,6 +33,7 @@ import { MapModal } from "./MapModal";
 import { InfoModal } from "./InfoModal";
 import { useToast } from "@/hooks/use-toast";
 import { useResenas } from "@/hooks/useResenas";
+import { useShare } from "@/hooks/useShare";
 
 interface PropertyDetailContentProps {
   property: PropertyView;
@@ -63,6 +66,7 @@ export function PropertyDetailContent({
     toggleSave,
     isLoading: isSavedLoading,
   } = useSavedProperties();
+  const { handleShare } = useShare();
 
   const isPropertySaved = displayProperty
     ? isSavedLoading
@@ -208,16 +212,9 @@ export function PropertyDetailContent({
               variant="ghost"
               size="sm"
               className="bg-white/80 hover:bg-white"
-              onClick={() => {
-                const propertyUrl = `${window.location.origin}/property/${displayProperty.id}`;
-                navigator.clipboard.writeText(propertyUrl).then(() => {
-                  toast({
-                    title: "Enlace copiado",
-                    description:
-                      "El enlace de la propiedad se ha copiado al portapapeles",
-                  });
-                });
-              }}
+              onClick={(e) =>
+                handleShare(e, "property", displayProperty.codigo_propiedad)
+              }
             >
               <Share2 className="h-4 w-4" />
             </Button>
@@ -297,13 +294,25 @@ export function PropertyDetailContent({
 
               {(displayProperty.habitaciones || 0) > 0 && (
                 <div className="flex items-center gap-2 p-3 bg-accent rounded-lg">
-                  <Bed className="h-5 w-5 text-primary" />
+                  {property.tipo === "comercial" ||
+                  property.tipo === "industrial" ? (
+                    <Container className="h-5 w-5 text-primary" />
+                  ) : (
+                    <Bed className="h-5 w-5 text-primary" />
+                  )}
                   <div>
                     <div className="font-semibold">
                       {displayProperty.habitaciones}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      Habitaciones
+                      {displayProperty.tipo === "comercial" ||
+                      displayProperty.tipo === "industrial"
+                        ? displayProperty.habitaciones > 1
+                          ? "Espacios"
+                          : "Espacio"
+                        : displayProperty.habitaciones > 1
+                          ? "Habitaciones"
+                          : "Habitación"}
                     </div>
                   </div>
                 </div>
@@ -314,7 +323,9 @@ export function PropertyDetailContent({
                   <Bath className="h-5 w-5 text-primary" />
                   <div>
                     <div className="font-semibold">{displayProperty.banos}</div>
-                    <div className="text-sm text-muted-foreground">Baños</div>
+                    <div className="text-sm text-muted-foreground">
+                      {displayProperty.banos > 1 ? "Baños" : "Baño"}
+                    </div>
                   </div>
                 </div>
               )}
@@ -327,7 +338,25 @@ export function PropertyDetailContent({
                       {displayProperty.estacionamientos}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      Estacionamientos
+                      {displayProperty.estacionamientos > 1
+                        ? "Estacionamientos"
+                        : "Estacionamiento"}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {(displayProperty.pisos || 0) > 0 && (
+                <div className="flex items-center gap-2 p-3 bg-accent rounded-lg">
+                  <Building2 className="h-5 w-5 text-primary" />
+                  <div>
+                    <div className="font-semibold">
+                      {displayProperty.pisos < 2
+                        ? displayProperty.pisos + " piso"
+                        : displayProperty.pisos + " pisos"}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {displayProperty.pisos > 1 ? "Niveles" : "Nivel"}
                     </div>
                   </div>
                 </div>

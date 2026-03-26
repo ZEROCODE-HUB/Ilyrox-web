@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import type { Property, Advisor, PropertyFilters } from "@/types/property";
 import { PropertyView } from "@/types/types";
+import { MUNICIPIOS_ESTADO } from "@/constants/MexLocations/municipios";
 
 // Helper to map View row to PropertyView interface
 const mapViewToPropertyView = (
@@ -24,9 +25,10 @@ export const propertyService = {
   async searchProperties(
     filters: PropertyFilters & {
       searchText?: string;
-      state?: string;
+      state?: string | string[];
       municipality?: string;
       colony?: string;
+      municipios?: string[];
     },
     page: number = 0,
     pageSize: number = 10,
@@ -71,12 +73,11 @@ export const propertyService = {
       );
     }
 
-    if (filters.state) query = query.eq("estado", filters.state);
-    if (filters.municipality)
-      query = query.eq("municipio", filters.municipality);
-    if (filters.colony) query = query.eq("colonia", filters.colony);
+    // Filtro por zonas (colonias y municipios combinados en un OR)
+    const locationOrConditions: string[] = [];
+
+    // Colonias
     if (filters.colonias && filters.colonias.length > 0) {
-      // Separamos las que tienen municipio de las que no
       const withMunicipio: string[] = [];
       const withoutMunicipio: string[] = [];
 
@@ -90,31 +91,94 @@ export const propertyService = {
       });
 
       if (withMunicipio.length > 0) {
-        // Para las que tienen municipio, usamos OR con condiciones anidadas
-        const conditions = withMunicipio
-          .map((c) => {
-            const match = c.match(/(.+) \((.+)\)/);
-            if (match) {
-              const colName = match[1].replace(/"/g, '""');
-              const muniName = match[2].replace(/"/g, '""');
-              return `and(colonia.eq."${colName}",municipio.eq."${muniName}")`;
-            }
-            return "";
-          })
-          .filter(Boolean);
+        withMunicipio.forEach((c) => {
+          const match = c.match(/(.+) \((.+)\)/);
+          if (match) {
+            const colName = match[1].replace(/"/g, '""');
+            const muniName = match[2].replace(/"/g, '""');
+            locationOrConditions.push(`and(colonia.eq."${colName}",municipio.eq."${muniName}")`);
+          }
+        });
+      }
 
-        // Si también hay sin municipio, las agregamos al OR
-        if (withoutMunicipio.length > 0) {
-          const list = withoutMunicipio
-            .map((c) => `"${c.replace(/"/g, '""')}"`)
-            .join(",");
-          conditions.push(`colonia.in.(${list})`);
+      if (withoutMunicipio.length > 0) {
+        const list = withoutMunicipio
+          .map((c) => `"${c.replace(/"/g, '""')}"`)
+          .join(",");
+        locationOrConditions.push(`colonia.in.(${list})`);
+      }
+    }
+
+    // Municipios
+    if (filters.municipios && filters.municipios.length > 0) {
+      const muniList = filters.municipios
+        .map((m) => `"${m.replace(/"/g, '""')}"`)
+        .join(",");
+      locationOrConditions.push(`municipio.in.(${muniList})`);
+    }
+
+    // Identificar estados que "no tienen" filtros de municipio/colonia que los refinen
+    // Para esos estados, debemos mostrar todas sus propiedades, agregándolos al OR global.
+    const states = Array.isArray(filters.state) 
+      ? filters.state 
+      : (filters.state ? [filters.state] : []);
+
+    if (states.length > 0) {
+      const normalizeString = (str: string) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+      const unrefinedStates: string[] = [];
+
+      states.forEach(state => {
+        const normState = normalizeString(state);
+        // Clean up common suffixes for matching with MUNICIPIOS_ESTADO keys 
+        // e.g., "Ciudad de México (CDMX)" vs "Ciudad de México (CDMX)" usually matches perfectly,
+        // but just in case we do a loose find.
+        const stateKey = Object.keys(MUNICIPIOS_ESTADO).find(
+          k => normalizeString(k).includes(normState) || normState.includes(normalizeString(k))
+        );
+        
+        const stateMunis = stateKey ? MUNICIPIOS_ESTADO[stateKey] : [];
+        const normStateMunis = stateMunis.map(m => normalizeString(m));
+        
+        let hasRefinements = false;
+
+        if (filters.municipios?.some(m => normStateMunis.includes(normalizeString(m)))) {
+          hasRefinements = true;
         }
 
-        query = query.or(conditions.join(","));
-      } else {
-        // Si ninguna tiene municipio, usamos el .in normal
-        query = query.in("colonia", withoutMunicipio);
+        if (!hasRefinements && filters.colonias) {
+          filters.colonias.forEach(c => {
+            const match = c.match(/(.+) \((.+)\)/);
+            if (match) {
+               const muni = match[2];
+               if (normStateMunis.includes(normalizeString(muni))) {
+                 hasRefinements = true;
+               }
+            }
+          });
+        }
+
+        if (!hasRefinements) {
+          unrefinedStates.push(state);
+        }
+      });
+
+      if (unrefinedStates.length > 0) {
+        const unrefinedList = unrefinedStates.map(s => `"${s.replace(/"/g, '""')}"`).join(",");
+        locationOrConditions.push(`estado.in.(${unrefinedList})`);
+      }
+    }
+
+    // Aplicar el OR de todas las zonas si existen
+    if (locationOrConditions.length > 0) {
+      query = query.or(locationOrConditions.join(","));
+    }
+
+    // El filtro de estado se mantiene como base si está presente
+    if (filters.state) {
+      if (Array.isArray(filters.state) && filters.state.length > 0) {
+        query = query.in("estado", filters.state);
+      } else if (typeof filters.state === "string") {
+        query = query.eq("estado", filters.state);
       }
     }
 
