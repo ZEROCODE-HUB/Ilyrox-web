@@ -40,8 +40,9 @@ export function useLocationSearch() {
     termRef.current = term;
 
     try {
-      const { data, error } = await supabaseGeo.rpc("buscar_ubicaciones", {
-        p_nombre_busqueda: term.trim(),
+    const cleanTerm = term.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const { data, error } = await supabaseGeo.rpc("buscar_ubicaciones", {
+        p_nombre_busqueda: cleanTerm,
         p_limit: 20,
         p_offset: offset,
       });

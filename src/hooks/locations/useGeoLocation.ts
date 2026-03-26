@@ -21,8 +21,9 @@ export const useGeoLocation = () => {
   const fetchEstados = async (busqueda: string = "") => {
     try {
       setIsLoading(true);
+      const cleanBusqueda = busqueda.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
       const { data, error } = await supabaseGeo.rpc("obtener_estados", {
-        p_nombre_busqueda: busqueda,
+        p_nombre_busqueda: cleanBusqueda,
       });
       if (error) throw error;
       if (data) {
@@ -49,11 +50,12 @@ export const useGeoLocation = () => {
         return;
       }
       setIsLoading(true);
+      const cleanBusqueda = busqueda.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
       const { data, error } = await supabaseGeo.rpc(
         "obtener_municipios_por_estado",
         {
           p_estado_id: parseInt(estadoId),
-          p_nombre_busqueda: busqueda,
+          p_nombre_busqueda: cleanBusqueda,
         },
       );
       if (error) throw error;
@@ -83,12 +85,13 @@ export const useGeoLocation = () => {
         return;
       }
       setIsLoading(true);
+      const cleanBusqueda = busqueda.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
       const { data, error } = await supabaseGeo.rpc(
         "obtener_colonias_geografia",
         {
           p_municipio_id: municipioId ? parseInt(municipioId) : null,
           p_estado_id: estadoId ? parseInt(estadoId) : null,
-          p_nombre_busqueda: busqueda,
+          p_nombre_busqueda: cleanBusqueda,
         },
       );
       if (error) throw error;

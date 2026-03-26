@@ -61,7 +61,14 @@ export function useProperties(page = 0, pageSize = 10) {
     queryFn: async () => {
       // Read latest state directly from the store (not from hook values)
       const s = useFilterStore.getState();
-      if (s.estadoMexico.length === 0 && s.radiusKm === 0 && !s.searchTerm) return [];
+      if (
+        s.estadoMexico.length === 0 &&
+        s.colonias.length === 0 &&
+        s.municipios.length === 0 &&
+        s.radiusKm === 0 &&
+        !s.searchTerm
+      )
+        return [];
 
       return propertyService.searchProperties(
         {
