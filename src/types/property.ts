@@ -121,7 +121,7 @@ export interface PropertyFilters {
   financing?: string[];
   lien?: boolean;
   operationType?: "venta" | "renta" | "todas";
-  state?: string;
+  state?: string | string[];
   municipality?: string;
   colony?: string;
   colonias?: string[];

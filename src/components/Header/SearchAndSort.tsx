@@ -7,9 +7,7 @@ import {
   PopoverContent,
   PopoverAnchor,
 } from "@/components/ui/popover";
-import { useState, useRef, useEffect, useCallback } from "react";
-import { Modal } from "../ui/Modal";
-import { AlertTriangle } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 
 import {
   useFilterStore,
@@ -35,15 +33,12 @@ export function SearchAndSort({
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
-  const [showStateWarning, setShowStateWarning] = useState(false);
-  const [pendingSuggestion, setPendingSuggestion] =
-    useState<LocationSuggestion | null>(null);
 
   // ── Store ────────────────────────────────────
-  const estadoMexico = useEstadoMexico();
+  const estados = useEstadoMexico();
   const selectedColonias = useSelectedColonias();
   const selectedMunicipios = useSelectedMunicipios();
-  const { setEstadoMexico, toggleColonia, toggleMunicipio } = useFilterStore();
+  const { toggleEstado, toggleColonia, toggleMunicipio } = useFilterStore();
 
   // ── Search ───────────────────────────────────
   const { suggestions, loading, hasMore, search, loadMore, clear } =
@@ -89,12 +84,18 @@ export function SearchAndSort({
     const { tipo, nombre, municipio_nombre, estado_nombre } = s;
 
     if (tipo === "estado") {
-      setEstadoMexico(nombre);
+      toggleEstado(nombre);
     } else if (tipo === "municipio") {
-      if (estado_nombre) setEstadoMexico(estado_nombre);
+      // Ensure parent estado is added if not already present
+      if (estado_nombre && !estados.includes(estado_nombre)) {
+        toggleEstado(estado_nombre);
+      }
       toggleMunicipio(nombre);
     } else {
-      if (estado_nombre) setEstadoMexico(estado_nombre);
+      // Colonia
+      if (estado_nombre && !estados.includes(estado_nombre)) {
+        toggleEstado(estado_nombre);
+      }
       toggleColonia(nombre, municipio_nombre);
     }
 
@@ -105,30 +106,12 @@ export function SearchAndSort({
   };
 
   const handleSelectSuggestion = (s: LocationSuggestion) => {
-    const { tipo, nombre, estado_nombre } = s;
-
-    // Si ya hay un estado y el nuevo es distinto, avisar si hay filtros activos
-    const newEstado = tipo === "estado" ? nombre : estado_nombre;
-    const hasActiveFilters =
-      selectedColonias.length > 0 || selectedMunicipios.length > 0;
-
-    if (
-      estadoMexico &&
-      newEstado &&
-      estadoMexico !== newEstado &&
-      hasActiveFilters
-    ) {
-      setPendingSuggestion(s);
-      setShowStateWarning(true);
-      setOpen(false); // Close suggestions popover
-      return;
-    }
-
     applySelection(s);
   };
 
   const handleClearAll = () => {
-    setEstadoMexico("");
+    // Clear all estados
+    useFilterStore.setState({ estadoMexico: [], colonias: [], municipios: [] });
     setInputValue("");
     clear();
     setOpen(false);
@@ -137,19 +120,18 @@ export function SearchAndSort({
   const hasValue = inputValue.trim().length > 0;
   const hasSuggestions = suggestions.length > 0;
   const hasActiveFilter =
-    estadoMexico !== "" ||
+    estados.length > 0 ||
     selectedColonias.length > 0 ||
     selectedMunicipios.length > 0;
 
   // Count of active location selections
   const selectionCount =
-    selectedColonias.length +
-    selectedMunicipios.length +
-    (estadoMexico &&
-    selectedColonias.length === 0 &&
-    selectedMunicipios.length === 0
-      ? 1
-      : 0);
+    estados.length + selectedColonias.length + selectedMunicipios.length;
+
+  // Placeholder text
+  const placeholderText = hasActiveFilter
+    ? `${selectionCount} zona${selectionCount !== 1 ? "s" : ""} seleccionada${selectionCount !== 1 ? "s" : ""} · Buscar otra...`
+    : "Busca por colonia, municipio o estado...";
 
   const getIconForType = (tipo: LocationSuggestion["tipo"]) => {
     if (tipo === "estado")
@@ -177,11 +159,7 @@ export function SearchAndSort({
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 ref={inputRef}
-                placeholder={
-                  hasActiveFilter
-                    ? `${estadoMexico} seleccionada · Buscar otra...`
-                    : "Busca por colonia, municipio o estado..."
-                }
+                placeholder={placeholderText}
                 value={inputValue}
                 onChange={handleInputChange}
                 onFocus={() => {
@@ -274,7 +252,7 @@ export function SearchAndSort({
                     ? selectedColonias.includes(keyColonia)
                     : isMunicipio
                       ? selectedMunicipios.includes(s.nombre)
-                      : estadoMexico === s.nombre;
+                      : estados.includes(s.nombre);
 
                   // Subtitle: colonia: municipio, estado / municipio: estado / estado: nothing
                   const subtitle = isEstado
@@ -363,52 +341,6 @@ export function SearchAndSort({
           </PopoverContent>
         </Popover>
       </div>
-
-      <Modal
-        isOpen={showStateWarning}
-        onClose={() => setShowStateWarning(false)}
-        title="Cambiar de Estado"
-        size="sm"
-        className="z-50"
-      >
-        <div className="p-6 flex flex-col items-center text-center">
-          <div className="h-14 w-14 rounded-full bg-amber-50 flex items-center justify-center mb-4">
-            <AlertTriangle className="h-8 w-8 text-amber-500" />
-          </div>
-          <h4 className="text-base font-bold text-slate-800 mb-2">
-            ¿Quieres buscar en otro estado?
-          </h4>
-          <p className="text-sm text-slate-500 leading-relaxed mb-6">
-            Al seleccionar una ubicación en{" "}
-            <span className="font-bold text-slate-700">
-              {pendingSuggestion?.tipo === "estado"
-                ? pendingSuggestion.nombre
-                : pendingSuggestion?.estado_nombre}
-            </span>
-            , se borrarán las colonias y municipios de{" "}
-            <span className="font-bold text-slate-700">{estadoMexico}</span> que
-            tienes seleccionados.
-          </p>
-          <div className="grid grid-cols-2 gap-3 w-full">
-            <Button
-              variant="outline"
-              onClick={() => setShowStateWarning(false)}
-              className="rounded-xl py-6 border-slate-200 text-slate-600 hover:bg-slate-50 font-semibold"
-            >
-              Cancelar
-            </Button>
-            <Button
-              onClick={() => {
-                if (pendingSuggestion) applySelection(pendingSuggestion);
-                setShowStateWarning(false);
-              }}
-              className="rounded-xl py-6 bg-navbar hover:bg-navbar/90 shadow-lg shadow-navbar/20 text-white font-semibold"
-            >
-              Confirmar
-            </Button>
-          </div>
-        </div>
-      </Modal>
     </div>
   );
 }

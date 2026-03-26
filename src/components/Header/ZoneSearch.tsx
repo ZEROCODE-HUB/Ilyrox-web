@@ -23,7 +23,7 @@ export function ZoneSearch() {
   const estadoMexico = useEstadoMexico();
   const selectedColonias = useSelectedColonias();
   const selectedMunicipios = useSelectedMunicipios();
-  const { toggleColonia, toggleMunicipio } = useFilterStore();
+  const { toggleColonia, toggleMunicipio, toggleEstado } = useFilterStore();
   const [searchModal, setSearchModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -31,9 +31,11 @@ export function ZoneSearch() {
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
   const estadoId = useMemo(() => {
-    if (!estadoMexico) return null;
-    const cleanEstado = estadoMexico.replace(" (CDMX)", "");
-    return MAPA_ESTADO_ID[estadoMexico] || MAPA_ESTADO_ID[cleanEstado] || null;
+    if (!estadoMexico || estadoMexico.length === 0) return null;
+    // Use the first selected estado for colony modal lookups
+    const firstEstado = estadoMexico[0];
+    const cleanEstado = firstEstado.replace(" (CDMX)", "");
+    return MAPA_ESTADO_ID[firstEstado] || MAPA_ESTADO_ID[cleanEstado] || null;
   }, [estadoMexico]);
 
   useEffect(() => {
@@ -79,7 +81,7 @@ export function ZoneSearch() {
   };
 
   const uniqueColonyNames = useMemo(() => {
-    if (!estadoMexico) return [];
+    if (!estadoMexico || estadoMexico.length === 0) return [];
 
     const namesSet = new Set<string>();
 
@@ -98,7 +100,7 @@ export function ZoneSearch() {
 
     // Fallback to constants if needed
     if (namesSet.size === 0) {
-      const normalized = normalizeEstado(estadoMexico);
+      const normalized = normalizeEstado(estadoMexico[0] || "");
       const municipios = MUNICIPIOS_ESTADO[normalized] || [];
       municipios.forEach((muni) => {
         const cols = COLONIAS_POR_MUNICIPIO[muni] || [];
@@ -152,8 +154,10 @@ export function ZoneSearch() {
   }, [colonias, selectedColonias]);
 
   const hasSelections =
-    selectedColonias.length > 0 || selectedMunicipios.length > 0;
-  if (!estadoMexico || !hasSelections) return null;
+    estadoMexico.length > 0 ||
+    selectedColonias.length > 0 ||
+    selectedMunicipios.length > 0;
+  if (!hasSelections) return null;
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-2">
@@ -161,8 +165,24 @@ export function ZoneSearch() {
         <p className="text-white/90 text-md font-bold pb-2">
           Zona seleccionada
         </p>
-        <ScrollArea className="w-full whitespace-nowrap pb-3">
+        <ScrollArea className="w-full whitespace-nowrap pb- h-12">
           <div className="flex gap-4 px-1">
+            {/* Estado badges */}
+            {estadoMexico.map((est) => (
+              <Badge
+                key={`est-badge-${est}`}
+                variant="default"
+                className={cn(
+                  "cursor-pointer px-4 py-1.5 rounded-full text-sm transition-all border-none font-medium select-none whitespace-nowrap",
+                  "bg-green-500 text-white scale-105 shadow-md hover:bg-green-500/90 flex items-center gap-1.5",
+                )}
+                onClick={() => toggleEstado(est)}
+              >
+                <span className="text-[12px] font-normal">Est.</span>
+                {est}
+                <X className="h-3 w-3 opacity-60" />
+              </Badge>
+            ))}
             {/* Municipio badges */}
             {selectedMunicipios.map((muni) => (
               <Badge
@@ -217,7 +237,7 @@ export function ZoneSearch() {
           setSearchModal(false);
           setSearchQuery("");
         }}
-        title={`Colonias en ${estadoMexico}`}
+        title={`Colonias en ${estadoMexico.join(", ") || "selección"}`}
         size="md"
       >
         <div className="p-4 space-y-4">

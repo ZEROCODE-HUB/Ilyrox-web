@@ -5,7 +5,7 @@ import { ImperativePanelHandle } from "@/components/ui/resizable";
 import { useAuth } from "@/contexts/AuthContext";
 import { PropertyDetail } from "@/components/PropertyDetails/PropertyDetail";
 import { MainTabs } from "@/components/MainTabs";
-import { AuthPopup } from "@/components/AuthPopup";
+import { AuthPopup } from "@/components/auth/AuthPopup";
 import { RentSellPopup } from "@/components/RentSellPopup";
 import "react-loading-skeleton/dist/skeleton.css";
 // Import Location Data
@@ -55,7 +55,7 @@ const Index = () => {
   const propertiesPanelRef = useRef<ImperativePanelHandle>(null);
 
   // ── Derived ─────────────────────────────────
-  const hasStateSelected = Boolean(estadoMexico);
+  const hasStateSelected = estadoMexico.length > 0;
 
   // Client-side distance-filtered properties
   const filteredProperties = useMemo(() => {
@@ -77,9 +77,13 @@ const Index = () => {
 
   // Map center when state changes
   useEffect(() => {
-    if (estadoMexico && COORDENADAS_ESTADO[estadoMexico]) {
-      const { lat, lng } = COORDENADAS_ESTADO[estadoMexico];
-      setCenterLocation([lat, lng]);
+    if (estadoMexico.length > 0) {
+      // Center on the first selected state
+      const firstEstado = estadoMexico[0];
+      if (COORDENADAS_ESTADO[firstEstado]) {
+        const { lat, lng } = COORDENADAS_ESTADO[firstEstado];
+        setCenterLocation([lat, lng]);
+      }
     }
   }, [estadoMexico]);
 
@@ -113,7 +117,7 @@ const Index = () => {
     }
   };
 
-  const hasActiveFilters = Boolean(estadoMexico || radiusKm > 0);
+  const hasActiveFilters = Boolean(estadoMexico.length > 0 || radiusKm > 0);
 
   // ── Render ──────────────────────────────────
 

@@ -11,7 +11,7 @@ export type Currency = "MXN" | "USD";
 
 export interface FilterState {
   // Location
-  estadoMexico: string;
+  estadoMexico: string[];
   colonias: string[];
   municipios: string[];
 
@@ -49,6 +49,8 @@ export interface FilterState {
 export interface FilterActions {
   // Individual setters
   setEstadoMexico: (estado: string) => void;
+  toggleEstado: (estado: string) => void;
+  removeEstado: (estado: string) => void;
   setColonias: (colonias: string[]) => void;
   toggleColonia: (colonia: string, municipio?: string) => void;
   removeColonia: (colonia: string) => void;
@@ -91,7 +93,7 @@ export type FilterStore = FilterState & FilterActions;
 // ──────────────────────────────────────────────
 
 const initialState: FilterState = {
-  estadoMexico: "",
+  estadoMexico: [],
   colonias: [],
   municipios: [],
 
@@ -128,17 +130,25 @@ export const useFilterStore = create<FilterStore>()(
     ...initialState,
 
     // ── Location ──────────────────────────────
+    // Legacy setter: replaces entire array with a single estado (backward compat)
     setEstadoMexico: (estado) =>
-      set((s) => {
-        // Si el estado es el mismo, no hacemos nada (evita resetear colonias/municipios al añadir más)
-        if (s.estadoMexico === estado && estado !== "") return s;
-        
-        return {
-          estadoMexico: estado,
-          colonias: [],    // Reset colonias on state change
-          municipios: [],  // Reset municipios on state change
-        };
-      }),
+      set(() =>
+        estado
+          ? { estadoMexico: [estado] }
+          : { estadoMexico: [], colonias: [], municipios: [] },
+      ),
+
+    toggleEstado: (estado) =>
+      set((s) => ({
+        estadoMexico: s.estadoMexico.includes(estado)
+          ? s.estadoMexico.filter((e) => e !== estado)
+          : [...s.estadoMexico, estado],
+      })),
+
+    removeEstado: (estado) =>
+      set((s) => ({
+        estadoMexico: s.estadoMexico.filter((e) => e !== estado),
+      })),
 
     setColonias: (colonias) => set({ colonias }),
 
@@ -226,7 +236,7 @@ export const useFilterStore = create<FilterStore>()(
     setRadiusKm: (radius) => set({ radiusKm: radius }),
 
     // ── Reset ─────────────────────────────────
-    resetFilters: () => set((state) => ({ ...initialState })),
+    resetFilters: () => set(() => ({ ...initialState })),
   })),
 );
 

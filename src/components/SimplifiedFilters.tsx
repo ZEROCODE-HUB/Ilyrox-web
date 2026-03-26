@@ -2,7 +2,14 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Home, Building2, Factory, Sprout, Bookmark } from "lucide-react";
+import {
+  Home,
+  Building2,
+  Factory,
+  Sprout,
+  Bookmark,
+  Store,
+} from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -81,7 +88,7 @@ const propertyTypes = [
   {
     value: "comercial",
     label: "Comercial",
-    icon: <Building2 className="w-5 h-5" />,
+    icon: <Store className="w-5 h-5" />,
   },
   {
     value: "industrial",
@@ -157,12 +164,14 @@ export function SimplifiedFilters({
 
   // ── Derived data ────────────────────────────
   const availableColonias = useMemo(() => {
-    if (!estadoMexico) return [];
-    const municipios = MUNICIPIOS_ESTADO[estadoMexico] || [];
+    if (!estadoMexico || estadoMexico.length === 0) return [];
     const allCols: string[] = [];
-    municipios.forEach((muni) => {
-      const cols = COLONIAS_POR_MUNICIPIO[muni] || [];
-      allCols.push(...cols);
+    estadoMexico.forEach((est) => {
+      const munis = MUNICIPIOS_ESTADO[est] || [];
+      munis.forEach((muni) => {
+        const cols = COLONIAS_POR_MUNICIPIO[muni] || [];
+        allCols.push(...cols);
+      });
     });
     return Array.from(new Set(allCols)).sort();
   }, [estadoMexico]);
@@ -230,7 +239,7 @@ export function SimplifiedFilters({
       return;
     }
 
-    if (!estadoMexico) {
+    if (!estadoMexico || estadoMexico.length === 0) {
       toast({
         variant: "destructive",
         title: "Información faltante",
@@ -455,7 +464,9 @@ export function SimplifiedFilters({
               {/* Recámaras */}
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium text-muted-foreground">
-                  Recámaras
+                  {type === "comercial" || type === "industrial"
+                    ? "Espacios"
+                    : "Recámaras"}
                 </Label>
                 <Select
                   value={bedrooms || "any"}
@@ -608,7 +619,9 @@ export function SimplifiedFilters({
                   placeholder="0"
                   value={landAreaMin || ""}
                   onChange={(e) =>
-                    setLandAreaMin(parseInt(resetNumber(e.target.value)) || undefined)
+                    setLandAreaMin(
+                      parseInt(resetNumber(e.target.value)) || undefined,
+                    )
                   }
                   className="h-10"
                 />
@@ -620,7 +633,9 @@ export function SimplifiedFilters({
                   placeholder="0"
                   value={landAreaMax || ""}
                   onChange={(e) =>
-                    setLandAreaMax(parseInt(resetNumber(e.target.value)) || undefined)
+                    setLandAreaMax(
+                      parseInt(resetNumber(e.target.value)) || undefined,
+                    )
                   }
                   className="h-10"
                 />

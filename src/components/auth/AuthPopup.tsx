@@ -18,7 +18,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
+} from "@/components/ui/select";
 import { ESTADOS_MEXICO } from "@/constants/MexLocations/estados";
 
 interface AuthPopupProps {
