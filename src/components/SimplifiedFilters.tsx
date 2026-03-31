@@ -608,8 +608,9 @@ export function SimplifiedFilters({
             </div>
 
             {/* m² Terreno y Construcción */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
+            <div className="flex flex-row gap-4">
+              <div>
+                {" "}
                 <Label className="text-xs font-medium text-muted-foreground">
                   m² Terreno Mín.
                 </Label>
@@ -624,6 +625,9 @@ export function SimplifiedFilters({
                   }
                   className="h-10"
                 />
+              </div>
+              <div>
+                {" "}
                 <Label className="text-xs font-medium text-muted-foreground">
                   m² Terreno Max.
                 </Label>
@@ -639,7 +643,9 @@ export function SimplifiedFilters({
                   className="h-10"
                 />
               </div>
-              <div className="space-y-1.5">
+            </div>
+            <div className="flex flex-row gap-4">
+              <div>
                 <Label className="text-xs font-medium text-muted-foreground">
                   m² Constr. Mín.
                 </Label>
@@ -654,6 +660,8 @@ export function SimplifiedFilters({
                   }
                   className="h-10"
                 />
+              </div>
+              <div>
                 <Label className="text-xs font-medium text-muted-foreground">
                   m² Constr. Max.
                 </Label>

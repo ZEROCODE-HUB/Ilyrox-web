@@ -73,7 +73,7 @@ export function SearchAndSort({
     setInputValue(val);
 
     if (val.trim().length >= 2) {
-      search(val);
+      search(val.replace(/,/g, ""));
       if (!open) setOpen(true);
     } else {
       clear();
