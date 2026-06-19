@@ -97,7 +97,10 @@ export function ContactSellerModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent
+        className="sm:max-w-md z-[110]"
+        overlayClassName="z-[110]"
+      >
         <DialogHeader>
           <DialogTitle>Contactar al asesor</DialogTitle>
           <DialogDescription>
