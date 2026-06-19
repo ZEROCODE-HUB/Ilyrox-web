@@ -32,6 +32,17 @@ export function useProperties(page = 0, pageSize = 10) {
   const constructionAreaMin = useFilterStore((s) => s.constructionAreaMin);
   const constructionAreaMax = useFilterStore((s) => s.constructionAreaMax);
   const searchTerm = useFilterStore((s) => s.searchTerm);
+  const comercialKey = useFilterStore((s) => JSON.stringify(s.comercialFilters));
+  const industrialKey = useFilterStore((s) =>
+    JSON.stringify(s.industrialFilters),
+  );
+  const agricolaKey = useFilterStore((s) => JSON.stringify(s.agricolaFilters));
+  const antiguedad = useFilterStore((s) => s.antiguedad);
+  const amenidadesKey = useFilterStore((s) => JSON.stringify(s.amenidades));
+  const anchoTerrenoMin = useFilterStore((s) => s.anchoTerrenoMin);
+  const largoTerrenoMin = useFilterStore((s) => s.largoTerrenoMin);
+  const comisionVentaMin = useFilterStore((s) => s.comisionVentaMin);
+  const comisionRentaMin = useFilterStore((s) => s.comisionRentaMin);
 
   return useQuery<PropertyView[]>({
     queryKey: [
@@ -55,6 +66,15 @@ export function useProperties(page = 0, pageSize = 10) {
       constructionAreaMin,
       constructionAreaMax,
       searchTerm,
+      comercialKey,
+      industrialKey,
+      agricolaKey,
+      antiguedad,
+      amenidadesKey,
+      anchoTerrenoMin,
+      largoTerrenoMin,
+      comisionVentaMin,
+      comisionRentaMin,
       page,
       pageSize,
     ],
@@ -91,6 +111,15 @@ export function useProperties(page = 0, pageSize = 10) {
           landAreaMax: s.landAreaMax,
           constructionAreaMin: s.constructionAreaMin,
           constructionAreaMax: s.constructionAreaMax,
+          comercial: s.comercialFilters,
+          industrial: s.industrialFilters,
+          agricola: s.agricolaFilters,
+          antiguedad: s.antiguedad,
+          amenidades: s.amenidades,
+          anchoTerrenoMin: s.anchoTerrenoMin,
+          largoTerrenoMin: s.largoTerrenoMin,
+          comisionVentaMin: s.comisionVentaMin,
+          comisionRentaMin: s.comisionRentaMin,
         },
         page,
         pageSize,

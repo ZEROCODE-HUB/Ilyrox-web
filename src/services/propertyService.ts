@@ -2,6 +2,11 @@ import { supabase } from "@/lib/supabase";
 import type { Property, Advisor, PropertyFilters } from "@/types/property";
 import { PropertyView } from "@/types/types";
 import { MUNICIPIOS_ESTADO } from "@/constants/MexLocations/municipios";
+import type {
+  ComercialFilters,
+  IndustrialFilters,
+  AgricolaFilters,
+} from "@/stores/useFilterStore";
 
 // Helper to map View row to PropertyView interface
 const mapViewToPropertyView = (
@@ -12,6 +17,10 @@ const mapViewToPropertyView = (
     ...row,
     likes_count: Number(row.likes_count || 0),
     comentarios_count: Number(row.comentarios_count || 0),
+    // Las columnas `numeric` (lat/lng) llegan como string desde PostgREST;
+    // Google Maps exige números para posicionar los marcadores.
+    latitud: row.latitud != null ? Number(row.latitud) : undefined,
+    longitud: row.longitud != null ? Number(row.longitud) : undefined,
     isLiked:
       Array.isArray(row.liked_by_users) && currentUserId
         ? row.liked_by_users.includes(currentUserId)
@@ -29,6 +38,15 @@ export const propertyService = {
       municipality?: string;
       colony?: string;
       municipios?: string[];
+      comercial?: ComercialFilters;
+      industrial?: IndustrialFilters;
+      agricola?: AgricolaFilters;
+      antiguedad?: string;
+      amenidades?: string[];
+      anchoTerrenoMin?: number;
+      largoTerrenoMin?: number;
+      comisionVentaMin?: number;
+      comisionRentaMin?: number;
     },
     page: number = 0,
     pageSize: number = 10,
@@ -247,6 +265,80 @@ export const propertyService = {
       query = query.gte("metros_cuadrados_terreno", filters.landAreaMin);
     if (filters.landAreaMax)
       query = query.lte("metros_cuadrados_terreno", filters.landAreaMax);
+
+    // Frente / fondo (dimensiones del terreno)
+    if (filters.anchoTerrenoMin)
+      query = query.gte("ancho_terreno", filters.anchoTerrenoMin);
+    if (filters.largoTerrenoMin)
+      query = query.gte("largo_terreno", filters.largoTerrenoMin);
+
+    // Comisión mínima
+    if (filters.comisionVentaMin)
+      query = query.gte("comision_venta_pct", filters.comisionVentaMin);
+    if (filters.comisionRentaMin)
+      query = query.gte("comision_renta_meses", filters.comisionRentaMin);
+
+    // Amenidades (debe tener TODAS las seleccionadas, igual que el móvil)
+    if (filters.amenidades && filters.amenidades.length > 0)
+      query = query.contains("amenidades", filters.amenidades);
+
+    // Antigüedad por rango (mismos rangos que el móvil)
+    if (filters.antiguedad) {
+      const a = filters.antiguedad;
+      if (a === "0 (Nueva)") query = query.eq("antiguedad", 0);
+      else if (a === "1-5")
+        query = query.gte("antiguedad", 1).lte("antiguedad", 5);
+      else if (a === "6-10")
+        query = query.gte("antiguedad", 6).lte("antiguedad", 10);
+      else if (a === "11-20")
+        query = query.gte("antiguedad", 11).lte("antiguedad", 20);
+      else if (a === "21-50")
+        query = query.gte("antiguedad", 21).lte("antiguedad", 50);
+      else if (a === "Más de 50") query = query.gte("antiguedad", 51);
+    }
+
+    // ── Filtros especializados por tipo ──────────────────────────────
+    if (filters.type === "comercial" && filters.comercial) {
+      const c = filters.comercial;
+      if (c.tipoUbicacion && c.tipoUbicacion.length > 0)
+        query = query.in("tipo_ubicacion_comercial", c.tipoUbicacion);
+      if (c.frenteMin) query = query.gte("frente_metros", c.frenteMin);
+      if (c.nivel) query = query.eq("nivel_piso", c.nivel);
+      if (c.sobreAvenidaPrincipal)
+        query = query.eq("sobre_avenida_principal", true);
+      if (c.enEsquina) query = query.eq("en_esquina", true);
+      if (c.altaVisibilidad) query = query.eq("alta_visibilidad", true);
+      if (c.altoFlujoVehicular) query = query.eq("alto_flujo_vehicular", true);
+    }
+
+    if (filters.type === "industrial" && filters.industrial) {
+      const i = filters.industrial;
+      if (i.ubicacion && i.ubicacion.length > 0)
+        query = query.in("ubicacion_industrial", i.ubicacion);
+      if (i.alturaLibre) query = query.eq("altura_libre_m", i.alturaLibre);
+      if (i.energiaKva && i.energiaKva.length > 0)
+        query = query.overlaps("tipo_energia_kva", i.energiaKva);
+      if (i.areaOficinasMin)
+        query = query.gte("area_oficinas_m2", i.areaOficinasMin);
+      if (i.patioManiobrasMin)
+        query = query.gte("patio_maniobras_m2", i.patioManiobrasMin);
+    }
+
+    if (filters.type === "agricola" && filters.agricola) {
+      const a = filters.agricola;
+      if (a.tiposAgua && a.tiposAgua.length > 0)
+        query = query.overlaps("tipo_agua", a.tiposAgua);
+      if (a.usoTerreno && a.usoTerreno.length > 0)
+        query = query.overlaps("uso_terreno", a.usoTerreno);
+      if (a.tipoRiego && a.tipoRiego.length > 0)
+        query = query.overlaps("tipo_riego", a.tipoRiego);
+      if (a.concesionAgua) query = query.eq("concesion_agua", true);
+      if (a.electricidad) query = query.eq("infra_electricidad", true);
+      if (a.caminoAcceso) query = query.eq("infra_camino_acceso", true);
+      if (a.cercado) query = query.eq("infra_cercado", true);
+      if (a.pieCarretera) query = query.eq("acceso_carretera", true);
+      if (a.accesCamiones) query = query.eq("acceso_camiones", true);
+    }
 
     const from = page * pageSize;
     const to = from + pageSize - 1;

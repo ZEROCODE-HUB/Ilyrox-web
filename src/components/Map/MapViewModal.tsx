@@ -1,10 +1,6 @@
 import React, { useCallback, useState, useEffect } from "react";
-import {
-  GoogleMap,
-  useJsApiLoader,
-  Marker,
-  Circle,
-} from "@react-google-maps/api";
+import { GoogleMap, Marker, Circle } from "@react-google-maps/api";
+import { useGoogleMapsApi } from "@/lib/googleMaps";
 import Skeleton from "react-loading-skeleton";
 
 const containerStyle = {
@@ -17,10 +13,7 @@ interface MapViewModalProps {
 }
 
 const MapViewModal: React.FC<MapViewModalProps> = ({ centerLocation }) => {
-  const { isLoaded, loadError } = useJsApiLoader({
-    id: "google-map-script",
-    googleMapsApiKey: import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY || "",
-  });
+  const { isLoaded, loadError } = useGoogleMapsApi();
 
   const [map, setMap] = useState<google.maps.Map | null>(null);
 
