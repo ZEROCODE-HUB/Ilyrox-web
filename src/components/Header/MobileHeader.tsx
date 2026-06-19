@@ -99,7 +99,7 @@ export const MobileHeader = ({
       </div>
 
       <div className="px-3 pb-3 space-y-3">
-        <SearchAndSort onLocationSearch={handleLocationSearch} />
+        <SearchAndSort />
         <ZoneSearch />
         <Button
           variant="outline"

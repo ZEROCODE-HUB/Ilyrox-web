@@ -1,10 +1,6 @@
 import React, { useCallback, useState, useEffect } from "react";
-import {
-  GoogleMap,
-  useJsApiLoader,
-  Marker,
-  Circle,
-} from "@react-google-maps/api";
+import { GoogleMap, Marker, Circle } from "@react-google-maps/api";
+import { useGoogleMapsApi } from "@/lib/googleMaps";
 import { PropertyView } from "@/types/types";
 import { EyeOff, MapPin, Map as MapIcon, Globe } from "lucide-react";
 import { Button } from "../ui/button";
@@ -39,70 +35,82 @@ const MapViewContainer: React.FC<MapViewContainerProps> = ({
   selectedProperty,
   handleToggleMap,
 }) => {
-  const { isLoaded, loadError } = useJsApiLoader({
-    id: "google-map-script",
-    googleMapsApiKey: import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY || "",
-  });
+  const { isLoaded, loadError } = useGoogleMapsApi();
 
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [mapTypeId, setMapTypeId] = useState<"roadmap" | "satellite">(
     "roadmap",
   );
+  // `center`/`zoom` se manejan en estado y se sincronizan con el mapa en `onIdle`
+  // para que el fitBounds no sea revertido por las props controladas.
+  const [center, setCenter] = useState(centerLocation || defaultCenter);
+  const [zoom, setZoom] = useState(5);
 
-  const onLoad = useCallback((map: google.maps.Map) => {
-    setMap(map);
-  }, []);
+  const onLoad = useCallback((m: google.maps.Map) => setMap(m), []);
+  const onUnmount = useCallback(() => setMap(null), []);
 
-  const onUnmount = useCallback((_map: google.maps.Map) => {
-    setMap(null);
-  }, []);
+  const onIdle = useCallback(() => {
+    if (!map) return;
+    const c = map.getCenter();
+    if (c) setCenter({ lat: c.lat(), lng: c.lng() });
+    const z = map.getZoom();
+    if (typeof z === "number") setZoom(z);
+  }, [map]);
 
-  // Update center
+  // Centra/ajusta el mapa según las propiedades cargadas.
   useEffect(() => {
-    if (map && centerLocation) {
-      map.panTo(centerLocation);
-      // Adjust zoom based on whether we have a specific location or just default
-      // If radius is set, zoom to fit radius roughly
-      if (radiusKm > 0) {
-        // Rough estimation: output zoom level
-        const zoom = Math.round(14 - Math.log(radiusKm) / Math.LN2);
-        map.setZoom(zoom);
-      } else {
-        map.setZoom(12);
-      }
+    if (!map || !window.google) return;
+    const pts = properties.filter(
+      (p) => Number(p.latitud) || Number(p.longitud),
+    );
+    if (pts.length === 0) {
+      if (centerLocation) map.panTo(centerLocation);
+      return;
     }
-  }, [map, centerLocation, radiusKm]);
-
-  // Fit bounds if properties change and we have filters, or initial load?
-  useEffect(() => {
-    if (map && properties.length > 0 && hasFilters && window.google) {
-      const bounds = new window.google.maps.LatLngBounds();
-      let hasPoints = false;
-
-      properties.forEach((prop) => {
-        const lat = prop.latitud || 0;
-        const lng = prop.longitud || 0;
-
-        if (lat !== 0 || lng !== 0) {
-          bounds.extend({ lat, lng });
-          hasPoints = true;
-        }
+    if (pts.length === 1) {
+      map.panTo({
+        lat: Number(pts[0].latitud),
+        lng: Number(pts[0].longitud),
       });
-
-      if (hasPoints) {
-        map.fitBounds(bounds);
-
-        // Adjust if only one property
-        if (properties.length === 1) {
-          const listener = google.maps.event.addListener(map, "idle", () => {
-            // @ts-ignore
-            if (map.getZoom() > 16) map.setZoom(16);
-            google.maps.event.removeListener(listener);
-          });
-        }
-      }
+      map.setZoom(15);
+      return;
     }
-  }, [map, properties, hasFilters]);
+    const bounds = new window.google.maps.LatLngBounds();
+    pts.forEach((p) =>
+      bounds.extend({ lat: Number(p.latitud), lng: Number(p.longitud) }),
+    );
+    map.fitBounds(bounds, 60);
+  }, [map, properties, centerLocation]);
+
+  // Precio abreviado para el marcador (igual que el móvil: "MXN 1.2M", "MXN 450k")
+  const formatMarkerPrice = (price: number, moneda?: string) => {
+    const sym = moneda === "USD" ? "USD" : "MXN";
+    if (!price) return `${sym} 0`;
+    if (price >= 1_000_000) return `${sym} ${(price / 1_000_000).toFixed(1)}M`;
+    if (price >= 1000) return `${sym} ${Math.round(price / 1000)}k`;
+    return `${sym} ${price}`;
+  };
+
+  // Marcador-etiqueta de precio (SVG), idéntico al del móvil. Teal normal,
+  // naranja cuando está seleccionado.
+  const buildPriceIcon = (
+    property: PropertyView,
+    selected: boolean,
+  ): google.maps.Icon => {
+    const op =
+      property.operaciones?.find((o) => o.tipo === "venta") ||
+      property.operaciones?.[0];
+    const text = formatMarkerPrice(Number(op?.precio) || 0, op?.moneda);
+    const color = selected ? "#f39c12" : "#45a0a5";
+    const w = Math.max(74, text.length * 8 + 26);
+    const rectW = w - 16;
+    const cx = w / 2;
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='45' viewBox='0 0 ${w} 45'><rect x='8' y='4' width='${rectW}' height='30' rx='15' fill='${color}' stroke='white' stroke-width='2.5'/><text x='${cx}' y='23' font-family='Arial' font-size='13' fill='white' text-anchor='middle' font-weight='bold'>${text}</text><path d='M ${cx - 5} 34 L ${cx} 42 L ${cx + 5} 34 Z' fill='${color}' stroke='white' stroke-width='2'/></svg>`;
+    return {
+      url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
+      anchor: new google.maps.Point(cx, 42),
+    };
+  };
 
   if (loadError) {
     return (
@@ -124,10 +132,11 @@ const MapViewContainer: React.FC<MapViewContainerProps> = ({
     <div className="w-full h-full rounded-xl overflow-hidden shadow-sm border border-gray-200 relative">
       <GoogleMap
         mapContainerStyle={containerStyle}
-        center={centerLocation || defaultCenter}
-        zoom={4}
+        center={center}
+        zoom={zoom}
         onLoad={onLoad}
         onUnmount={onUnmount}
+        onIdle={onIdle}
         mapTypeId={mapTypeId}
         options={{
           disableDefaultUI: false,
@@ -159,32 +168,28 @@ const MapViewContainer: React.FC<MapViewContainerProps> = ({
           />
         )}
 
-        {/* Markers - Only show if filters are active */}
-        {hasFilters &&
-          properties.map((property) => {
-            const lat = property.latitud || 0;
-            const lng = property.longitud || 0;
+        {/* Marcadores de las propiedades cargadas */}
+        {properties.map((property) => {
+            const lat = Number(property.latitud) || 0;
+            const lng = Number(property.longitud) || 0;
 
             if (!lat && !lng) return null;
+
+            const tipo = property.tipo || "";
 
             return (
               <Marker
                 key={property.id}
                 position={{ lat, lng }}
-                title={
-                  property.tipo.charAt(0).toUpperCase() + property.tipo.slice(1)
-                }
+                title={tipo ? tipo.charAt(0).toUpperCase() + tipo.slice(1) : ""}
                 onClick={() => {
                   onPropertySelect?.(property);
                 }}
-                // Highlight selected property
-                icon={
-                  selectedProperty?.id === property.id
-                    ? {
-                        url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-                      }
-                    : undefined
-                }
+                zIndex={selectedProperty?.id === property.id ? 999 : undefined}
+                icon={buildPriceIcon(
+                  property,
+                  selectedProperty?.id === property.id,
+                )}
               />
             );
           })}

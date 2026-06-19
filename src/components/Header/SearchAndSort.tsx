@@ -19,18 +19,14 @@ import {
   useLocationSearch,
   type LocationSuggestion,
 } from "@/hooks/locations/useLocationSearch";
-import Skeleton from "react-loading-skeleton";
+import { resolvePlace } from "@/lib/geocoding";
 import { SkeletonSearch } from "./SkeletonSearch";
 
 interface SearchAndSortProps {
-  onLocationSearch?: () => void;
   onFocus?: () => void;
 }
 
-export function SearchAndSort({
-  onLocationSearch,
-  onFocus,
-}: SearchAndSortProps) {
+export function SearchAndSort({ onFocus }: SearchAndSortProps) {
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -41,30 +37,9 @@ export function SearchAndSort({
   const selectedMunicipios = useSelectedMunicipios();
   const { toggleEstado, toggleColonia, toggleMunicipio } = useFilterStore();
 
-  // ── Search ───────────────────────────────────
-  const { suggestions, loading, hasMore, search, loadMore, clear } =
+  // ── Search (Google Places) ───────────────────
+  const { suggestions, loading, search, clear, getSessionToken } =
     useLocationSearch();
-  const loadMoreRef = useRef<HTMLDivElement>(null);
-
-  // ── Infinite Scroll Observer ───────────────
-  useEffect(() => {
-    if (!hasMore || loading || !open) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          loadMore();
-        }
-      },
-      { threshold: 0.1, rootMargin: "100px" },
-    );
-
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [hasMore, loading, open, loadMore]);
 
   // ── Handlers ────────────────────────────────
 
@@ -73,7 +48,7 @@ export function SearchAndSort({
     setInputValue(val);
 
     if (val.trim().length >= 2) {
-      search(val.replace(/,/g, ""));
+      search(val);
       if (!open) setOpen(true);
     } else {
       clear();
@@ -81,39 +56,26 @@ export function SearchAndSort({
     }
   };
 
-  const applySelection = (s: LocationSuggestion) => {
-    const { tipo, nombre, municipio_nombre, estado_nombre } = s;
+  // La selección resuelve el lugar (Google Place Details) para obtener
+  // estado/municipio/colonia y aplicar el filtro por nombres.
+  const handleSelectSuggestion = async (s: LocationSuggestion) => {
+    const resolved = await resolvePlace(s.placeId, s.tipo, getSessionToken());
+    if (!resolved) return;
 
+    const { tipo, estado, municipio, colonia } = resolved;
     if (tipo === "estado") {
-      toggleEstado(nombre);
+      if (estado) toggleEstado(estado);
     } else if (tipo === "municipio") {
-      // Ensure parent estado is added if not already present
-      if (estado_nombre && !estados.includes(estado_nombre)) {
-        toggleEstado(estado_nombre);
-      }
-      toggleMunicipio(nombre);
-    } else {
-      // Colonia
-      if (estado_nombre && !estados.includes(estado_nombre)) {
-        toggleEstado(estado_nombre);
-      }
-      toggleColonia(nombre, municipio_nombre);
+      if (municipio) toggleMunicipio(municipio);
+    } else if (colonia) {
+      toggleColonia(colonia, municipio || undefined);
     }
 
-    // Mantenemos el input intacto para que no desaparezca la lista y se cierre el popover
-    inputRef.current?.focus();
-  };
-
-  const handleSelectSuggestion = (s: LocationSuggestion) => {
-    applySelection(s);
-  };
-
-  const handleClearAll = () => {
-    // Clear all estados
-    useFilterStore.setState({ estadoMexico: [], colonias: [], municipios: [] });
+    // Limpiar el input para una nueva búsqueda; mantener el foco.
     setInputValue("");
     clear();
     setOpen(false);
+    inputRef.current?.focus();
   };
 
   const hasValue = inputValue.trim().length > 0;
@@ -123,11 +85,9 @@ export function SearchAndSort({
     selectedColonias.length > 0 ||
     selectedMunicipios.length > 0;
 
-  // Count of active location selections
   const selectionCount =
     estados.length + selectedColonias.length + selectedMunicipios.length;
 
-  // Placeholder text
   const placeholderText = hasActiveFilter
     ? `${selectionCount} zona${selectionCount !== 1 ? "s" : ""} seleccionada${selectionCount !== 1 ? "s" : ""} · Buscar otra...`
     : "Busca por colonia, municipio o estado...";
@@ -174,29 +134,18 @@ export function SearchAndSort({
                 </div>
               )}
               {/* Clear button */}
-              {(hasValue || hasActiveFilter) && (
+              {hasValue && (
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setInputValue("")}
+                  onClick={() => {
+                    setInputValue("");
+                    clear();
+                    setOpen(false);
+                  }}
                   className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 hover:bg-slate-100 rounded-full"
                 >
                   <X className="h-4 w-4 text-muted-foreground" />
-                </Button>
-              )}
-              {/* GPS button */}
-              {onLocationSearch && !hasValue && !hasActiveFilter && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onLocationSearch();
-                  }}
-                  className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 hover:bg-slate-100 rounded-full"
-                  title="Usar mi ubicación"
-                >
-                  <MapPin className="h-4 w-4 text-primary" />
                 </Button>
               )}
             </div>
@@ -231,68 +180,31 @@ export function SearchAndSort({
                 {suggestions.map((s, idx) => {
                   const isColonia = s.tipo === "colonia";
                   const isMunicipio = s.tipo === "municipio";
-                  const isEstado = s.tipo === "estado";
-
-                  // Check if this suggestion is already selected
-                  const keyColonia = s.municipio_nombre
-                    ? `${s.nombre} (${s.municipio_nombre})`
-                    : `${s.nombre},`;
-                  const isAlreadySelected = isColonia
-                    ? selectedColonias.includes(keyColonia)
-                    : isMunicipio
-                      ? selectedMunicipios.includes(s.nombre)
-                      : estados.includes(s.nombre);
-
-                  // Subtitle: colonia: municipio, estado / municipio: estado / estado: nothing
-                  const subtitle = isEstado
-                    ? null
-                    : isMunicipio
-                      ? `, ${s.estado_nombre}`
-                      : [`, ${s.municipio_nombre}, ${s.estado_nombre}`]
-                          .filter(Boolean)
-                          .join(", ");
 
                   return (
                     <CommandItem
-                      key={`loc-${s.tipo}-${s.id}-${idx}`}
-                      value={`loc-${s.tipo}-${s.id}-${s.nombre}`}
+                      key={`loc-${s.placeId}-${idx}`}
+                      value={`loc-${s.placeId}-${s.nombre}`}
                       onSelect={() => handleSelectSuggestion(s)}
                       onMouseDown={(e) => {
-                        // Previene que el click robe el foco del input y cierre el Popover espontáneamente
+                        // Evita que el click robe el foco y cierre el Popover
                         e.preventDefault();
                       }}
                       className="cursor-pointer mx-1 my-0.5 rounded-lg hover:bg-primary/5 transition-colors py-3 px-3 flex items-center gap-3 group"
                     >
                       {/* Icon */}
-                      <div
-                        className={`flex-shrink-0 h-9 w-9 rounded-full flex items-center justify-center transition-colors ${isAlreadySelected ? "bg-primary/10" : "bg-slate-100 group-hover:bg-primary/10"}`}
-                      >
-                        {isAlreadySelected ? (
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2.5"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="h-4 w-4 text-primary"
-                          >
-                            <polyline points="20 6 9 17 4 12" />
-                          </svg>
-                        ) : (
-                          getIconForType(s.tipo)
-                        )}
+                      <div className="flex-shrink-0 h-9 w-9 rounded-full flex items-center justify-center transition-colors bg-slate-100 group-hover:bg-primary/10">
+                        {getIconForType(s.tipo)}
                       </div>
 
                       {/* Text */}
-                      <div className="flex  min-w-0 flex-1">
+                      <div className="flex flex-col min-w-0 flex-1">
                         <span className="text-sm font-semibold text-slate-800 truncate">
                           {s.nombre}
                         </span>
-                        {subtitle && (
-                          <span className="text-sm font-semibold text-slate-500/90 truncate">
-                            {subtitle}
+                        {s.secondaryText && (
+                          <span className="text-xs font-medium text-slate-500/90 truncate">
+                            {s.secondaryText}
                           </span>
                         )}
                       </div>
@@ -316,17 +228,6 @@ export function SearchAndSort({
                     </CommandItem>
                   );
                 })}
-
-                {/* Sentinel for infinite scroll */}
-                {hasMore && (
-                  <div ref={loadMoreRef}>
-                    {Array(2)
-                      .fill(0)
-                      .map((_, i) => (
-                        <SkeletonSearch key={i} />
-                      ))}
-                  </div>
-                )}
               </CommandList>
             </Command>
           </PopoverContent>

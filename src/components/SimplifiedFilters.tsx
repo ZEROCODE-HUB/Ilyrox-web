@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import {
   Home,
   Building2,
@@ -25,6 +26,12 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { MarqueeText } from "@/components/ui/marquee-text";
 import { resetNumber } from "@/utils/resetNumber";
+import {
+  PROPERTY_TYPES,
+  getCamposVisibles,
+  AMENIDADES,
+} from "@/constants/propertyData";
+import { TypeSpecificFilters } from "@/components/filters/TypeSpecificFilters";
 
 import {
   useFilterStore,
@@ -42,41 +49,14 @@ import {
 // Static data
 // ──────────────────────────────────────────────
 
-const subtiposPorTipo: Record<string, { value: string; label: string }[]> = {
-  habitacional: [
-    { value: "Casa (Fracc. Abierto)", label: "Casa (Fracc. Abierto)" },
-    { value: "Casa en Condominio", label: "Casa en Condominio" },
-    { value: "Casa de campo/Descanso", label: "Casa de Campo/Descanso" },
-    { value: "Departamento", label: "Departamentos" },
-    { value: "Quinta", label: "Quinta" },
-    { value: "Rancho", label: "Rancho" },
-    { value: "Terreno", label: "Terreno" },
-    { value: "Villa", label: "Villa" },
-  ],
-  comercial: [
-    { value: "Local", label: "Local" },
-    {
-      value: "Oficina",
-      label: "Oficina",
-    },
-    { value: "Plaza", label: "Plaza" },
-    { value: "Bodega", label: "Bodega" },
-    { value: "Edificio", label: "Edificio" },
-    { value: "Terreno Comercial", label: "Terreno Comercial" },
-    { value: "Casa con uso comercial", label: "Casa con uso comercial" },
-  ],
-  industrial: [
-    { value: "Bodega Industrial", label: "Bodega Industrial" },
-    { value: "Nave Industrial", label: "Nave Industrial" },
-    { value: "Terreno Industrial", label: "Terreno Industrial" },
-  ],
-  agricola: [
-    { value: "Rancho agrícola", label: "Rancho" },
-    { value: "Terreno Agrícola", label: "Terreno Agrícola" },
-    { value: "Granja", label: "Granja" },
-    { value: "Invernadero", label: "Invernadero" },
-  ],
-};
+// Subtipos derivados del catálogo real (alineado con el móvil y los datos en BD)
+const subtiposPorTipo: Record<string, { value: string; label: string }[]> =
+  Object.fromEntries(
+    Object.entries(PROPERTY_TYPES).map(([tipo, subs]) => [
+      tipo,
+      (subs as readonly string[]).map((s) => ({ value: s, label: s })),
+    ]),
+  );
 
 const propertyTypes = [
   {
@@ -136,6 +116,12 @@ export function SimplifiedFilters({
   const { bedrooms, bathrooms, parking, levels } = useFeatures();
   const { landAreaMin, constructionAreaMin, landAreaMax, constructionAreaMax } =
     useAreaFilters();
+  const antiguedad = useFilterStore((s) => s.antiguedad);
+  const amenidades = useFilterStore((s) => s.amenidades);
+  const comisionVentaMin = useFilterStore((s) => s.comisionVentaMin);
+  const comisionRentaMin = useFilterStore((s) => s.comisionRentaMin);
+  const anchoTerrenoMin = useFilterStore((s) => s.anchoTerrenoMin);
+  const largoTerrenoMin = useFilterStore((s) => s.largoTerrenoMin);
 
   // ── Store actions (stable references) ───────
   const {
@@ -154,6 +140,12 @@ export function SimplifiedFilters({
     setConstructionAreaMin,
     setLandAreaMax,
     setConstructionAreaMax,
+    setAntiguedad,
+    setComisionVentaMin,
+    setComisionRentaMin,
+    toggleAmenidad,
+    setAnchoTerrenoMin,
+    setLargoTerrenoMin,
     toggleSubtype,
     resetFilters,
   } = useFilterStore();
@@ -184,6 +176,8 @@ export function SimplifiedFilters({
 
   const subtiposDisponibles = type ? subtiposPorTipo[type] || [] : [];
   const hasPropertyTypeSelected = !!type;
+  // Visibilidad de campos según tipo/subtipo (misma lógica que el móvil)
+  const cv = getCamposVisibles(subtype, type);
 
   const handlePriceMinChange = (value: string) => {
     // Preserve digits, optional dot, and remove other characters like commas or $
@@ -385,6 +379,67 @@ export function SimplifiedFilters({
           </div>
         </div>
 
+        {/* Comisión mínima (sliders, igual que el móvil) */}
+        <div className="space-y-5">
+          <Label className="text-sm font-semibold text-foreground">
+            Comisión mínima
+          </Label>
+
+          {operationType !== "renta" && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-medium text-muted-foreground">
+                  Venta
+                </Label>
+                <span className="text-sm font-bold text-primary">
+                  {comisionVentaMin ? `${comisionVentaMin}%` : "Cualquiera"}
+                </span>
+              </div>
+              <Slider
+                value={[comisionVentaMin ?? 0]}
+                onValueChange={([v]) =>
+                  setComisionVentaMin(v === 0 ? undefined : v)
+                }
+                min={0}
+                max={10}
+                step={0.5}
+              />
+              <div className="flex justify-between text-[10px] text-muted-foreground">
+                <span>Cualquiera</span>
+                <span>10%</span>
+              </div>
+            </div>
+          )}
+
+          {operationType !== "venta" && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-medium text-muted-foreground">
+                  Renta
+                </Label>
+                <span className="text-sm font-bold text-primary">
+                  {comisionRentaMin
+                    ? `${comisionRentaMin} ${comisionRentaMin === 1 ? "mes" : "meses"}`
+                    : "Cualquiera"}
+                </span>
+              </div>
+              <Slider
+                value={[comisionRentaMin ?? 0]}
+                onValueChange={([v]) =>
+                  setComisionRentaMin(v === 0 ? undefined : v)
+                }
+                min={0}
+                max={3}
+                step={0.5}
+              />
+              <div className="flex justify-between text-[10px] text-muted-foreground">
+                <span>Cualquiera</span>
+                <span>3 meses</span>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Tipo de Propiedad */}
         <div className="space-y-4">
           <Label className="text-sm font-semibold text-foreground">
@@ -461,6 +516,7 @@ export function SimplifiedFilters({
 
             <div className="grid grid-cols-2 gap-4">
               {/* Recámaras */}
+              {cv.recamaras && (
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium text-muted-foreground">
                   {type === "comercial" || type === "industrial"
@@ -497,8 +553,10 @@ export function SimplifiedFilters({
                   </SelectContent>
                 </Select>
               </div>
+              )}
 
               {/* Baños */}
+              {cv.banos && (
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium text-muted-foreground">
                   Baños
@@ -533,8 +591,10 @@ export function SimplifiedFilters({
                   </SelectContent>
                 </Select>
               </div>
+              )}
 
               {/* Estacionamiento */}
+              {cv.estacionamientos && (
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium text-muted-foreground">
                   Estacionamiento
@@ -569,8 +629,10 @@ export function SimplifiedFilters({
                   </SelectContent>
                 </Select>
               </div>
+              )}
 
               {/* Niveles */}
+              {cv.niveles && (
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium text-muted-foreground">
                   Niveles
@@ -605,7 +667,36 @@ export function SimplifiedFilters({
                   </SelectContent>
                 </Select>
               </div>
+              )}
             </div>
+
+            {/* Antigüedad */}
+            {cv.antiguedad && (
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium text-muted-foreground">
+                  Antigüedad
+                </Label>
+                <Select
+                  value={antiguedad || "any"}
+                  onValueChange={(val) =>
+                    setAntiguedad(val === "any" ? undefined : val)
+                  }
+                >
+                  <SelectTrigger className="h-10">
+                    <SelectValue placeholder="No indicado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="any">No indicado</SelectItem>
+                    <SelectItem value="0 (Nueva)">Nueva</SelectItem>
+                    <SelectItem value="1-5">1-5 años</SelectItem>
+                    <SelectItem value="6-10">6-10 años</SelectItem>
+                    <SelectItem value="11-20">11-20 años</SelectItem>
+                    <SelectItem value="21-50">21-50 años</SelectItem>
+                    <SelectItem value="Más de 50">Más de 50 años</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             {/* m² Terreno y Construcción */}
             <div className="flex flex-row gap-4">
@@ -678,8 +769,78 @@ export function SimplifiedFilters({
                 />
               </div>
             </div>
+
+            {/* Frente / Fondo (terrenos) */}
+            {cv.frenteFondo && (
+              <div className="flex flex-row gap-4">
+                <div>
+                  <Label className="text-xs font-medium text-muted-foreground">
+                    Frente (m) mín.
+                  </Label>
+                  <Input
+                    type="text"
+                    placeholder="0"
+                    value={anchoTerrenoMin || ""}
+                    onChange={(e) =>
+                      setAnchoTerrenoMin(
+                        parseInt(resetNumber(e.target.value)) || undefined,
+                      )
+                    }
+                    className="h-10"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs font-medium text-muted-foreground">
+                    Fondo (m) mín.
+                  </Label>
+                  <Input
+                    type="text"
+                    placeholder="0"
+                    value={largoTerrenoMin || ""}
+                    onChange={(e) =>
+                      setLargoTerrenoMin(
+                        parseInt(resetNumber(e.target.value)) || undefined,
+                      )
+                    }
+                    className="h-10"
+                  />
+                </div>
+              </div>
+            )}
           </div>
         )}
+
+        {/* Amenidades */}
+        {hasPropertyTypeSelected && cv.amenidades && (
+          <div className="space-y-3">
+            <Label className="text-sm font-semibold text-foreground">
+              Amenidades
+            </Label>
+            <div className="flex flex-wrap gap-2">
+              {AMENIDADES.map((a) => {
+                const active = amenidades.includes(a);
+                return (
+                  <button
+                    key={a}
+                    type="button"
+                    onClick={() => toggleAmenidad(a)}
+                    className={cn(
+                      "px-3 py-1.5 rounded-full text-xs font-medium transition-all border",
+                      active
+                        ? "bg-primary text-white border-primary"
+                        : "bg-muted/40 text-muted-foreground border-transparent hover:bg-muted",
+                    )}
+                  >
+                    {a}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Filtros especializados por tipo */}
+        {hasPropertyTypeSelected && <TypeSpecificFilters type={type} />}
 
         {/* Botón Guardar */}
         <div className="pt-4">

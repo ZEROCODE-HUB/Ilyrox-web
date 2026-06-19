@@ -8,9 +8,6 @@ import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
 import {
   MapPin,
-  Bed,
-  Bath,
-  Car,
   Calendar,
   Heart,
   Share2,
@@ -19,12 +16,15 @@ import {
   ChevronLeft,
   ChevronRight,
   Star,
-  Home,
-  MoveDiagonal,
-  Building2,
-  Container,
+  Percent,
+  AlertTriangle,
+  Banknote,
+  MessageCircle,
+  Phone,
 } from "lucide-react";
+import { buildPropertyStats } from "@/constants/propertyIcons";
 import { PropertyComments } from "@/components/PropertyComments";
+import { ContactSellerModal } from "./ContactSellerModal";
 import { Avatar } from "@/components/shared/Avatar";
 import { cn } from "@/lib/utils";
 import { useSavedProperties } from "@/hooks/useSavedProperties";
@@ -46,6 +46,7 @@ export function PropertyDetailContent({
 }: PropertyDetailContentProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isContactFormOpen, setIsContactFormOpen] = useState(false);
+  const [isContactChatOpen, setIsContactChatOpen] = useState(false);
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
   const [reviewFilter, setReviewFilter] = useState([5]);
   const [displayProperty, setDisplayProperty] =
@@ -263,105 +264,29 @@ export function PropertyDetailContent({
               </div>
             </div>
 
-            {/* Características principales */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {displayProperty.metros_cuadrados_construccion && (
-                <div className="flex items-center gap-2 p-3 bg-accent rounded-lg">
-                  <Home className="h-5 w-5 text-primary" />
-                  <div>
-                    <div className="font-semibold">
-                      {displayProperty.metros_cuadrados_construccion}
+            {/* Características principales (stats según tipo, igual que el detalle móvil) */}
+            {(() => {
+              const stats = buildPropertyStats(displayProperty);
+              if (stats.length === 0) return null;
+              return (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {stats.map(({ key, Icon, value, label }) => (
+                    <div
+                      key={key}
+                      className="flex items-center gap-2 p-3 bg-accent rounded-lg"
+                    >
+                      <Icon className="h-5 w-5 text-primary flex-shrink-0" />
+                      <div className="min-w-0">
+                        <div className="font-semibold truncate">{value}</div>
+                        <div className="text-sm text-muted-foreground truncate">
+                          {label}
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-sm text-muted-foreground">
-                      m² Construcción
-                    </div>
-                  </div>
+                  ))}
                 </div>
-              )}
-              {displayProperty.metros_cuadrados_terreno && (
-                <div className="flex items-center gap-2 p-3 bg-accent rounded-lg">
-                  <MoveDiagonal className="h-5 w-5 text-primary" />
-                  <div>
-                    <div className="font-semibold">
-                      {displayProperty.metros_cuadrados_terreno}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      m² Terreno
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {(displayProperty.habitaciones || 0) > 0 && (
-                <div className="flex items-center gap-2 p-3 bg-accent rounded-lg">
-                  {property.tipo === "comercial" ||
-                  property.tipo === "industrial" ? (
-                    <Container className="h-5 w-5 text-primary" />
-                  ) : (
-                    <Bed className="h-5 w-5 text-primary" />
-                  )}
-                  <div>
-                    <div className="font-semibold">
-                      {displayProperty.habitaciones}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {displayProperty.tipo === "comercial" ||
-                      displayProperty.tipo === "industrial"
-                        ? displayProperty.habitaciones > 1
-                          ? "Espacios"
-                          : "Espacio"
-                        : displayProperty.habitaciones > 1
-                          ? "Habitaciones"
-                          : "Habitación"}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {(displayProperty.banos || 0) > 0 && (
-                <div className="flex items-center gap-2 p-3 bg-accent rounded-lg">
-                  <Bath className="h-5 w-5 text-primary" />
-                  <div>
-                    <div className="font-semibold">{displayProperty.banos}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {displayProperty.banos > 1 ? "Baños" : "Baño"}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {(displayProperty.estacionamientos || 0) > 0 && (
-                <div className="flex items-center gap-2 p-3 bg-accent rounded-lg">
-                  <Car className="h-5 w-5 text-primary" />
-                  <div>
-                    <div className="font-semibold">
-                      {displayProperty.estacionamientos}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {displayProperty.estacionamientos > 1
-                        ? "Estacionamientos"
-                        : "Estacionamiento"}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {(displayProperty.pisos || 0) > 0 && (
-                <div className="flex items-center gap-2 p-3 bg-accent rounded-lg">
-                  <Building2 className="h-5 w-5 text-primary" />
-                  <div>
-                    <div className="font-semibold">
-                      {displayProperty.pisos < 2
-                        ? displayProperty.pisos + " piso"
-                        : displayProperty.pisos + " pisos"}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {displayProperty.pisos > 1 ? "Niveles" : "Nivel"}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+              );
+            })()}
 
             {/* Descripción */}
             <div>
@@ -424,6 +349,90 @@ export function PropertyDetailContent({
                 </div>
               </div>
             </div>
+
+            {/* Esquema de comisión */}
+            {(() => {
+              const ops = (displayProperty.operaciones || []).filter(
+                (o) => o.comparte_comision,
+              );
+              if (ops.length === 0) return null;
+              return (
+                <div>
+                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                    <Percent className="h-4 w-4 text-primary" /> Esquema de
+                    comisión
+                  </h4>
+                  <div className="space-y-2">
+                    {ops.map((op, i) => (
+                      <div
+                        key={i}
+                        className="p-3 bg-accent rounded-lg text-sm space-y-1"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="capitalize font-semibold">
+                            {op.tipo}
+                          </span>
+                          <span className="text-primary font-bold">
+                            {op.comision_porcentaje
+                              ? `${op.comision_porcentaje}%`
+                              : op.comision_meses
+                                ? `${op.comision_meses} ${op.comision_meses === 1 ? "mes" : "meses"}`
+                                : op.comision_monto_fijo
+                                  ? formatPrice(op.comision_monto_fijo)
+                                  : "—"}
+                          </span>
+                        </div>
+                        {(op.porcentaje_comision_compartida ||
+                          op.monto_comision_compartida) && (
+                          <div className="text-muted-foreground">
+                            Comparte:{" "}
+                            {op.porcentaje_comision_compartida
+                              ? `${op.porcentaje_comision_compartida}%`
+                              : formatPrice(op.monto_comision_compartida || 0)}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Gravamen */}
+            {displayProperty.gravamenes &&
+              displayProperty.gravamenes.length > 0 && (
+                <div className="p-4 rounded-lg border border-red-200 bg-red-50">
+                  <h4 className="font-medium mb-2 flex items-center gap-2 text-red-700">
+                    <AlertTriangle className="h-4 w-4" /> Propiedad con gravamen
+                  </h4>
+                  <ul className="text-sm text-red-700/90 space-y-1">
+                    {displayProperty.gravamenes.map((g, i) => (
+                      <li key={i}>
+                        {g.institucion || "Institución"}
+                        {g.monto ? `: ${formatPrice(g.monto)}` : ""}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+            {/* Financiamiento */}
+            {displayProperty.financiamientos &&
+              displayProperty.financiamientos.length > 0 && (
+                <div>
+                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                    <Banknote className="h-4 w-4 text-primary" /> Acepta
+                    financiamiento
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {displayProperty.financiamientos.map((f) => (
+                      <Badge key={f} variant="secondary">
+                        {f}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
 
             {/* Comentarios */}
             <Separator className="my-6" />
@@ -515,29 +524,71 @@ export function PropertyDetailContent({
 
                 <Separator className="my-4" />
 
-                <Button
-                  onClick={() => {
-                    if (!user) {
-                      toast({
-                        variant: "destructive",
-                        title: "Inicia sesión",
-                        description:
-                          "Debes iniciar sesión para solicitar información",
-                      });
-                      return;
-                    }
-                    setIsContactFormOpen(true);
-                  }}
-                  className="w-full"
-                  size="lg"
-                >
-                  Solicitar más información
-                </Button>
+                <div className="space-y-2">
+                  <Button
+                    onClick={() => {
+                      if (!user) {
+                        toast({
+                          variant: "destructive",
+                          title: "Inicia sesión",
+                          description:
+                            "Debes iniciar sesión para contactar al asesor",
+                        });
+                        return;
+                      }
+                      setIsContactChatOpen(true);
+                    }}
+                    className="w-full"
+                    size="lg"
+                  >
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    Contactar al asesor
+                  </Button>
+
+                  {displayProperty.asesor_telefono && (
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="lg"
+                      className="w-full"
+                    >
+                      <a href={`tel:${displayProperty.asesor_telefono}`}>
+                        <Phone className="h-4 w-4 mr-2" />
+                        Llamar
+                      </a>
+                    </Button>
+                  )}
+
+                  <button
+                    onClick={() => {
+                      if (!user) {
+                        toast({
+                          variant: "destructive",
+                          title: "Inicia sesión",
+                          description:
+                            "Debes iniciar sesión para solicitar información",
+                        });
+                        return;
+                      }
+                      setIsContactFormOpen(true);
+                    }}
+                    className="w-full text-xs text-muted-foreground hover:text-primary underline underline-offset-2 pt-1"
+                  >
+                    O enviar una solicitud formal
+                  </button>
+                </div>
               </CardContent>
             </Card>
           </div>
         </div>
       </div>
+
+      {/* Contacto por chat (misma secuencia que el móvil) */}
+      <ContactSellerModal
+        isOpen={isContactChatOpen}
+        onClose={() => setIsContactChatOpen(false)}
+        property={displayProperty}
+      />
 
       {/* Formulario de contacto */}
       <InfoModal

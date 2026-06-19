@@ -9,6 +9,35 @@ import { useShallow } from "zustand/shallow";
 export type OperationType = "venta" | "renta" | "todas";
 export type Currency = "MXN" | "USD";
 
+// Filtros especializados por tipo (espejo de la app móvil)
+export interface ComercialFilters {
+  tipoUbicacion?: string[];
+  frenteMin?: number;
+  nivel?: string;
+  sobreAvenidaPrincipal?: boolean;
+  enEsquina?: boolean;
+  altaVisibilidad?: boolean;
+  altoFlujoVehicular?: boolean;
+}
+export interface IndustrialFilters {
+  ubicacion?: string[];
+  alturaLibre?: string;
+  energiaKva?: string[];
+  areaOficinasMin?: number;
+  patioManiobrasMin?: number;
+}
+export interface AgricolaFilters {
+  tiposAgua?: string[];
+  concesionAgua?: boolean;
+  usoTerreno?: string[];
+  tipoRiego?: string[];
+  electricidad?: boolean;
+  caminoAcceso?: boolean;
+  cercado?: boolean;
+  pieCarretera?: boolean;
+  accesCamiones?: boolean;
+}
+
 export interface FilterState {
   // Location
   estadoMexico: string[];
@@ -32,18 +61,31 @@ export interface FilterState {
   bathrooms: string | undefined;
   parking: string | undefined;
   levels: string | undefined;
+  antiguedad: string | undefined;
+
+  // Comisión y amenidades
+  comisionVentaMin: number | undefined;
+  comisionRentaMin: number | undefined;
+  amenidades: string[];
 
   // Area
   landAreaMin: number | undefined;
   constructionAreaMin: number | undefined;
   landAreaMax: number | undefined;
   constructionAreaMax: number | undefined;
+  anchoTerrenoMin: number | undefined;
+  largoTerrenoMin: number | undefined;
 
   // Search
   searchTerm: string;
 
   // Radius
   radiusKm: number;
+
+  // Filtros especializados por tipo
+  comercialFilters: ComercialFilters;
+  industrialFilters: IndustrialFilters;
+  agricolaFilters: AgricolaFilters;
 }
 
 export interface FilterActions {
@@ -72,15 +114,28 @@ export interface FilterActions {
   setBathrooms: (n: string | undefined) => void;
   setParking: (n: string | undefined) => void;
   setLevels: (n: string | undefined) => void;
+  setAntiguedad: (n: string | undefined) => void;
+
+  setComisionVentaMin: (n: number | undefined) => void;
+  setComisionRentaMin: (n: number | undefined) => void;
+  setAmenidades: (a: string[]) => void;
+  toggleAmenidad: (a: string) => void;
 
   setLandAreaMin: (n: number | undefined) => void;
   setConstructionAreaMin: (n: number | undefined) => void;
   setLandAreaMax: (n: number | undefined) => void;
   setConstructionAreaMax: (n: number | undefined) => void;
+  setAnchoTerrenoMin: (n: number | undefined) => void;
+  setLargoTerrenoMin: (n: number | undefined) => void;
 
   setSearchTerm: (term: string) => void;
 
   setRadiusKm: (radius: number) => void;
+
+  // Filtros especializados (merge parcial)
+  setComercialFilters: (partial: Partial<ComercialFilters>) => void;
+  setIndustrialFilters: (partial: Partial<IndustrialFilters>) => void;
+  setAgricolaFilters: (partial: Partial<AgricolaFilters>) => void;
 
   // Bulk
   resetFilters: () => void;
@@ -110,15 +165,26 @@ const initialState: FilterState = {
   bathrooms: undefined,
   parking: undefined,
   levels: undefined,
+  antiguedad: undefined,
+
+  comisionVentaMin: undefined,
+  comisionRentaMin: undefined,
+  amenidades: [],
 
   landAreaMin: undefined,
   constructionAreaMin: undefined,
   landAreaMax: undefined,
   constructionAreaMax: undefined,
+  anchoTerrenoMin: undefined,
+  largoTerrenoMin: undefined,
 
   searchTerm: "",
 
   radiusKm: 0,
+
+  comercialFilters: {},
+  industrialFilters: {},
+  agricolaFilters: {},
 };
 
 // ──────────────────────────────────────────────
@@ -223,17 +289,39 @@ export const useFilterStore = create<FilterStore>()(
     setBathrooms: (n) => set({ bathrooms: n }),
     setParking: (n) => set({ parking: n }),
     setLevels: (n) => set({ levels: n }),
+    setAntiguedad: (n) => set({ antiguedad: n }),
+
+    // ── Comisión y amenidades ─────────────────
+    setComisionVentaMin: (n) => set({ comisionVentaMin: n }),
+    setComisionRentaMin: (n) => set({ comisionRentaMin: n }),
+    setAmenidades: (a) => set({ amenidades: a }),
+    toggleAmenidad: (a) =>
+      set((s) => ({
+        amenidades: s.amenidades.includes(a)
+          ? s.amenidades.filter((x) => x !== a)
+          : [...s.amenidades, a],
+      })),
 
     // ── Area ──────────────────────────────────
     setLandAreaMin: (n) => set({ landAreaMin: n }),
     setConstructionAreaMin: (n) => set({ constructionAreaMin: n }),
     setLandAreaMax: (n) => set({ landAreaMax: n }),
     setConstructionAreaMax: (n) => set({ constructionAreaMax: n }),
+    setAnchoTerrenoMin: (n) => set({ anchoTerrenoMin: n }),
+    setLargoTerrenoMin: (n) => set({ largoTerrenoMin: n }),
 
     // ── Search ────────────────────────────────
     setSearchTerm: (term) => set({ searchTerm: term }),
 
     setRadiusKm: (radius) => set({ radiusKm: radius }),
+
+    // ── Filtros especializados ────────────────
+    setComercialFilters: (partial) =>
+      set((s) => ({ comercialFilters: { ...s.comercialFilters, ...partial } })),
+    setIndustrialFilters: (partial) =>
+      set((s) => ({ industrialFilters: { ...s.industrialFilters, ...partial } })),
+    setAgricolaFilters: (partial) =>
+      set((s) => ({ agricolaFilters: { ...s.agricolaFilters, ...partial } })),
 
     // ── Reset ─────────────────────────────────
     resetFilters: () => set(() => ({ ...initialState })),
@@ -287,6 +375,13 @@ export const useAreaFilters = () =>
 export const useSearchTerm = () => useFilterStore((s) => s.searchTerm);
 
 export const useRadiusKm = () => useFilterStore((s) => s.radiusKm);
+
+export const useComercialFilters = () =>
+  useFilterStore((s) => s.comercialFilters);
+export const useIndustrialFilters = () =>
+  useFilterStore((s) => s.industrialFilters);
+export const useAgricolaFilters = () =>
+  useFilterStore((s) => s.agricolaFilters);
 
 /** Build the queryKey-friendly snapshot of all filters */
 export const useFilterSnapshot = () =>

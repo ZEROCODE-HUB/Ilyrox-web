@@ -19,8 +19,13 @@ import { DesktopHeader } from "@/components/Header/DesktopHeader";
 import { MobileHeader } from "@/components/Header/MobileHeader";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { DesktopResizableLayout } from "@/components/layout/DesktopResizableLayout";
+import { useGoogleMapsApi } from "@/lib/googleMaps";
 
 const Index = () => {
+  // Carga global de Google Maps + Places para que el autocomplete de ubicación
+  // funcione aunque el panel de mapa no esté montado.
+  useGoogleMapsApi();
+
   // ── Store state ─────────────────────────────
   const estadoMexico = useEstadoMexico();
   const colonias = useFilterStore((s) => s.colonias);

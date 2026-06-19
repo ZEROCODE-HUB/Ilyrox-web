@@ -1,98 +1,70 @@
 // hooks/locations/useLocationSearch.ts
+//
+// Búsqueda de ubicaciones con Google Places (paridad con la app móvil).
+// Antes consultaba RPCs de un Supabase "geo"; ahora usa el autocomplete de
+// Google. Mantiene la misma interfaz pública para no romper el consumidor.
 import { useState, useCallback, useRef } from "react";
-import { supabaseGeo } from "@/lib/supabase-geo";
 import { useDebouncedCallback } from "use-debounce";
+import {
+  searchPlaces,
+  newSessionToken,
+  type PlaceSuggestion,
+  type LocationType,
+} from "@/lib/geocoding";
 
-export type LocationType = "colonia" | "municipio" | "estado";
-
-export interface LocationSuggestion {
-  id: number;
-  tipo: LocationType;
-  nombre: string;
-  municipio_nombre?: string;
-  estado_nombre?: string;
-}
+export type { LocationType };
+// Se mantiene el nombre del tipo para compatibilidad con los consumidores.
+export type LocationSuggestion = PlaceSuggestion;
 
 export function useLocationSearch() {
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([]);
   const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(false);
-  const offsetRef = useRef(0);
-  const termRef = useRef("");
-  const abortRef = useRef<AbortController | null>(null);
+  // Google Places no pagina como la RPC anterior; siempre false.
+  const hasMore = false;
+  const reqIdRef = useRef(0);
+  const sessionRef = useRef<
+    google.maps.places.AutocompleteSessionToken | undefined
+  >(undefined);
 
-  const fetchSuggestions = async (term: string, reset = false) => {
+  const getSession = () => {
+    if (!sessionRef.current) sessionRef.current = newSessionToken();
+    return sessionRef.current;
+  };
+
+  const fetchSuggestions = async (term: string) => {
     if (!term || term.trim().length < 2) {
       setSuggestions([]);
-      setHasMore(false);
-      offsetRef.current = 0;
       return;
     }
-
-    if (loading && !reset) return;
-
-    // Abort previous request
-    if (abortRef.current) abortRef.current.abort();
-    abortRef.current = new AbortController();
-
+    const reqId = ++reqIdRef.current;
     setLoading(true);
-    const offset = reset ? 0 : offsetRef.current;
-    termRef.current = term;
-
     try {
-    const cleanTerm = term.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    const { data, error } = await supabaseGeo.rpc("buscar_ubicaciones", {
-        p_nombre_busqueda: cleanTerm,
-        p_limit: 20,
-        p_offset: offset,
-      });
-
-      if (error) throw error;
-
-      const totalCount = data?.[0]?.total_count ?? 0;
-      const results: LocationSuggestion[] = (data || []).map((item: any) => ({
-        id: item.id,
-        tipo: item.tipo as LocationType,
-        nombre: item.nombre,
-        municipio_nombre: item.municipio_nombre ?? undefined,
-        estado_nombre: item.estado_nombre ?? undefined,
-      }));
-
-      if (reset) {
-        setSuggestions(results);
-        offsetRef.current = 20;
-      } else {
-        setSuggestions((prev) => [...prev, ...results]);
-        offsetRef.current = offset + 20;
-      }
-
-      setHasMore(offsetRef.current < totalCount);
-    } catch (err: any) {
-      if (err?.name !== "AbortError") {
-        console.error("Location search error:", err);
-        if (reset) setSuggestions([]);
-      }
+      const results = await searchPlaces(term, getSession());
+      // Descartar respuestas obsoletas (carrera entre teclas)
+      if (reqId === reqIdRef.current) setSuggestions(results);
+    } catch (err) {
+      console.error("Location search error:", err);
+      if (reqId === reqIdRef.current) setSuggestions([]);
     } finally {
-      setLoading(false);
+      if (reqId === reqIdRef.current) setLoading(false);
     }
   };
 
   const search = useDebouncedCallback((term: string) => {
-    fetchSuggestions(term, true);
+    fetchSuggestions(term);
   }, 300);
 
-  const loadMore = useCallback(() => {
-    if (!loading && hasMore) {
-      fetchSuggestions(termRef.current, false);
-    }
-  }, [loading, hasMore]);
+  // Sin paginación con Places.
+  const loadMore = useCallback(() => {}, []);
 
   const clear = useCallback(() => {
     setSuggestions([]);
-    setHasMore(false);
-    offsetRef.current = 0;
-    termRef.current = "";
+    // Nueva sesión de autocomplete tras limpiar (mejor facturación de Places).
+    sessionRef.current = newSessionToken();
   }, []);
 
-  return { suggestions, loading, hasMore, search, loadMore, clear };
+  /** Expone el session token actual para resolver el detalle del lugar. */
+  const getSessionToken = useCallback(() => sessionRef.current, []);
+
+  return { suggestions, loading, hasMore, search, loadMore, clear, getSessionToken };
 }

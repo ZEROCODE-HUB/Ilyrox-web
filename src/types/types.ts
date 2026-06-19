@@ -44,6 +44,35 @@ export type propiedades = {
   status?: string;
   descripcion?: string;
   estado?: string;
+  // Características físicas extra
+  medios_banos?: number;
+  // Comercial
+  tipo_ubicacion_comercial?: string;
+  nivel_piso?: number | string;
+  sobre_avenida_principal?: boolean;
+  en_esquina?: boolean;
+  alta_visibilidad?: boolean;
+  alto_flujo_vehicular?: boolean;
+  frente_metros?: number;
+  // Terreno (frente / fondo)
+  ancho_terreno?: number;
+  largo_terreno?: number;
+  // Industrial
+  ubicacion_industrial?: string;
+  altura_libre_m?: string;
+  area_oficinas_m2?: number;
+  patio_maniobras_m2?: number;
+  tipo_energia_kva?: string[];
+  // Agrícola
+  tipo_agua?: string[];
+  concesion_agua?: boolean;
+  uso_terreno?: string[];
+  tipo_riego?: string[];
+  infra_electricidad?: boolean;
+  infra_camino_acceso?: boolean;
+  infra_cercado?: boolean;
+  acceso_carretera?: boolean;
+  acceso_camiones?: boolean;
   operaciones_propiedad?: operaciones_propiedad[];
 };
 
@@ -153,13 +182,21 @@ export type perfiles = {
 
 // Interface extension based on View_propiedades_busqueda
 export interface PropertyView extends propiedades {
-  // Operations
+  // Operations (con datos de comisión incluidos por la vista)
   operaciones?: {
     tipo: string;
     precio: number;
     moneda: string;
     periodo_renta?: string;
     precio_usd: number;
+    comision_tipo?: string;
+    comision_porcentaje?: number;
+    comision_monto_fijo?: number;
+    comision_meses?: number;
+    comparte_comision?: boolean;
+    porcentaje_comision_compartida?: number;
+    monto_comision_compartida?: number;
+    condiciones_comision_compartida?: string;
   }[];
   tipo_operacion?: string; // Will contain comma separated types from VIEW
   precio_original?: number;
@@ -179,6 +216,10 @@ export interface PropertyView extends propiedades {
   asesor_telefono?: string;
   asesor_foto?: string;
   asesor_rol?: string;
+
+  // Gravámenes y financiamientos (provistos por la vista)
+  gravamenes?: { institucion: string | null; monto: number | null; notas?: string | null }[];
+  financiamientos?: string[];
 
   // Computed / Helper
   isLiked?: boolean;

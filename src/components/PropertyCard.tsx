@@ -2,19 +2,7 @@ import { PropertyView } from "@/types/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  MapPin,
-  Bed,
-  Bath,
-  Car,
-  Heart,
-  Share2,
-  Home,
-  MoveDiagonal,
-  Building2,
-  MoveUp,
-  Container,
-} from "lucide-react";
+import { MapPin, Heart, Share2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useSavedProperties } from "@/hooks/useSavedProperties";
@@ -24,6 +12,7 @@ import { Avatar } from "@/components/shared/Avatar";
 import { useToast } from "@/hooks/use-toast";
 import { upperWord } from "@/utils/upperWord";
 import { useShare } from "@/hooks/useShare";
+import { buildPropertyStats, getCommissionLabel } from "@/constants/propertyIcons";
 
 interface PropertyCardProps {
   property: PropertyView;
@@ -136,6 +125,10 @@ export function PropertyCard({
   const ventaOp = operations.find((o) => o.tipo === "venta");
   const rentaOp = operations.find((o) => o.tipo === "renta");
 
+  // Stats por tipo (mismo criterio que el feed móvil) + comisión
+  const stats = buildPropertyStats(property);
+  const commissionLabel = getCommissionLabel(property);
+
   return (
     <Card className="group overflow-hidden transition-all duration-300 hover:shadow-lg border-border bg-card animate-fade-in flex flex-col h-full min-h-[440px]">
       <div className="relative h-56 flex-shrink-0 overflow-hidden bg-muted">
@@ -215,102 +208,46 @@ export function PropertyCard({
             </div>
           </div>
 
-          {/* Price Tag Overlay */}
-          <div className="text-primary flex flex-col gap-0">
-            {ventaOp ? (
-              <p className="text-xl font-bold">
-                {ventaOp.moneda || ""} {formatPrice(ventaOp.precio)}
-              </p>
-            ) : rentaOp ? (
-              <p className="text-xl font-bold">
-                {rentaOp.moneda === "MXN" ? "MXN" : "USD"}{" "}
-                {formatPrice(rentaOp.precio)}
-              </p>
-            ) : (
-              <p className="text-xl font-bold">Consultar Precio</p>
+          {/* Precio + comisión */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="text-primary flex flex-col gap-0">
+              {ventaOp ? (
+                <p className="text-xl font-bold">
+                  {ventaOp.moneda || ""} {formatPrice(ventaOp.precio)}
+                </p>
+              ) : rentaOp ? (
+                <p className="text-xl font-bold">
+                  {rentaOp.moneda === "MXN" ? "MXN" : "USD"}{" "}
+                  {formatPrice(rentaOp.precio)}
+                </p>
+              ) : (
+                <p className="text-xl font-bold">Consultar Precio</p>
+              )}
+            </div>
+            {commissionLabel && (
+              <span className="text-xs font-bold rounded-full px-2 py-1 bg-primary/10 text-primary whitespace-nowrap">
+                {commissionLabel}
+              </span>
             )}
           </div>
 
-          {/* Features Grid */}
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1 border-t border-border/50">
-            {Number(property.habitaciones) > 0 && (
-              <div
-                className="flex items-center gap-1.5 text-muted-foreground"
-                title={`${property.habitaciones} Recámaras`}
-              >
-                {property.tipo === "comercial" ||
-                property.tipo === "industrial" ? (
-                  <Container className="h-5 w-5" />
-                ) : (
-                  <Bed className="h-5 w-5" />
-                )}
-                <span className="text-sm font-semibold">
-                  {property.habitaciones}
-                </span>
-              </div>
-            )}
-            {Number(property.banos) > 0 && (
-              <div
-                className="flex items-center gap-1.5 text-muted-foreground"
-                title={`${property.banos} Baños`}
-              >
-                <Bath className="h-5 w-5" />
-                <span className="text-sm font-semibold">{property.banos}</span>
-              </div>
-            )}
-            {Number(property.estacionamientos) > 0 && (
-              <div
-                className="flex items-center gap-1.5 text-muted-foreground"
-                title={`${property.estacionamientos} Estacionamientos`}
-              >
-                <Car className="h-5 w-5" />
-                <span className="text-sm font-semibold">
-                  {property.estacionamientos}
-                </span>
-              </div>
-            )}
-            {Number(property.metros_cuadrados_construccion) > 0 && (
-              <div
-                className="flex items-center gap-1.5 text-muted-foreground"
-                title={`${property.metros_cuadrados_construccion} m²`}
-              >
-                <Home className="h-5 w-5" />
-                <span className="text-sm font-semibold whitespace-nowrap">
-                  {property.metros_cuadrados_construccion}
-                  <span className="text-[10px] ml-0.5 uppercase opacity-70">
-                    m²
+          {/* Features Grid (stats según tipo, igual que el feed móvil) */}
+          {stats.length > 0 && (
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1 border-t border-border/50">
+              {stats.map(({ key, Icon, value, label }) => (
+                <div
+                  key={key}
+                  className="flex items-center gap-1.5 text-muted-foreground"
+                  title={`${label}: ${value}`}
+                >
+                  <Icon className="h-5 w-5" />
+                  <span className="text-sm font-semibold whitespace-nowrap">
+                    {value}
                   </span>
-                </span>
-              </div>
-            )}
-            {Number(property.metros_cuadrados_terreno) > 0 && (
-              <div
-                className="flex items-center gap-1.5 text-muted-foreground"
-                title={`${property.metros_cuadrados_terreno} m²`}
-              >
-                <MoveDiagonal className="h-5 w-5" />
-                <span className="text-sm font-semibold whitespace-nowrap">
-                  {property.metros_cuadrados_terreno}
-                  <span className="text-[10px] ml-0.5 uppercase opacity-70">
-                    m²
-                  </span>
-                </span>
-              </div>
-            )}
-            {Number(property.pisos) > 0 && (
-              <div
-                className="flex items-center gap-1.5 text-muted-foreground"
-                title={`${property.pisos}`}
-              >
-                <Building2 className="h-5 w-5" />
-                <span className="text-sm font-semibold whitespace-nowrap">
-                  {property.pisos < 2
-                    ? property.pisos + " piso"
-                    : property.pisos + " pisos"}
-                </span>
-              </div>
-            )}
-          </div>
+                </div>
+              ))}
+            </div>
+          )}
           {/* Amenidades */}
           {property.amenidades && property.amenidades.length > 0 && (
             <div className="flex flex-wrap items-center gap-1.5 pt-1">

@@ -73,10 +73,7 @@ export const DesktopHeader = ({
                 />
               </Link>
               <div className="w-full max-w-2xl">
-                <SearchAndSort
-                  onLocationSearch={handleLocationSearch}
-                  onFocus={() => {}}
-                />
+                <SearchAndSort onFocus={() => {}} />
               </div>
             </div>
 
