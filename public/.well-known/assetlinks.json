@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.ilyrox.app",
+      "sha256_cert_fingerprints": [
+        "3988d0b93686b792fc882281b8f73c3dc45750015f216a1c38755a8deaa6600b",
+        "fac61745dc0903786fb9ede62a962b399f7348f0bb6f899b8332667591033b9c"
+      ]
+    }
+  }
+]

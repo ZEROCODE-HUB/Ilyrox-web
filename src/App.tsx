@@ -14,6 +14,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import ProgramFamilies from "./pages/ProgramFamilies";
 import PropertyPage from "./pages/PropertyPage";
+import Invite from "./pages/Invite";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +51,10 @@ const App = () => {
     {
       path: "/programs-families",
       element: <ProgramFamilies />,
+    },
+    {
+      path: "/invite/*",
+      element: <Invite />,
     },
     {
       path: "*",
