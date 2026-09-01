@@ -66,12 +66,13 @@ const Invite = () => {
     // cuando la app se abra por primera vez en este dispositivo.
     if (inviteCode) {
       const deviceToken = getDeviceToken();
+      const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       getDeviceMetadata().then((metadata) => {
         supabase
           .rpc("registrar_dispositivo_invitacion", {
             p_device_token: deviceToken,
             p_ref_code: inviteCode,
-            p_plataforma: "web",
+            p_plataforma: isMobileDevice ? "mobile" : "web",
             p_user_agent: navigator.userAgent,
             p_ip: metadata.ip,
             p_asn: metadata.asn,
