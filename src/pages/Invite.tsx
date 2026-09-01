@@ -30,6 +30,61 @@ function getDeviceToken(): string {
   }
 }
 
+interface DeviceFingerprint {
+  ip?: string | null;
+  asn?: string | null;
+  timezone?: string | null;
+  pais?: string | null;
+  region?: string | null;
+  ciudad?: string | null;
+  locale?: string | null;
+}
+
+function detectOs(): string | null {
+  const ua = navigator.userAgent;
+  if (/android/i.test(ua)) return "android";
+  if (/iphone|ipad|ipod/i.test(ua)) return "ios";
+  if (/windows/i.test(ua)) return "windows";
+  if (/mac os/i.test(ua)) return "macos";
+  if (/linux/i.test(ua)) return "linux";
+  return null;
+}
+
+async function getDeviceFingerprint(): Promise<DeviceFingerprint> {
+  const fingerprint: DeviceFingerprint = {
+    locale: navigator.language || null,
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || null,
+  };
+  try {
+    const res = await fetch("https://ip-api.com/json/?fields=query,as,timezone,country,regionName,city", {
+      signal: AbortSignal.timeout(4000),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      fingerprint.ip = data?.query ?? null;
+      fingerprint.asn = data?.as ?? null;
+      fingerprint.timezone = data?.timezone ?? fingerprint.timezone;
+      fingerprint.pais = data?.country ?? null;
+      fingerprint.region = data?.regionName ?? null;
+      fingerprint.ciudad = data?.city ?? null;
+    }
+  } catch {
+    // si falla ip-api, intentamos solo la IP con ipify
+    try {
+      const res = await fetch("https://api.ipify.org?format=json", {
+        signal: AbortSignal.timeout(4000),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        fingerprint.ip = data?.ip ?? null;
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+  return fingerprint;
+}
+
 function extractCodeFromPath(pathname: string): string {
   // /invite/{codigo} o /invite/{codigo}?ref=... → extrae el segmento
   const match = pathname.match(/\/invite\/([^/?#]+)/i);
@@ -58,25 +113,64 @@ const Invite = () => {
     if (inviteCode) {
       try {
         localStorage.setItem(INVITE_CODE_KEY, inviteCode);
+        // Cookie de respaldo en el dominio: persiste aunque se borre el
+        // localStorage y es legible si el usuario vuelve a la landing.
+        document.cookie = `ilyrox_invite_code=${encodeURIComponent(
+          inviteCode,
+        )}; path=/; max-age=${60 * 60 * 24 * 7}`;
+      } catch {
+        /* ignore */
+      }
+
+      // Copiar el link de invitación al portapapeles del dispositivo. El
+      // portapapeles es del sistema operativo y sobrevive a la instalación de
+      // la app: al abrir la app por primera vez desde el icono, la app lo lee
+      // y detecta el código de invitación sin necesidad de tocar el link de nuevo.
+      const fullInviteUrl = `${window.location.origin}${window.location.pathname}`;
+      try {
+        if (navigator.clipboard?.writeText) {
+          navigator.clipboard.writeText(fullInviteUrl).catch(() => {});
+        } else {
+          const ta = document.createElement("textarea");
+          ta.value = fullInviteUrl;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+        }
       } catch {
         /* ignore */
       }
     }
 
     // Guardar el dispositivo + código ref en la BD para asociar la invitación
-    // cuando la app se abra por primera vez en este dispositivo.
+    // cuando la app se abra por primera vez en este dispositivo. Se guarda el
+    // fingerprint completo (IP, ASN, OS, timezone, país, región, ciudad,
+    // locale) para que la app pueda hacer un match ponderado.
     if (inviteCode) {
       const deviceToken = getDeviceToken();
-      supabase
-        .rpc("registrar_dispositivo_invitacion", {
-          p_device_token: deviceToken,
-          p_ref_code: inviteCode,
-          p_plataforma: "web",
-          p_user_agent: navigator.userAgent,
-        })
-        .then(({ error }) => {
-          if (error) console.warn("[invite] no se pudo registrar el dispositivo:", error);
-        });
+      (async () => {
+        const fp = await getDeviceFingerprint();
+        const os = detectOs();
+        supabase
+          .rpc("registrar_dispositivo_invitacion", {
+            p_device_token: deviceToken,
+            p_ref_code: inviteCode,
+            p_plataforma: "web",
+            p_user_agent: navigator.userAgent,
+            p_ip: fp.ip,
+            p_asn: fp.asn,
+            p_os: os,
+            p_timezone: fp.timezone,
+            p_pais: fp.pais,
+            p_region: fp.region,
+            p_ciudad: fp.ciudad,
+            p_locale: fp.locale,
+          })
+          .then(({ error }) => {
+            if (error) console.warn("[invite] no se pudo registrar el dispositivo:", error);
+          });
+      })();
     }
 
     // Marcar como abierta si la app toma el foco (la página queda en background)
@@ -132,6 +226,17 @@ const Invite = () => {
   }, []);
 
   const storeButtonsDisabled = !APP_STORE_URL && !GOOGLE_PLAY_URL;
+
+  // Google Play soporta el parámetro `referrer` para rastrear el origen de la
+  // descarga. Aquí adjuntamos el device_token para que quede registrado en la
+  // instalación de Android.
+  const googlePlayUrlWithReferrer = (() => {
+    if (!GOOGLE_PLAY_URL) return "";
+    const sep = GOOGLE_PLAY_URL.includes("?") ? "&" : "?";
+    return `${GOOGLE_PLAY_URL}${sep}referrer=ilyrox_${encodeURIComponent(
+      getDeviceToken(),
+    )}`;
+  })();
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-teal-50 to-white flex flex-col">
@@ -211,7 +316,7 @@ const Invite = () => {
                   asChild={!!GOOGLE_PLAY_URL}
                 >
                   {GOOGLE_PLAY_URL ? (
-                    <a href={GOOGLE_PLAY_URL} target="_blank" rel="noreferrer">
+                    <a href={googlePlayUrlWithReferrer} target="_blank" rel="noreferrer">
                       <Play className="h-5 w-5" /> Google Play
                     </a>
                   ) : (
