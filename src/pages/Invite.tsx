@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Apple, Play, Users, Share2, CheckCircle2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/lib/supabase";
 
@@ -131,142 +129,119 @@ const Invite = () => {
     };
   }, []);
 
-  const storeButtonsDisabled = !APP_STORE_URL && !GOOGLE_PLAY_URL;
+  const handleActionClick = () => {
+    // Si hay URL de store configurada, prioriza redirigir
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const targetUrl = isIOS ? APP_STORE_URL : GOOGLE_PLAY_URL;
+
+    if (targetUrl) {
+      window.open(targetUrl, "_blank");
+    } else {
+      // Fallback a deeplink si se presiona el botón manualmente
+      const deeplink = `${APP_SCHEME}${
+        code ? `?type=invite&code=${encodeURIComponent(code)}` : ""
+      }`;
+      window.location.href = deeplink;
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-teal-50 to-white flex flex-col">
-      {/* Header */}
-      <header className="w-full border-b border-border/40 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <span className="text-2xl font-extrabold tracking-tight text-teal-600">
-              Ilyrox
-            </span>
-          </Link>
-          <span className="text-sm text-muted-foreground">
-            Comunidad de asesores inmobiliarios
-          </span>
-        </div>
-      </header>
+    <div className="min-h-screen bg-white flex flex-col justify-between font-sans selection:bg-sky-100">
+      {/* Contenido Principal / Hero */}
+      <main className="container mx-auto px-6 py-10 max-w-6xl flex-1 flex flex-col justify-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          
+          {/* Lado Izquierdo: Textos y Botón */}
+          <div className="lg:col-span-6 flex flex-col items-start text-left">
+            {code && (
+              <Badge variant="secondary" className="mb-4 gap-1.5 bg-sky-50 text-[#007B99] border-sky-200">
+                <CheckCircle2 className="h-4 w-4" /> Código de invitación detectado
+              </Badge>
+            )}
 
-      <main className="flex-1 container mx-auto px-4 py-12 flex flex-col items-center text-center max-w-2xl">
-        {/* Badge */}
-        <Badge variant="secondary" className="mb-6 gap-1.5">
-          <Users className="h-3.5 w-3.5" /> Invitación de un asesor
-        </Badge>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-[#0A192F] leading-[1.1] mb-2">
+              Te busca <br /> propiedades
+            </h1>
+            
+            <p className="text-3xl sm:text-4xl font-extrabold text-[#007B99] mb-4">
+              24/7 <span className="text-[#0A192F] text-2xl sm:text-3xl font-bold">para tus clientes</span>
+            </p>
 
-        {/* Hero */}
-        <h1 className="text-3xl md:text-5xl font-bold mb-4 text-foreground">
-          Únete a <span className="text-teal-600">Ilyrox</span>
-        </h1>
-        <p className="text-lg text-muted-foreground mb-2">
-          Descargaste una comunidad.
-        </p>
-        <p className="text-muted-foreground mb-8 max-w-xl">
-          Un asesor inmobiliario te invitó a colaborar y compartir propiedades.
-          Regístrate y entrarás directamente a su red.
-        </p>
+            <div className="w-10 h-1 bg-[#007B99] mb-6 rounded-full" />
 
-        {code && (
-          <div className="flex items-center gap-2 text-sm text-teal-700 bg-teal-50 border border-teal-200 rounded-full px-4 py-2 mb-8">
-            <CheckCircle2 className="h-4 w-4" />
-            Código de invitación detectado
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0A192F] mb-4">
+              Únete a <span className="text-[#007B99]">ILYROX</span>
+            </h2>
+
+            <p className="text-gray-600 text-base sm:text-lg mb-8 leading-relaxed max-w-md">
+              Llena una sola vez lo que busca tu cliente y recibe{" "}
+              <span className="text-[#007B99] font-semibold">alertas</span> cuando aparezcan nuevas opciones.
+            </p>
+
+            {/* CTA Button / Estados de carga */}
+            {!checked ? (
+              <p className="text-[#007B99] animate-pulse font-medium mb-6">
+                Abriendo la app...
+              </p>
+            ) : appOpened ? (
+              <p className="text-[#007B99] font-semibold mb-6">
+                ¡La app se está abriendo!
+              </p>
+            ) : (
+              <button
+                onClick={handleActionClick}
+                className="bg-[#007B99] hover:bg-[#00647D] text-white font-bold text-lg px-8 py-3.5 rounded-lg transition-colors shadow-md mb-6"
+              >
+                Probar ILYROX
+              </button>
+            )}
           </div>
-        )}
 
-        {/* CTA / Descarga */}
-        {!checked ? (
-          <p className="text-muted-foreground animate-pulse mb-8">
-            Abriendo la app...
-          </p>
-        ) : appOpened ? (
-          <p className="text-teal-600 font-medium mb-8">
-            ¡La app se está abriendo!
-          </p>
-        ) : (
-          <Card className="w-full max-w-md mb-8 border-border/40 shadow-elegant">
-            <CardContent className="pt-6 flex flex-col gap-4">
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button
-                  size="lg"
-                  className="flex-1 gap-2"
-                  disabled={!APP_STORE_URL}
-                  asChild={!!APP_STORE_URL}
-                >
-                  {APP_STORE_URL ? (
-                    <a href={APP_STORE_URL} target="_blank" rel="noreferrer">
-                      <Apple className="h-5 w-5" /> Descargar en App Store
-                    </a>
-                  ) : (
-                    <span>
-                      <Apple className="h-5 w-5" /> App Store (pronto)
-                    </span>
-                  )}
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="flex-1 gap-2"
-                  disabled={!GOOGLE_PLAY_URL}
-                  asChild={!!GOOGLE_PLAY_URL}
-                >
-                  {GOOGLE_PLAY_URL ? (
-                    <a href={GOOGLE_PLAY_URL} target="_blank" rel="noreferrer">
-                      <Play className="h-5 w-5" /> Google Play
-                    </a>
-                  ) : (
-                    <span>
-                      <Play className="h-5 w-5" /> Google Play (pronto)
-                    </span>
-                  )}
-                </Button>
-              </div>
+          {/* Lado Derecho: Preview Mockup del Móvil */}
+          <img src={'celular_ilyrox.webp'} className="w-full h-auto lg:col-span-6 max-w-[350px] mx-auto"></img>
 
-              {storeButtonsDisabled && (
-                <p className="text-xs text-muted-foreground">
-                  La app estará disponible próximamente en App Store y Google
-                  Play.
-                </p>
-              )}
-
-              <div className="border-t border-border/40 pt-4 flex flex-col items-center gap-2">
-                <p className="text-sm font-medium text-foreground flex items-center gap-1.5">
-                  <Share2 className="h-4 w-4 text-teal-600" /> La colaboración
-                  nunca tendrá costo
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Publicar y compartir propiedades en Ilyrox siempre será gratis.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Cómo funciona */}
-        <div className="w-full max-w-md text-left">
-          <h2 className="text-xl font-semibold mb-4 text-center">
-            Cómo funciona
-          </h2>
-          <ol className="space-y-3">
-            {[
-              "Instala Ilyrox desde App Store o Google Play.",
-              "Abre la app con este enlace: tu invitación se detecta automáticamente.",
-              "Completa tu registro y obtén la aprobación de la comunidad.",
-              "Colabora, comparte propiedades y crece tu red.",
-            ].map((step, i) => (
-              <li key={i} className="flex items-start gap-3">
-                <span className="flex-shrink-0 w-7 h-7 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-sm font-semibold">
-                  {i + 1}
-                </span>
-                <span className="text-muted-foreground">{step}</span>
-              </li>
-            ))}
-          </ol>
         </div>
       </main>
 
-      <footer className="border-t border-border/40 py-6">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
+      {/* Sección Inferior: 3 Columnas Informativas */}
+      <section className="border-t border-slate-200 bg-slate-50/50 py-10">
+        <div className="container mx-auto px-6 max-w-5xl">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-slate-200">
+            
+            <div className="pt-6 md:pt-0 md:px-6 flex flex-col items-center justify-between">
+              <h3 className="text-xl font-black text-[#0A192F] mb-3 leading-tight">
+                Busca dibujando<br />zonas en el mapa
+              </h3>
+              <p className="text-sm text-slate-600 leading-relaxed max-w-xs">
+                Encuentra propiedades exactamente donde busca tu cliente.
+              </p>
+            </div>
+
+            <div className="pt-6 md:pt-0 md:px-6 flex flex-col items-center justify-between">
+              <h3 className="text-xl font-black text-[#0A192F] mb-3 leading-tight">
+                Red profesional<br />de asesores
+              </h3>
+              <p className="text-sm text-slate-600 leading-relaxed max-w-xs">
+                Comparte ideas, experiencias, sube videos y publicaciones.
+              </p>
+            </div>
+
+            <div className="pt-6 md:pt-0 md:px-6 flex flex-col items-center justify-between">
+              <h3 className="text-xl font-black text-[#0A192F] mb-3 leading-tight">
+                Comunidad<br />verificada
+              </h3>
+              <p className="text-sm text-slate-600 leading-relaxed max-w-xs">
+                Solo ingresan asesores aprobados por la comunidad.
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-slate-200 py-4 bg-white">
+        <div className="container mx-auto px-4 text-center text-xs text-slate-500">
           © {new Date().getFullYear()} Ilyrox ·{" "}
           <Link to="/terms" className="hover:underline">
             Términos
