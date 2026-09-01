@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/lib/supabase";
+import { getDeviceMetadata } from "@/utils/deviceMetadata";
 
 const APP_SCHEME =
   import.meta.env.VITE_APP_SCHEME ||
@@ -65,16 +66,26 @@ const Invite = () => {
     // cuando la app se abra por primera vez en este dispositivo.
     if (inviteCode) {
       const deviceToken = getDeviceToken();
-      supabase
-        .rpc("registrar_dispositivo_invitacion", {
-          p_device_token: deviceToken,
-          p_ref_code: inviteCode,
-          p_plataforma: "web",
-          p_user_agent: navigator.userAgent,
-        })
-        .then(({ error }) => {
-          if (error) console.warn("[invite] no se pudo registrar el dispositivo:", error);
-        });
+      getDeviceMetadata().then((metadata) => {
+        supabase
+          .rpc("registrar_dispositivo_invitacion", {
+            p_device_token: deviceToken,
+            p_ref_code: inviteCode,
+            p_plataforma: "web",
+            p_user_agent: navigator.userAgent,
+            p_ip: metadata.ip,
+            p_asn: metadata.asn,
+            p_os: metadata.os,
+            p_timezone: metadata.timezone,
+            p_pais: metadata.pais,
+            p_region: metadata.region,
+            p_ciudad: metadata.ciudad,
+            p_locale: metadata.locale,
+          })
+          .then(({ error }) => {
+            if (error) console.warn("[invite] no se pudo registrar el dispositivo:", error);
+          });
+      });
     }
 
     // Marcar como abierta si la app toma el foco (la página queda en background)
@@ -198,7 +209,7 @@ const Invite = () => {
           </div>
 
           {/* Lado Derecho: Preview Mockup del Móvil */}
-          <img src={'celular_ilyrox.webp'} className="w-full h-auto lg:col-span-6 max-w-[350px] mx-auto"></img>
+          <img src={'/celular_ilyrox.webp'} className="w-full h-auto lg:col-span-6 max-w-[350px] mx-auto"></img>
 
         </div>
       </main>
