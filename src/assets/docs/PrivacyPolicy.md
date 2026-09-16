@@ -1,6 +1,6 @@
 # POLÍTICA DE PRIVACIDAD
 
-_(VERSIÓN FINAL v9.9 — LISTA PARA TIENDAS + META SDK + ATT + WEB PÚBLICA SIN GA/PIXEL)_
+_(VERSIÓN FINAL v10.0 — LISTA PARA TIENDAS + META SDK + ATT + WEB PÚBLICA SIN GA/PIXEL + GOOGLE API DATA PROTECTION)_
 
 ---
 
@@ -12,7 +12,7 @@ _(VERSIÓN FINAL v9.9 — LISTA PARA TIENDAS + META SDK + ATT + WEB PÚBLICA SIN
 | **Contacto privacidad (ARCO)**                  | privacidad@ilyrox.com                                                                 |
 | **Contacto seguridad**                          | seguridad@ilyrox.com                                                                  |
 | **URL pública de esta política**                | [URL PÚBLICA]                                                                         |
-| **Última actualización**                        | 10/feb/26                                                                             |
+| **Última actualización**                        | 16/sep/26                                                                             |
 | **Idioma**                                      | Prevalece español.                                                                    |
 
 ---
@@ -163,6 +163,34 @@ Podemos compartir datos en estos supuestos:
 2. **Con proveedores (encargados):** hosting, almacenamiento/CDN, analítica/performance, crash reporting, notificaciones y seguridad, bajo obligaciones de confidencialidad y protección.
 3. **Con Meta y/o plataformas publicitarias y de medición (terceros)** mediante SDKs y/o cargas de audiencia: para 6.4 y medición/atribución, podremos compartir identificadores cifrados/hasheados y/o eventos de medición (por ejemplo, eventos de uso dentro de la App) conforme a permisos del sistema (por ejemplo, ATT en iOS) y a las políticas de dichas plataformas. Estas plataformas tratan la información conforme a sus propias políticas; el Responsable no controla su tratamiento posterior dentro de dichas plataformas. No compartimos datos del CRM de clientes con Meta ni con plataformas publicitarias.
 4. **Con autoridades:** cuando exista requerimiento u obligación legal aplicable.
+
+## 7 bis. Protección de Datos de Google API
+
+### Acceso a Google Calendar
+
+La aplicación ilyrox utiliza las APIs de Google Calendar únicamente para las siguientes funciones relacionadas con la gestión de citas y reuniones entre asesores dentro de la plataforma:
+
+- **Consultar** eventos del calendario del usuario vinculados a la cuenta Google autorizada.
+- **Crear** nuevos eventos de cita o reunión con los datos proporcionados por el usuario (título, fecha, hora, descripción, participantes).
+- **Actualizar** eventos existentes cuando el usuario modifique detalles de una cita o reunión.
+- **Eliminar** eventos previamente creados a través de la aplicación.
+
+### Protección de los datos recibidos
+
+Los datos de calendario recibidos a través de las APIs de Google (incluyendo títulos, descripciones, fechas, horas y datos de participantes) son:
+
+- **Protegidos mediante medidas de seguridad apropiadas** tanto en tránsito como en reposo dentro de nuestros sistemas.
+- **Accedidos exclusivamente** para los fines de sincronización y gestión de citas descritos anteriormente.
+- **No compartidos, vendidos ni utilizados** con fines publicitarios, reventa o entrenamiento de modelos de inteligencia artificial.
+- **No transferidos** a terceros más allá de lo necesario para la operación del servicio y lo descrito en esta política.
+
+### Control del usuario
+
+El usuario puede revocar el acceso a su cuenta de Google en cualquier momento a través de su cuenta de Google (https://myaccount.google.com/permissions) y solicitar la eliminación de los datos asociados a su cuenta mediante los canales de contacto establecidos en esta política.
+
+### Alcance de permisos solicitados
+
+Los permisos de Google OAuth solicitados se limitan exclusivamente a los scopes de Google Calendar necesarios para implementar las funciones de sincronización de citas descritas en esta sección. No se solicitan permisos adicionales más allá de los estrictamente necesarios.
 
 ## 8. Protección anti-reidentificación en estudios de mercado
 
