@@ -40,6 +40,7 @@ const Invite = () => {
   const [code, setCode] = useState<string>("");
   const [checked, setChecked] = useState(false);
   const [appOpened, setAppOpened] = useState(false);
+  const [linkInvalido, setLinkInvalido] = useState(false);
   const timerRef = useRef<number | null>(null);
   const openedRef = useRef(false);
 
@@ -53,87 +54,87 @@ const Invite = () => {
       "";
     setCode(inviteCode);
 
-    // Persistir el código para que la app lo tome al abrirse
-    if (inviteCode) {
-      try {
-        localStorage.setItem(INVITE_CODE_KEY, inviteCode);
-      } catch {
-        /* ignore */
-      }
+    if (!inviteCode) {
+      setChecked(true);
+      return;
     }
 
-    // Guardar el dispositivo + código ref en la BD para asociar la invitación
-    // cuando la app se abra por primera vez en este dispositivo.
-    if (inviteCode) {
+    const validateAndProceed = async () => {
+      const { data: validacion, error: validacionError } = await supabase.rpc(
+        "validar_codigo_invitacion",
+        { p_codigo: inviteCode }
+      );
+
+      if (validacionError || !validacion?.valido) {
+        console.warn("[invite] Codigo invalido o expirado:", validacion?.mensaje || validacionError);
+        setLinkInvalido(true);
+        setChecked(true);
+        return;
+      }
+
+      localStorage.setItem(INVITE_CODE_KEY, inviteCode);
+
       const deviceToken = getDeviceToken();
       const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      getDeviceMetadata().then((metadata) => {
-        supabase
-          .rpc("registrar_dispositivo_invitacion", {
-            p_device_token: deviceToken,
-            p_ref_code: inviteCode,
-            p_plataforma: isMobileDevice ? "mobile" : "web",
-            p_user_agent: navigator.userAgent,
-            p_ip: metadata.ip,
-            p_asn: metadata.asn,
-            p_os: metadata.os,
-            p_timezone: metadata.timezone,
-            p_pais: metadata.pais,
-            p_region: metadata.region,
-            p_ciudad: metadata.ciudad,
-            p_locale: metadata.locale,
-          })
-          .then(({ error }) => {
-            if (error) console.warn("[invite] no se pudo registrar el dispositivo:", error);
-          });
-      });
-    }
+      const metadata = await getDeviceMetadata();
 
-    // Marcar como abierta si la app toma el foco (la página queda en background)
-    const markOpened = () => {
-      if (document.hidden) {
-        openedRef.current = true;
-        setAppOpened(true);
-        if (timerRef.current) window.clearTimeout(timerRef.current);
+      supabase
+        .rpc("registrar_dispositivo_invitacion", {
+          p_device_token: deviceToken,
+          p_ref_code: inviteCode,
+          p_plataforma: isMobileDevice ? "mobile" : "web",
+          p_user_agent: navigator.userAgent,
+          p_ip: metadata.ip,
+          p_asn: metadata.asn,
+          p_os: metadata.os,
+          p_timezone: metadata.timezone,
+          p_pais: metadata.pais,
+          p_region: metadata.region,
+          p_ciudad: metadata.ciudad,
+          p_locale: metadata.locale,
+        })
+        .then(({ error }) => {
+          if (error) console.warn("[invite] no se pudo registrar el dispositivo:", error);
+        });
+
+      const tryOpenApp = () => {
+        const deeplink = `${APP_SCHEME}?type=invite&code=${encodeURIComponent(inviteCode)}`;
+
+        const iframe = document.createElement("iframe");
+        iframe.style.display = "none";
+        iframe.src = deeplink;
+        document.body.appendChild(iframe);
+
+        timerRef.current = window.setTimeout(() => {
+          if (!openedRef.current) {
+            setAppOpened(false);
+            setChecked(true);
+          }
+        }, 1800);
+
+        window.setTimeout(() => {
+          if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+        }, 2500);
+      };
+
+      const markOpened = () => {
+        if (document.hidden) {
+          openedRef.current = true;
+          setAppOpened(true);
+          if (timerRef.current) window.clearTimeout(timerRef.current);
+        }
+      };
+      document.addEventListener("visibilitychange", markOpened);
+
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (isMobile) {
+        window.setTimeout(tryOpenApp, 300);
+      } else {
+        setChecked(true);
       }
     };
-    document.addEventListener("visibilitychange", markOpened);
 
-    // Intentar abrir la app si está instalada
-    const tryOpenApp = () => {
-      const deeplink = `${APP_SCHEME}${
-        inviteCode ? `?type=invite&code=${encodeURIComponent(inviteCode)}` : ""
-      }`;
-
-      // Usar un iframe oculto en lugar de window.location: en iOS evita el
-      // alert nativo de error cuando la app no está instalada.
-      const iframe = document.createElement("iframe");
-      iframe.style.display = "none";
-      iframe.src = deeplink;
-      document.body.appendChild(iframe);
-
-      // Si la app no responde, asumimos que no está instalada
-      timerRef.current = window.setTimeout(() => {
-        if (!openedRef.current) {
-          setAppOpened(false);
-          setChecked(true);
-        }
-      }, 1800);
-
-      // Limpiar el iframe después del intento
-      window.setTimeout(() => {
-        if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
-      }, 2500);
-    };
-
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-    if (isMobile && inviteCode) {
-      // Solo en móvil intentamos abrir la app directamente
-      window.setTimeout(tryOpenApp, 300);
-    } else {
-      setChecked(true);
-    }
+    validateAndProceed();
 
     return () => {
       if (timerRef.current) window.clearTimeout(timerRef.current);
@@ -165,7 +166,11 @@ const Invite = () => {
           
           {/* Lado Izquierdo: Textos y Botón */}
           <div className="lg:col-span-6 flex flex-col items-start text-left">
-            {code && (
+            {linkInvalido ? (
+              <Badge variant="destructive" className="mb-4 gap-1.5 bg-red-50 text-red-600 border-red-200">
+                Este link ha expirado
+              </Badge>
+            ) : code && (
               <Badge variant="secondary" className="mb-4 gap-1.5 bg-sky-50 text-[#007B99] border-sky-200">
                 <CheckCircle2 className="h-4 w-4" /> Código de invitación detectado
               </Badge>
