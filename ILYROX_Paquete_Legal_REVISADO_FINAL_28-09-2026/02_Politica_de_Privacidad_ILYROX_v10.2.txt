@@ -1,0 +1,91 @@
+POLÍTICA DE PRIVACIDAD INTEGRAL
+Usuarios, profesionales, prospectos/leads, cursos, pagos, reseñas, CRM e inteligencia artificial
+
+
+1. Identidad y contacto del responsable
+ILYROX TECHNOLOGIES, S.A.P.I. DE C.V., RFC ITE2608279M7, es responsable del tratamiento descrito en esta Política. Domicilio social: Aguascalientes, Aguascalientes, México. Domicilio para oír y recibir notificaciones: Juan Morales 1319, Col. Hacienda los Morales, San Nicolás de los Garza, Nuevo León, México, C.P. 66495. Privacidad y ARCO: privacidad@ilyrox.com. Seguridad: seguridad@ilyrox.com. Soporte y reclamaciones: ayuda@ilyrox.com | +52 81 3679 8047.
+2. Alcance
+Aplica a personas que usan la App o el Sitio, crean perfiles, publican fichas, utilizan CRM, solicitan información, se convierten en Leads, compran o consumen Cursos, actúan como Instructores, publican reseñas, reciben comunicaciones o utilizan automatizaciones o IA.
+3. Datos personales que podemos tratar
+3.1 Cuenta y perfil
+Nombre, nombre profesional, fotografía, teléfono, correo, estado/ubicación general, empresa, experiencia, especialidad, identificadores de cuenta, reputación, reseñas, verificaciones y datos aportados al perfil.
+3.2 Inmuebles y contenido
+Precio, metraje, características, zona, ubicación o dirección exacta/aproximada, imágenes, video, estatus, documentos y metadatos asociados cuando se habiliten.
+3.3 Prospectos y Leads
+Nombre, teléfono, correo, inmueble o servicio de interés, zona, presupuesto o rango, preferencias, mensaje, fuente de campaña, citas, estatus de seguimiento e interacciones necesarias para atender la solicitud.
+3.4 CRM y datos de terceros
+Nombre, teléfono, correo, preferencias, notas, etiquetas, estatus, citas, historial y datos que un Profesional cargue legítimamente. Para estos datos ILYROX puede actuar como encargado por cuenta del Profesional, según el Acuerdo de Tratamiento de Datos.
+3.5 Cursos, Instructor, compras y facturación
+Cursos adquiridos o publicados, progreso, evaluaciones, constancias, transacciones, importes, moneda, cupones, facturación, referencias del procesador, datos fiscales del Instructor, información de pagos y saldos. ILYROX procurará no almacenar datos completos de tarjetas cuando el pago sea procesado por un tercero.
+3.6 Datos financieros o patrimoniales
+Si se habilitan funciones de crédito hipotecario, calificación financiera u otras que requieran ingresos, patrimonio, endeudamiento, estados de cuenta o información equivalente, se identificará esa finalidad y se recabará consentimiento expreso cuando lo exija la ley. No son datos necesarios para el registro básico en ILYROX.
+3.7 Actividad, reputación y comunicaciones
+Búsquedas, filtros, clics, vistas, guardados, compartidos, follows, recomendaciones, reseñas, mensajes, citas, conversiones, respuestas a campañas, consentimientos, bajas y preferencias de contacto.
+3.8 Datos técnicos, ubicación y seguridad
+IP, dispositivo, sistema operativo, versión de App, idioma, identificadores técnicos, logs, eventos de seguridad, fallas, rendimiento y ubicación aproximada. La ubicación precisa del dispositivo sólo se tratará con permiso cuando una función la requiera.
+3.9 Inferencias y datos generados por IA
+Clasificaciones, resúmenes, recomendaciones, coincidencias de propiedades, prioridad de Leads, intención estimada, tareas sugeridas y registros de automatización. Las inferencias pueden ser inexactas y se utilizan para apoyar la operación.
+3.10 Datos personales sensibles
+ILYROX no solicita datos personales sensibles para el registro ni para el uso básico de la plataforma. Si una función futura requiriera legítimamente datos sensibles, ILYROX los identificará de forma específica, limitará su tratamiento a finalidades justificadas y recabará el consentimiento expreso y por escrito mediante firma autógrafa, firma electrónica o un mecanismo de autenticación legalmente válido, salvo una excepción aplicable.
+4. Fuentes de los datos
+Los datos pueden obtenerse directamente del titular, de su actividad en ILYROX, de un Profesional que los cargue legítimamente al CRM, de formularios o campañas, de proveedores tecnológicos, autenticación, pagos, integraciones autorizadas y, cuando la ley lo permita, de fuentes de acceso público. Cuando los datos no se obtengan directamente del titular, se cumplirán las obligaciones de información correspondientes.
+5. Datos públicos y publicación en web
+Los perfiles profesionales y Contenido destinado a publicación pueden mostrarse en App y Sitio, indexarse por buscadores y compartirse por enlaces. ILYROX podrá usar formularios o botones de contacto para reducir exposición de teléfonos o correos. Los datos del CRM, mensajes privados y datos configurados como privados no se hacen públicos por el solo hecho de almacenarse.
+ILYROX no puede garantizar la eliminación inmediata de información que terceros hayan indexado, copiado o republicado fuera de sus sistemas, aunque atenderá solicitudes respecto de servicios bajo su control conforme a la ley.
+6. Finalidades primarias necesarias
+Crear, autenticar, administrar y proteger cuentas.
+Operar perfiles, fichas, buscador, feed, mensajes, agenda, CRM y networking.
+Publicar y distribuir Contenido destinado a publicación, incluyendo páginas web e indexación.
+Captar, perfilar en lo necesario, asignar, enviar y dar seguimiento a Leads y solicitudes.
+Permitir que Profesionales seleccionados atiendan solicitudes conforme a base jurídica aplicable.
+Operar IA y automatizaciones habilitadas, con registros de auditoría cuando corresponda.
+Procesar compras, acceso a Cursos, progreso, soporte, facturación, liquidaciones a Instructores y prevención de fraude.
+Administrar reseñas, reputación, reportes, seguridad y cumplimiento.
+Cumplir obligaciones legales, contractuales, fiscales, de consumo y propiedad intelectual.
+7. Finalidades secundarias u opcionales
+Enviar promociones, novedades, recomendaciones comerciales, Cursos, eventos, encuestas u ofertas por canales autorizados.
+Crear audiencias publicitarias o similares y medir campañas conforme a permisos y consentimientos aplicables.
+Personalizar publicidad o recomendaciones comerciales más allá de lo necesario para atender una solicitud concreta.
+Usar testimonios, nombre, imagen o Contenido identificable en campañas externas cuando exista autorización aplicable.
+La negativa u oposición a finalidades secundarias no impedirá el uso básico de ILYROX. El titular puede retirar o limitar estos consentimientos mediante privacidad@ilyrox.com y controles disponibles.
+8. Consentimiento y evidencia
+Cuando el tratamiento requiera consentimiento, ILYROX lo solicitará de forma libre, específica e informada. Podrá registrar identificador de cuenta o Lead, fecha y hora, versión del aviso, canal, IP o identificador técnico proporcional y opción seleccionada. Si una finalidad cambia materialmente y exige nuevo consentimiento, se solicitará antes de aplicar la nueva finalidad.
+9. Leads y transferencias a Profesionales
+Cuando una persona solicite información, ILYROX puede compartir los datos estrictamente necesarios con uno o más Profesionales seleccionados para atenderla, conforme al aviso mostrado y a la base jurídica aplicable. Cuando una transferencia requiera consentimiento, la interfaz deberá permitir manifestar si se acepta o no esa transferencia en los términos legalmente exigibles.
+Cláusula de consentimiento para transferencias que lo requieran
+Cuando la transferencia de datos de un Lead a uno o más Profesionales requiera consentimiento, ILYROX deberá presentar una elección afirmativa separada en el formulario o pantalla correspondiente: “[ ] ACEPTO / [ ] NO ACEPTO que ILYROX transfiera los datos estrictamente necesarios de mi solicitud a uno o más Profesionales seleccionados para que atiendan el inmueble o servicio solicitado”. Si la persona selecciona “No acepto”, ILYROX no realizará esa transferencia con base en consentimiento; ello no afectará funciones de ILYROX que no dependan de dicha transferencia.
+El Profesional receptor usará los datos para atender la solicitud y sólo podrá ampliarlos a otras finalidades con base jurídica propia. ILYROX podrá imponer condiciones contractuales, trazabilidad y sanciones para reducir uso indebido de Leads.
+10. CRM: relación responsable-encargado
+Respecto de datos que un Profesional incorpore al CRM por cuenta propia, el Profesional puede actuar como responsable e ILYROX como encargado tecnológico. Esa relación se rige por el Acuerdo de Tratamiento de Datos para Profesionales e Instructores, que limita el tratamiento a instrucciones documentadas, seguridad, soporte y obligaciones legalmente permitidas. Los contactos privados del CRM no se utilizarán para campañas de ILYROX salvo autorización independiente del titular.
+11. Inteligencia artificial y decisiones automatizadas
+ILYROX puede usar sistemas propios o de proveedores para recomendaciones, coincidencias, resúmenes, generación de contenido y automatizaciones. Se aplicarán minimización y controles de acceso. Las decisiones con efectos jurídicos significativos no deberán depender exclusivamente de una salida automatizada salvo que exista base jurídica y un diseño específico compatible con la normativa aplicable.
+12. Cursos, Instructores y compradores
+ILYROX tratará información necesaria para publicar Cursos, validar cuentas de Instructor, gestionar acceso, compras, soporte, reembolsos, contracargos y liquidaciones. El Instructor sólo podrá utilizar datos de compradores para prestar o dar soporte al Curso y para otras finalidades cuando cuente con base legal o consentimiento propio. La aceptación del Contrato de Instructor incorpora reglas específicas de protección de datos.
+13. Comunicaciones por WhatsApp, correo, SMS, llamadas y push
+ILYROX distingue comunicaciones necesarias del servicio de promociones. Los avisos de cuenta, seguridad, soporte, citas, Leads, compras, acceso a Cursos o cambios legales pueden enviarse por medios razonablemente vinculados al servicio. Las promociones se sujetan a la Autorización y Preferencias de Contacto. El titular puede darse de baja sin afectar el servicio básico.
+14. Publicidad, SDKs, ATT y medición
+ILYROX puede integrar servicios de medición y publicidad, incluyendo Meta, para atribución, adquisición y optimización. Cuando se utilicen identificadores como correo o teléfono para emparejamiento publicitario, podrán enviarse en formato hasheado o equivalente conforme a permisos y consentimientos. En iOS, cuando una función constituya tracking según las reglas aplicables de Apple, se solicitará autorización ATT.
+15. Cookies y tecnologías similares
+El Sitio puede utilizar tecnologías necesarias para sesión, seguridad, preferencias y funcionamiento. Analítica, publicidad o medición no esenciales se activarán y describirán conforme a la configuración vigente y normativa aplicable. Cuando exista centro de preferencias, el Usuario podrá modificar allí sus elecciones.
+16. Con quién compartimos datos
+Otros Usuarios o el público respecto de información destinada a publicación.
+Profesionales seleccionados para atender Leads, cuando exista base jurídica.
+Proveedores encargados: hosting, almacenamiento, seguridad, soporte, mensajería, correo, SMS, pagos, analítica, IA, mapas y notificaciones.
+Instructores o proveedores de Cursos cuando sea estrictamente necesario para entregar una compra o soporte.
+Tiendas de aplicaciones y procesadores de pago para transacciones, suscripciones, prevención de fraude y gestión de compras.
+Plataformas publicitarias o de medición cuando la finalidad y consentimiento aplicables lo permitan.
+Autoridades competentes ante obligación, requerimiento válido o necesidad jurídica de defensa.
+17. Estudios, estadísticas y datos agregados
+ILYROX puede analizar oferta, demanda, búsquedas, inventario, tendencias, interacción y tiempos de mercado para generar productos estadísticos. Se procurará usar información agregada, disociada o con umbrales que reduzcan el riesgo de identificar a personas o domicilios. ILYROX no venderá teléfonos o correos identificables como listado comercial salvo consentimiento expreso y cumplimiento legal.
+18. Procesamiento internacional y subencargados
+Algunos proveedores pueden procesar datos fuera de México. ILYROX aplicará medidas contractuales, técnicas y organizativas razonables. Cuando ILYROX actúe como encargado de un Profesional, podrá utilizar subencargados necesarios para el servicio bajo obligaciones compatibles y mantendrá información razonable sobre categorías de proveedores.
+19. Seguridad e incidentes
+ILYROX mantiene medidas administrativas, técnicas y físicas razonables según el riesgo, incluyendo controles de acceso, cifrado en tránsito cuando aplique, registros, respaldos, monitoreo y minimización. Si una vulneración afecta de forma significativa derechos patrimoniales o morales de titulares, realizará las notificaciones que correspondan conforme a la ley. Vulnerabilidades: seguridad@ilyrox.com.
+20. Conservación
+Los datos se conservarán durante el tiempo necesario para finalidades informadas, relación contractual, seguridad, fraude, derechos, disputas y obligaciones legales. Al concluir la finalidad, se bloquearán, eliminarán o disociarán según corresponda, sujeto a periodos legales, respaldos y defensa de reclamaciones.
+21. Derechos ARCO, revocación y limitación
+El titular puede solicitar acceso, rectificación, cancelación u oposición (ARCO), revocar consentimientos cuando proceda y limitar el uso o divulgación escribiendo al Área de Privacidad de ILYROX en privacidad@ilyrox.com. La solicitud deberá permitir identificar al titular o a su representante, precisar el derecho que se desea ejercer y describir los datos o tratamiento involucrado. ILYROX comunicará la determinación adoptada en un plazo máximo de veinte días hábiles desde la recepción de la solicitud y, si resulta procedente, la hará efectiva dentro de los quince días hábiles siguientes a la comunicación de la respuesta. Ambos plazos podrán ampliarse una sola vez por un periodo igual cuando las circunstancias lo justifiquen. Las bajas promocionales también podrán ejecutarse mediante el propio mensaje o los controles de cuenta.
+22. Menores de edad
+ILYROX está dirigido exclusivamente a mayores de 18 años. Si identifica razonablemente una cuenta de una persona menor de edad, podrá suspenderla, eliminarla y aplicar los Estándares de Seguridad Infantil.
+23. Cambios y contacto
+La versión vigente se publicará en el Sitio y podrá notificarse en la App. Si una nueva finalidad requiere consentimiento, se solicitará antes de aplicarla. Para datos recabados por medios electrónicos, ILYROX pondrá a disposición un Aviso de Privacidad Simplificado y el enlace a esta Política integral. Contacto: privacidad@ilyrox.com | +52 81 3679 8047. La persona titular puede acudir a la Secretaría Anticorrupción y Buen Gobierno o a la autoridad competente que legalmente corresponda en materia de protección de datos.

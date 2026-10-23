@@ -1,0 +1,63 @@
+CONTRATO ELECTRÓNICO DE INSTRUCTOR / CREADOR ILYROX
+Publicación, comercialización, cobro, licencias, pagos y responsabilidades
+
+
+1. Partes y celebración electrónica
+Este Contrato se celebra entre ILYROX TECHNOLOGIES, S.A.P.I. DE C.V., RFC ITE2608279M7 (“ILYROX”), y la persona física o moral que solicita activar un perfil de Instructor (“Instructor”). La aceptación electrónica produce efectos desde el momento en que el Instructor ejecuta la acción afirmativa de aceptación y ILYROX registra dicha evidencia.
+
+2. Objeto y modelo de relación
+ILYROX proporciona al Instructor una plataforma para alojar, distribuir, promocionar y facilitar la comercialización de Cursos. En los Cursos del Instructor, éste conserva la calidad de creador y proveedor del contenido y es responsable de su legalidad, titularidad, calidad, exactitud, oferta y soporte académico. ILYROX actúa como proveedor de tecnología y distribución y, cuando corresponda, como facilitador o gestor de cobro y reembolso, sin perjuicio de obligaciones que la ley le imponga directamente.
+El Instructor autoriza a ILYROX a recibir pagos de compradores por cuenta del Instructor, procesar devoluciones, aplicar ajustes, deducir tarifas y efectuar liquidaciones conforme a este Contrato. Esta autorización es limitada a la operación de Cursos dentro de ILYROX.
+3. Requisitos del Instructor
+Ser mayor de 18 años y tener capacidad para contratar; si actúa por una persona moral, contar con facultades suficientes.
+Proporcionar nombre, identificación comercial, país, datos fiscales, medios de contacto, cuenta bancaria o método de liquidación y demás información razonablemente solicitada.
+Mantener información actualizada y cooperar con verificaciones de identidad, fraude, fiscalidad, propiedad intelectual o cumplimiento.
+No utilizar identidades falsas, cuentas de terceros ni información de pago no autorizada.
+4. Obligaciones sobre el Curso
+Crear y mantener contenido lícito, veraz, útil y coherente con la oferta.
+Contar con derechos y autorizaciones sobre videos, música, imágenes, marcas, textos, plantillas, software y demás materiales.
+No prometer resultados garantizados, ingresos ciertos, certificaciones oficiales inexistentes ni beneficios que no puedan sustentarse.
+Informar requisitos, alcance, duración, modalidad, vigencia de acceso, actualizaciones y limitaciones materiales.
+Brindar soporte académico razonable y atender solicitudes relacionadas con el contenido.
+Mantener respaldos del material fuente y evidencia de licencias de terceros cuando resulte aplicable.
+Cumplir Community Guidelines, Política de Propiedad Intelectual, privacidad, reglas de tiendas y normativa aplicable.
+5. Propiedad intelectual y licencia a ILYROX
+El Instructor conserva la titularidad de su Curso. Para prestar los Servicios concede a ILYROX una licencia mundial, no exclusiva, durante la vigencia y por el periodo necesario para honrar compras existentes, para alojar, almacenar, reproducir, codificar, adaptar técnicamente, transmitir, comunicar públicamente, mostrar, distribuir, crear miniaturas, transcripciones, subtítulos y formatos técnicos, y utilizar fragmentos razonables, nombre profesional, imagen, marcas y materiales promocionales para anunciar el Curso e ILYROX.
+ILYROX no adquiere la propiedad del Curso por virtud de este Contrato. Las modificaciones sustantivas, traducciones comerciales integrales o explotación ajena a ILYROX requerirán autorización adicional cuando no sean técnicamente necesarias para la prestación del servicio.
+6. Continuidad para compradores existentes
+Si el Instructor retira un Curso, termina su cuenta o ILYROX lo suspende, ILYROX podrá mantener una copia funcional y acceso limitado al Curso durante el tiempo necesario para respetar derechos de compradores existentes, resolver reembolsos, disputas, respaldos o exigencias legales. Alternativamente, ILYROX podrá reembolsar compradores y cargar los importes correspondientes al saldo presente o futuro del Instructor cuando el motivo sea atribuible a éste.
+7. Precio, promociones y oferta
+El Instructor podrá proponer precios dentro de las herramientas disponibles. ILYROX puede ofrecer campañas, cupones, bundles, afiliación o promociones únicamente conforme a las autorizaciones o reglas visibles en el panel. El Instructor es responsable de que la descripción comercial de su Curso sea veraz y no engañosa.
+8. Modelo económico y liquidaciones
+Salvo condiciones comerciales específicas aceptadas electrónicamente para un Curso, se aplicará el Anexo Económico de este Contrato. El porcentaje se calcula sobre el Ingreso Neto Distribuible, no sobre importes que ILYROX nunca recibe o que deba devolver, retener o entregar a terceros.
+ILYROX podrá deducir impuestos indirectos incluidos en el precio, tarifas de tienda o procesador, comisiones de afiliación o promoción aprobadas, reembolsos, contracargos, descuentos financiados por el Instructor, costos atribuibles a fraude o incumplimiento del Instructor, retenciones fiscales obligatorias y otros conceptos expresamente aceptados o legalmente exigibles.
+Las liquidaciones se realizarán conforme al calendario mostrado en el panel. Si el panel no establece otro calendario, ILYROX realizará liquidación mensual dentro de los primeros quince días hábiles del mes siguiente, respecto de importes elegibles y una vez considerados periodos de reembolso, contracargos y verificaciones razonables.
+9. Reembolsos, contracargos y reservas
+ILYROX puede tramitar reembolsos y cancelaciones conforme a la ley, condiciones publicadas, reglas de tiendas/procesadores, fraude, incumplimiento o protección del comprador. Los importes reembolsados, contracargos y costos operativos directamente atribuibles al Curso podrán deducirse del saldo actual o futuro del Instructor.
+Si existen niveles anormales de reclamaciones, fraude, contracargos, investigaciones, cierre de cuenta o riesgo razonable de obligaciones pendientes, ILYROX podrá establecer una reserva proporcional y temporal sobre saldos. Tras la terminación, ILYROX podrá mantener reservas hasta por 180 días naturales cuando sea razonablemente necesario para cubrir reembolsos o contracargos aún posibles, sin perjuicio de extender el bloqueo sobre montos específicamente disputados o exigidos por ley.
+10. Impuestos, facturación y documentación fiscal
+Cada parte es responsable de las obligaciones fiscales que legalmente le correspondan. El Instructor deberá proporcionar constancia de situación fiscal, datos para CFDI y documentación necesaria. El flujo de cobro, facturación, retenciones y comprobación podrá variar según el canal, el tipo de Instructor, la jurisdicción y la estructura fiscal aplicable. ILYROX podrá efectuar retenciones, emitir o gestionar comprobantes, autofacturas, recibos o documentos de liquidación cuando la ley o la estructura operativa lo requieran, y el Instructor autoriza el tratamiento de sus datos fiscales para estos fines. Antes de activar ventas, ILYROX informará en el panel o documentación aplicable el esquema operativo correspondiente; el Instructor conservará responsabilidad sobre las declaraciones y obligaciones que la ley no atribuya a ILYROX.
+11. Soporte, calidad y reclamaciones
+El Instructor atenderá preguntas sobre contenido, materiales y promesas del Curso. ILYROX atenderá problemas de plataforma, acceso, pago y operación. ILYROX podrá pedir al Instructor que responda una reclamación en un plazo razonable y podrá intervenir, reembolsar, suspender ventas o limitar el Curso si el Instructor no responde o si el volumen de quejas, devoluciones o contracargos resulta incompatible con estándares de calidad, seguridad o cumplimiento.
+12. Datos personales de compradores
+El Instructor sólo podrá acceder a los datos de compradores estrictamente necesarios para prestar o soportar el Curso. No podrá venderlos, cederlos, enriquecerlos, exportarlos para fines ajenos ni agregarlos a campañas de marketing sin base jurídica propia. Se aplica el Acuerdo de Tratamiento de Datos para Profesionales e Instructores y la Política de Privacidad.
+13. Uso de inteligencia artificial
+El Instructor puede utilizar herramientas de IA siempre que mantenga responsabilidad sobre legalidad, derechos, veracidad y calidad. No podrá cargar datos personales de alumnos en servicios externos de IA sin base jurídica, ni utilizar IA para clonar o suplantar voz, imagen o identidad de terceros sin autorización aplicable. Si el Curso contiene material sintético que pueda inducir razonablemente a error sobre identidad o autenticidad, deberá informarse cuando resulte necesario.
+14. Independencia de las partes
+El Instructor es contratista independiente. Este Contrato no crea relación laboral, sociedad, franquicia, representación general, mandato distinto al cobro limitado previsto, agencia exclusiva ni facultad para obligar a ILYROX frente a terceros. El Instructor determina cómo crea su contenido, sujeto a los requisitos del servicio y la ley.
+15. Suspensión y terminación
+ILYROX puede rechazar, despublicar o suspender un Curso o una cuenta por incumplimiento, fraude, infracción intelectual, riesgo de seguridad, quejas relevantes, altas tasas de reembolso/contracargo, impago, incumplimiento fiscal/documental o requerimiento legal. Cuando sea razonable, se permitirá aclaración; ante riesgo grave la medida podrá ser inmediata.
+El Instructor puede solicitar terminar su participación, pero la terminación no elimina obligaciones pendientes, reembolsos, contracargos, impuestos, licencias necesarias para compradores existentes, indemnidad, confidencialidad o conservación de evidencia.
+16. Indemnidad y responsabilidad
+En la medida permitida por la ley, el Instructor mantendrá a ILYROX, sus administradores y colaboradores en paz y a salvo respecto de reclamaciones de terceros derivadas del Curso, publicidad del Instructor, incumplimiento de promesas, infracción de propiedad intelectual, uso indebido de datos, impuestos u otros actos atribuibles al Instructor. ILYROX notificará razonablemente las reclamaciones cuando proceda. Esta obligación no cubre daños causados por actos atribuibles a ILYROX.
+ILYROX no garantiza ventas, posicionamiento, ingresos, tasa de conversión ni disponibilidad ininterrumpida. Las limitaciones de responsabilidad se aplican en la máxima medida permitida por la ley y no excluyen responsabilidades irrenunciables.
+17. Confidencialidad
+El Instructor mantendrá confidencial la información no pública sobre tecnología, precios negociados, métricas internas, seguridad, datos de compradores, estrategias y documentación de ILYROX. La obligación no aplica a información pública legítimamente, recibida lícitamente de terceros o cuya divulgación exija una autoridad competente.
+18. Modificaciones y versiones
+ILYROX puede actualizar este Contrato por cambios legales, técnicos o comerciales. Los cambios materiales se notificarán y, cuando afecten de manera sustancial obligaciones económicas o requieran aceptación, el Instructor deberá volver a aceptar la nueva versión antes de continuar con la función correspondiente.
+19. Ley aplicable y jurisdicción
+El Contrato se rige por las leyes de los Estados Unidos Mexicanos. Entre partes empresariales y salvo norma imperativa distinta, cualquier controversia se someterá a los tribunales competentes de Aguascalientes, Aguascalientes, México.
+20. Contacto
+ILYROX: ayuda@ilyrox.com | +52 81 3679 8047. Domicilio para notificaciones: Juan Morales 1319, Col. Hacienda los Morales, San Nicolás de los Garza, Nuevo León, México, C.P. 66495.
+ANEXO A - CONDICIONES ECONÓMICAS PREDETERMINADAS
+El Anexo Económico forma parte integrante de este Contrato. La aceptación electrónica del Contrato comprende el Anexo vigente mostrado al Instructor. Cualquier condición económica distinta deberá quedar identificada y aceptada electrónicamente antes de producir efectos.

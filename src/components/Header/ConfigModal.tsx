@@ -12,6 +12,8 @@ import {
   Pen,
   Check,
   X,
+  FileText,
+  ChevronRight,
 } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Input } from "../ui/input";
@@ -25,6 +27,7 @@ import {
 } from "../ui/select";
 import { ESTADOS_MEXICO } from "@/constants/locations";
 import { resetNumber } from "@/utils/resetNumber";
+import { LegalDocumentModal, type LegalDocumentType } from "@/components/auth/LegalDocumentModal";
 
 interface ConfigModalProps {
   open: boolean;
@@ -55,6 +58,13 @@ export const ConfigModal = ({
   const [localOverrides, setLocalOverrides] = useState<Partial<typeof profile>>(
     {},
   );
+  const [showLegalModal, setShowLegalModal] = useState(false);
+  const [legalDocToShow, setLegalDocToShow] = useState<LegalDocumentType>("terms");
+
+  const openLegalModal = (doc: LegalDocumentType) => {
+    setLegalDocToShow(doc);
+    setShowLegalModal(true);
+  };
 
   // Reset local form states when modal opens/closes
   useEffect(() => {
@@ -106,8 +116,9 @@ export const ConfigModal = ({
       : profile.estado || "No especificado";
 
   return (
-    <Modal isOpen={open} onClose={() => onOpenChange(false)} title="Mi Perfil">
-      <div className="flex flex-col gap-6 py-4">
+    <>
+      <Modal isOpen={open} onClose={() => onOpenChange(false)} title="Mi Perfil">
+        <div className="flex flex-col gap-6 py-4">
         {/* Header con foto y nombre */}
         <div className="flex flex-col items-center gap-4 text-center">
           <div className="relative">
@@ -319,7 +330,94 @@ export const ConfigModal = ({
           <Shield className="h-3 w-3" />
           <span>Tus datos personales están protegidos por ilyrox.</span>
         </div>
+
+        {/* Documentos legales */}
+        <div className="px-2">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+            Documentos legales
+          </p>
+          <div className="space-y-1.5">
+            <LegalDocButton 
+              doc="terms" 
+              label="Términos y Condiciones" 
+              onClick={openLegalModal} 
+            />
+            <LegalDocButton 
+              doc="privacy" 
+              label="Política de Privacidad" 
+              onClick={openLegalModal} 
+            />
+            <LegalDocButton 
+              doc="community-guidelines" 
+              label="Community Guidelines" 
+              onClick={openLegalModal} 
+            />
+            <LegalDocButton 
+              doc="estandares-seguridad-infantil" 
+              label="Estándares de Seguridad Infantil" 
+              onClick={openLegalModal} 
+            />
+            <LegalDocButton 
+              doc="autorizacion-preferencias-contacto" 
+              label="Autorización y Preferencias de Contacto" 
+              onClick={openLegalModal} 
+            />
+            <LegalDocButton 
+              doc="aviso-privacidad-simplificado" 
+              label="Aviso de Privacidad Simplificado" 
+              onClick={openLegalModal} 
+            />
+            <LegalDocButton 
+              doc="condiciones-compra-suscripciones-reembolsos" 
+              label="Condiciones de Compra y Reembolsos" 
+              onClick={openLegalModal} 
+            />
+            <LegalDocButton 
+              doc="contrato-instructor-creador" 
+              label="Contrato de Instructor Creador" 
+              onClick={openLegalModal} 
+            />
+            <LegalDocButton 
+              doc="acuerdo-tratamiento-datos" 
+              label="Acuerdo de Tratamiento de Datos" 
+              onClick={openLegalModal} 
+            />
+            <LegalDocButton 
+              doc="politica-propiedad-intelectual" 
+              label="Política de Propiedad Intelectual" 
+              onClick={openLegalModal} 
+            />
+          </div>
+        </div>
       </div>
-    </Modal>
+      </Modal>
+
+      <LegalDocumentModal
+        isOpen={showLegalModal}
+        onClose={() => setShowLegalModal(false)}
+        initialDocument={legalDocToShow}
+      />
+    </>
   );
 };
+
+const LegalDocButton = ({ 
+  doc, 
+  label, 
+  onClick 
+}: { 
+  doc: LegalDocumentType; 
+  label: string; 
+  onClick: (doc: LegalDocumentType) => void;
+}) => (
+  <button
+    type="button"
+    onClick={() => onClick(doc)}
+    className="flex items-center justify-between w-full text-sm text-muted-foreground hover:text-primary transition-colors p-2 rounded-lg hover:bg-muted/30 text-left"
+  >
+    <span>{label}</span>
+    <ChevronRight className="h-4 w-4 opacity-50" />
+  </button>
+);
+
+export default ConfigModal;

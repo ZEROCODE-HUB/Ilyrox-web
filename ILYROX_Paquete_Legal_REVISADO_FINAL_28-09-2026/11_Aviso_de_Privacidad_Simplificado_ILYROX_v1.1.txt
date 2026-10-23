@@ -1,0 +1,20 @@
+AVISO DE PRIVACIDAD SIMPLIFICADO
+Para recabación electrónica de datos en ILYROX
+1. Datos personales que podemos recabar
+Según la pantalla o función, ILYROX puede recabar datos de identificación y contacto; perfil profesional; información de inmuebles o contenido; datos de interés y seguimiento de Leads; actividad e interacción; datos técnicos y de seguridad; información de Cursos, compras y facturación; y datos fiscales del Instructor. Si se habilitan funciones de crédito u otras equivalentes, podrán recabarse datos financieros o patrimoniales con consentimiento expreso cuando legalmente corresponda.
+ILYROX no solicita datos personales sensibles para el registro ni para el uso básico. Si una función futura los requiere legítimamente, se identificarán de forma específica y, cuando la ley lo exija, se obtendrá consentimiento expreso y por escrito mediante firma autógrafa, firma electrónica o un mecanismo de autenticación aplicable.
+2. Finalidades necesarias
+Crear, autenticar, administrar y proteger cuentas.
+Operar perfiles, fichas, búsquedas, mensajería, agenda, CRM, Cursos, pagos, soporte y seguridad.
+Atender solicitudes, perfilar lo necesario y gestionar Leads.
+Publicar el Contenido que el Usuario destine a publicación.
+Operar automatizaciones e IA habilitadas, prevenir fraude y cumplir obligaciones legales.
+3. Finalidades opcionales
+Con autorización separada, ILYROX puede enviar promociones, novedades, Cursos, eventos u ofertas; crear audiencias publicitarias o medir campañas; y utilizar testimonios o contenido identificable en campañas externas. Rechazar estas finalidades no impide el uso básico de ILYROX.
+4. Transferencia de Leads a Profesionales
+Cuando una solicitud de información requiera transferir datos a uno o más asesores/profesionales seleccionados y el consentimiento sea legalmente exigible, la pantalla deberá permitir elegir expresamente:
+Si se elige “No acepto”, ILYROX no realizará esa transferencia con base en consentimiento; la negativa no afecta otras funciones que no dependan de la transferencia.
+5. Limitación, revocación y derechos ARCO
+Puedes limitar el uso o divulgación, revocar consentimientos cuando proceda y ejercer acceso, rectificación, cancelación u oposición escribiendo a privacidad@ilyrox.com. Las preferencias promocionales también podrán modificarse mediante los mecanismos de baja disponibles en la App, Sitio o mensajes.
+6. Aviso integral
+Consulta la Política de Privacidad Integral vigente en https://www.ilyrox.com/legal/privacidad. ILYROX puede actualizar este aviso y comunicará cambios materiales por medios razonables.

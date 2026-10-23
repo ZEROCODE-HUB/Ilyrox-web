@@ -140,16 +140,64 @@ export const Footer = () => {
             <p>© 2025 ilyrox. Todos los derechos reservados.</p>
             <div className="flex gap-6">
               <Link
-                to="/search"
+                to="/terms"
                 className="hover:text-primary transition-colors"
               >
                 Términos y Condiciones
               </Link>
               <Link
-                to="/search"
+                to="/privacy"
                 className="hover:text-primary transition-colors"
               >
                 Aviso de Privacidad
+              </Link>
+              <Link
+                to="/legal/aviso-privacidad-simplificado"
+                className="hover:text-primary transition-colors"
+              >
+                Aviso de Privacidad Simplificado
+              </Link>
+              <Link
+                to="/legal/condiciones-compra-suscripciones-reembolsos"
+                className="hover:text-primary transition-colors"
+              >
+                Condiciones de Compra
+              </Link>
+              <Link
+                to="/legal/autorizacion-preferencias-contacto"
+                className="hover:text-primary transition-colors"
+              >
+                Preferencias de Contacto
+              </Link>
+              <Link
+                to="/legal/estandares-seguridad-infantil"
+                className="hover:text-primary transition-colors"
+              >
+                Seguridad Infantil
+              </Link>
+              <Link
+                to="/legal/contrato-instructor-creador"
+                className="hover:text-primary transition-colors"
+              >
+                Contrato Instructor
+              </Link>
+              <Link
+                to="/legal/acuerdo-tratamiento-datos"
+                className="hover:text-primary transition-colors"
+              >
+                Tratamiento de Datos
+              </Link>
+              <Link
+                to="/legal/politica-propiedad-intelectual"
+                className="hover:text-primary transition-colors"
+              >
+                Propiedad Intelectual
+              </Link>
+              <Link
+                to="/legal/community-guidelines"
+                className="hover:text-primary transition-colors"
+              >
+                Community Guidelines
               </Link>
             </div>
           </div>

@@ -10,9 +10,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Camera, Eye, EyeOff, User as UserIcon, X } from "lucide-react";
+import { Camera, Eye, EyeOff, User as UserIcon, X, Shield, FileText, Users, Globe, CheckCircle, AlertCircle, Info } from "lucide-react";
 import { useAuthForm } from "@/hooks/useAuthForm";
 import { resetNumber } from "@/utils/resetNumber";
+import { useToast } from "@/hooks/use-toast";
 
 import {
   Select,
@@ -22,12 +23,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ESTADOS_MEXICO } from "@/constants/MexLocations/estados";
+import { LegalDocumentModal } from "./LegalDocumentModal";
+import { Checkbox } from "@/components/ui/checkbox";
+import { PrivacyNoticeBlock } from "@/components/legal/PrivacyNoticeBlock";
 
 export const Register = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showLegalModal, setShowLegalModal] = useState(false);
+  const [legalDocToShow, setLegalDocToShow] = useState<"terms" | "privacy">("terms");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Legal checkboxes state
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [readPrivacy, setReadPrivacy] = useState(false);
+  const [confirmedAge, setConfirmedAge] = useState(false);
+  const [acknowledgedPublicProfile, setAcknowledgedPublicProfile] = useState(false);
 
   const {
     formState,
@@ -38,6 +50,8 @@ export const Register = () => {
     handleRegister,
     resetForm,
   } = useAuthForm();
+
+  const { toast } = useToast();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let { id, value } = e.target;
@@ -56,23 +70,70 @@ export const Register = () => {
     if (file) handleAvatarSelect(file);
   };
 
+  const validateLegalCheckboxes = (): boolean => {
+    if (!acceptedTerms) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Debes aceptar los Términos y Condiciones de ILYROX",
+      });
+      return false;
+    }
+    if (!readPrivacy) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Debes confirmar haber leído la Política de Privacidad",
+      });
+      return false;
+    }
+    if (!confirmedAge) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Debes confirmar que tienes 18 años o más",
+      });
+      return false;
+    }
+    if (!acknowledgedPublicProfile) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Debes confirmar qué información de tu perfil será pública",
+      });
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateLegalCheckboxes()) return;
     const success = await handleRegister();
     if (success) {
       navigate("/");
       resetForm();
+      setAcceptedTerms(false);
+      setReadPrivacy(false);
+      setConfirmedAge(false);
+      setAcknowledgedPublicProfile(false);
     }
   };
 
+  const openLegalModal = (doc: "terms" | "privacy") => {
+    setLegalDocToShow(doc);
+    setShowLegalModal(true);
+  };
+
   return (
-    <Card className="border-border/50 shadow-lg">
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">Crear cuenta</CardTitle>
-        <CardDescription>Completa el formulario para comenzar</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <>
+      <Card className="border-border/50 shadow-lg">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold">Crear cuenta</CardTitle>
+          <CardDescription>Completa el formulario para comenzar</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
           {/* Avatar Upload */}
           <div className="flex flex-col items-center justify-center space-y-3 pb-2">
             <div className="relative">
@@ -288,6 +349,99 @@ export const Register = () => {
             </div>
           </div>
 
+          {/* Aviso de Privacidad Simplificado - Onboarding */}
+          <PrivacyNoticeBlock context="onboarding" />
+
+          {/* Legal Checkboxes & Profile Publicity */}
+          <div className="space-y-3 pt-2 border-t border-border/50">
+            {/* 1. Términos y Condiciones */}
+            <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
+              <Checkbox
+                id="acceptedTerms"
+                checked={acceptedTerms}
+                onCheckedChange={setAcceptedTerms}
+                disabled={loading}
+                className="mt-0.5 h-4.5 w-4.5 rounded border-slate-300 text-primary focus:ring-primary"
+              />
+              <div className="flex-1 text-sm text-slate-700">
+                <Label htmlFor="acceptedTerms" className="font-medium cursor-pointer">
+                  Acepto los <span className="text-primary hover:underline cursor-pointer" onClick={() => openLegalModal("terms")}>Términos y Condiciones de ILYROX</span>
+                </Label>
+                <p className="text-xs text-slate-500 mt-0.5">Obligatorio. Reglas de uso, leads, CRM, IA, cursos, pagos y propiedad intelectual.</p>
+              </div>
+            </div>
+
+            {/* 2. Política de Privacidad */}
+            <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
+              <Checkbox
+                id="readPrivacy"
+                checked={readPrivacy}
+                onCheckedChange={setReadPrivacy}
+                disabled={loading}
+                className="mt-0.5 h-4.5 w-4.5 rounded border-slate-300 text-primary focus:ring-primary"
+              />
+              <div className="flex-1 text-sm text-slate-700">
+                <Label htmlFor="readPrivacy" className="font-medium cursor-pointer">
+                  He leído la <span className="text-primary hover:underline cursor-pointer" onClick={() => openLegalModal("privacy")}>Política de Privacidad</span>
+                </Label>
+                <p className="text-xs text-slate-500 mt-0.5">Obligatorio. Tratamiento de datos, finalidades, consentimientos, transferencias, derechos ARCO y seguridad.</p>
+              </div>
+            </div>
+
+            {/* 3. Confirmación de mayoría de edad */}
+            <div className="flex items-start gap-3 p-3 rounded-xl bg-amber-50 border border-amber-100">
+              <Checkbox
+                id="confirmedAge"
+                checked={confirmedAge}
+                onCheckedChange={setConfirmedAge}
+                disabled={loading}
+                className="mt-0.5 h-4.5 w-4.5 rounded border-amber-300 text-amber-700 focus:ring-amber-600"
+              />
+              <div className="flex-1 text-sm text-slate-700">
+                <Label htmlFor="confirmedAge" className="font-medium cursor-pointer">
+                  Confirmo que tengo 18 años o más
+                </Label>
+                <p className="text-xs text-slate-500 mt-0.5">Obligatorio. ILYROX está dirigido exclusivamente a personas mayores de edad.</p>
+              </div>
+            </div>
+
+            {/* 4. Confirmación de perfil público */}
+            <div className="flex items-start gap-3 p-3 rounded-xl bg-blue-50 border border-blue-100">
+              <div className="mt-0.5 flex-shrink-0">
+                <Info className="h-5 w-5 text-blue-600" />
+              </div>
+              <div className="flex-1 text-sm text-slate-700">
+                <p className="font-medium">Información pública de tu perfil</p>
+                <p className="text-xs text-slate-600 mt-1">
+                  Al registrarte, la siguiente información será <strong>visible públicamente</strong> en tu perfil profesional y en fichas que publiques:
+                </p>
+                <ul className="list-disc list-inside text-xs text-slate-600 mt-1.5 space-y-1">
+                  <li>Nombre completo y foto de perfil</li>
+                  <li>Estado y ocupación (ej. "Agente Inmobiliario")</li>
+                  <li>Biografía (si la completas)</li>
+                  <li>Fichas de inmuebles que publiques (precio, ubicación, fotos, descripción)</li>
+                  <li>Reseñas que recibas y des</li>
+                  <li>Cursos que publiques como Instructor</li>
+                </ul>
+                <p className="text-xs text-slate-500 mt-2">
+                  Tu teléfono, email, CRM, mensajes privados y datos fiscales <strong>nunca</strong> se publican.
+                </p>
+                <div className="flex items-center gap-2 mt-2">
+                  <Checkbox
+                    id="acknowledgedPublicProfile"
+                    checked={acknowledgedPublicProfile}
+                    onCheckedChange={setAcknowledgedPublicProfile}
+                    disabled={loading}
+                    className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
+                  />
+                  <Label htmlFor="acknowledgedPublicProfile" className="font-medium cursor-pointer text-sm">
+                    Entiendo y acepto qué información será pública
+                  </Label>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <Button
             type="submit"
             className="w-full h-11 text-base font-medium"
@@ -298,5 +452,12 @@ export const Register = () => {
         </form>
       </CardContent>
     </Card>
+
+    <LegalDocumentModal
+      isOpen={showLegalModal}
+      onClose={() => setShowLegalModal(false)}
+      initialDocument={legalDocToShow}
+    />
+    </>
   );
 };

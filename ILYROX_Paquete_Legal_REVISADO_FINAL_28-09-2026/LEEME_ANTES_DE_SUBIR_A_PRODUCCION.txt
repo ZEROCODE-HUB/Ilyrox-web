@@ -1,0 +1,24 @@
+ILYROX — PAQUETE LEGAL REVISADO 28-09-2026
+
+DOCUMENTOS PUBLICOS / CONTRACTUALES:
+01 Terminos y Condiciones v2.2
+02 Politica de Privacidad Integral v10.2
+03 Community Guidelines v2.1
+04 Estandares de Seguridad Infantil v2.2
+05 Autorizacion y Preferencias de Contacto v1.2
+06 Condiciones de Compra, Suscripciones y Reembolsos v1.1
+07 Contrato de Instructor / Creador v1.1
+08 Acuerdo de Tratamiento de Datos v1.1
+09 Politica de Propiedad Intelectual / Notice & Takedown v1.1
+11 Aviso de Privacidad Simplificado v1.0
+
+INTERNO - NO PUBLICAR:
+10 Checklist de Implementacion Legal para Andres v2.1
+
+BLOQUEADORES ANTES DE ACTIVAR VENTAS (no bloquean la carga de textos):
+1. Contador/asesor fiscal debe definir por escrito el flujo real de CFDI, IVA, retenciones y liquidaciones por canal.
+2. Andres debe implementar el aviso de renovacion con al menos 5 dias naturales y cancelacion inmediata para suscripciones.
+3. Debe quedar designada internamente una persona responsable de seguridad infantil y registrarse donde Google Play lo requiera.
+4. Las pantallas reales deben coincidir con los textos y conservar evidencia versionada de consentimientos/contratos.
+
+Control adicional incorporado: las condiciones de compra reconocen el derecho de revocación cuando legalmente proceda conforme a LFPC, incluyendo la excepción legal aplicable a servicios próximos.

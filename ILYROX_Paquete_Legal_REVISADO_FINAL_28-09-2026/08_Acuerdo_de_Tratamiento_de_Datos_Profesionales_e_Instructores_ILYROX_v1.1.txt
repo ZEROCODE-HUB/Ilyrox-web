@@ -1,0 +1,49 @@
+ACUERDO DE TRATAMIENTO DE DATOS
+Profesionales e Instructores - CRM, leads, compradores y servicios tecnológicos
+
+
+1. Partes y aceptación
+Este Acuerdo complementa los Términos y, cuando corresponda, el Contrato de Instructor. Se celebra entre ILYROX y el Profesional o Instructor que utiliza funciones que implican tratamiento de datos. Puede aceptarse electrónicamente y quedará vinculado a la cuenta y versión aceptada.
+2. Tratamiento por cuenta del Profesional: CRM
+Cuando el Profesional determine finalidades y medios esenciales de datos que incorpora a su CRM y utilice ILYROX como infraestructura tecnológica, el Profesional actúa como responsable e ILYROX como encargado respecto de ese tratamiento. ILYROX tratará esos datos únicamente conforme a instrucciones documentadas, este Acuerdo y obligaciones legales aplicables.
+3. Objeto, naturaleza y duración
+El encargo comprende alojamiento, organización, búsqueda, etiquetado, mensajería, agenda, automatización autorizada, respaldos, seguridad, soporte, exportación y eliminación de datos del CRM. Durará mientras la cuenta o función permanezca activa y durante periodos posteriores necesarios para respaldos, bloqueo, cumplimiento o defensa jurídica.
+4. Categorías de titulares y datos
+Clientes y prospectos del Profesional.
+Compradores o alumnos cuando el Profesional sea Instructor.
+Contactos comerciales autorizados.
+Datos de identificación y contacto; preferencias; notas; inmuebles o Cursos de interés; citas; historial; mensajes; etiquetas; documentos cuando la función lo permita.
+Datos financieros o sensibles sólo deberán cargarse cuando exista necesidad, base jurídica y controles adecuados.
+5. Obligaciones de ILYROX como encargado
+Tratar datos conforme a instrucciones documentadas y no para finalidades propias incompatibles.
+Mantener confidencialidad y acceso por necesidad de conocer.
+Aplicar medidas administrativas, técnicas y físicas razonables según el riesgo.
+Apoyar razonablemente al Profesional en solicitudes de derechos e incidentes, considerando naturaleza del servicio.
+Eliminar, devolver, bloquear o disociar datos al terminar, sujeto a respaldos y obligaciones legales.
+Mantener registros y controles razonables para demostrar cumplimiento de sus obligaciones de encargado.
+Abstenerse de transferir datos personales tratados por cuenta del Profesional, salvo que éste lo instruya, la comunicación derive de una subcontratación autorizada conforme a este Acuerdo o exista requerimiento válido de autoridad competente.
+6. Subencargados
+Al aceptar este Acuerdo, el Profesional autoriza a ILYROX a utilizar y sustituir subencargados razonablemente necesarios para hosting, almacenamiento, mensajería, correo, seguridad, analítica, IA, pagos, mapas, notificaciones y soporte, siempre que ILYROX formalice con ellos obligaciones de protección de datos compatibles con este Acuerdo y la normativa aplicable. Los subencargados asumirán obligaciones equivalentes respecto del tratamiento encomendado. ILYROX conservará evidencia razonable de esta autorización y seguirá siendo responsable frente al Profesional por la selección y gestión de sus subencargados en la medida prevista por la ley y el contrato.
+7. Obligaciones del Profesional
+Contar con base jurídica y proporcionar avisos de privacidad que correspondan.
+No cargar datos obtenidos ilícitamente, datos excesivos ni categorías sensibles sin necesidad y controles adecuados.
+Configurar accesos, usuarios internos y permisos de forma segura.
+Atender derechos y comunicaciones del titular cuando sea el responsable.
+No instruir a ILYROX a realizar tratamientos contrarios a la ley.
+Mantener sus propias listas de bajas y autorizaciones cuando utilice canales externos o exporte datos.
+8. Leads generados por ILYROX
+Cuando ILYROX capte un Lead bajo su propio aviso y lo transfiera a un Profesional para atender una solicitud, la relación no se considera automáticamente un encargo de CRM. ILYROX será responsable del tratamiento que realiza antes y durante la transferencia y el Profesional será responsable del tratamiento posterior que determine, sujeto a la finalidad informada, consentimiento y demás base jurídica aplicable.
+9. Datos de compradores de Cursos
+ILYROX podrá compartir con el Instructor datos mínimos necesarios para soporte académico o cumplimiento de la compra. El Instructor no puede utilizar esos datos para campañas propias no relacionadas sin base jurídica independiente. Si el Instructor determina una nueva finalidad, será responsable de informar y recabar las autorizaciones correspondientes.
+10. Incidentes de seguridad
+Cada parte notificará a la otra sin demora indebida cuando identifique un incidente que afecte datos tratados en el marco de este Acuerdo y sea razonablemente necesario coordinar investigación o notificaciones. La comunicación incluirá la información disponible sobre naturaleza, categorías, medidas y acciones correctivas, sin admitir responsabilidad por el solo hecho de notificar.
+11. Solicitudes de titulares y autoridades
+Si ILYROX recibe una solicitud relativa exclusivamente a datos de los que el Profesional es responsable, podrá remitirla al Profesional o asistirle razonablemente. Cada parte responderá directamente cuando sea responsable del tratamiento involucrado. Los requerimientos de autoridad se atenderán conforme a su competencia y validez jurídica.
+12. Transferencias internacionales
+Los proveedores de infraestructura pueden tratar datos en otros países. ILYROX aplicará medidas contractuales y organizativas razonables y comunicará categorías relevantes de subencargados conforme a su Política de Privacidad.
+13. Auditoría y cooperación
+ILYROX podrá proporcionar información, certificaciones, cuestionarios o evidencia razonable de sus medidas. Las auditorías presenciales o técnicas deberán acordarse previamente, respetar confidencialidad, seguridad de otros clientes y ser proporcionales al riesgo, salvo requerimiento de autoridad competente.
+14. Responsabilidad y terminación
+Cada parte responde por sus propios incumplimientos. La terminación de la cuenta no elimina obligaciones de confidencialidad, seguridad, incidentes, conservación legal ni defensa de reclamaciones. Este Acuerdo se interpreta junto con los Términos, Política de Privacidad y, cuando aplique, Contrato de Instructor.
+15. Contacto
+Privacidad: privacidad@ilyrox.com. Seguridad: seguridad@ilyrox.com. Teléfono: +52 81 3679 8047.

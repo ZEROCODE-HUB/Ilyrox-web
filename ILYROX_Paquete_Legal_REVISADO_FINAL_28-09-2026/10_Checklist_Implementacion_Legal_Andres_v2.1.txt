@@ -1,0 +1,104 @@
+CHECKLIST DE IMPLEMENTACIÓN LEGAL PARA ANDRÉS
+Pantallas, checkboxes, logs, pagos, instructores, datos y moderación
+
+
+1. Datos corporativos y contacto
+Responsable/proveedor: ILYROX TECHNOLOGIES, S.A.P.I. DE C.V. RFC ITE2608279M7.
+Domicilio social: Aguascalientes, Aguascalientes, México.
+Domicilio para notificaciones: Juan Morales 1319, Col. Hacienda los Morales, San Nicolás de los Garza, Nuevo León, México, C.P. 66495.
+Teléfono empresarial de soporte/reclamaciones: +52 81 3679 8047.
+Correos: ayuda@ilyrox.com | privacidad@ilyrox.com | seguridad@ilyrox.com.
+2. Onboarding general
+Checkbox obligatorio no pre-marcado: “Acepto los Términos y Condiciones de ILYROX”.
+Checkbox obligatorio: “He leído la Política de Privacidad”.
+Checkbox obligatorio: “Confirmo que tengo 18 años o más”.
+Confirmación clara de qué información del perfil y Contenido será pública.
+Marketing opcional separado; no bloquear registro si se rechaza.
+WhatsApp separado cuando se enviarán mensajes posteriores que requieran consentimiento.
+Aviso de Privacidad Simplificado en medios electrónicos
+Antes o al momento de recabar datos en onboarding, formularios de Leads, alta de Instructor, checkout y otros medios electrónicos, mostrar la modalidad simplificada correspondiente con: identidad/domicilio del responsable; categorías de datos; finalidades distinguiendo las que requieren consentimiento; opciones para limitar uso/divulgación; y enlace visible al Aviso Integral. Usar el documento 11 como base y adaptar el bloque al formulario concreto.
+3. Log probatorio
+user_id / lead_id / instructor_id
+tipo de consentimiento o contrato
+versión exacta y hash del texto aceptado
+fecha/hora UTC
+aceptado/rechazado
+IP o identificador técnico proporcional
+origen/pantalla/campaña
+dato de contacto asociado
+fecha y método de revocación
+para compras: order_id, precio, moneda, producto, Instructor, versión de condiciones
+para Instructor: versión de Contrato + Anexo Económico
+4. Formularios de Leads y transferencias
+Separar la autorización para atender una solicitud de la autorización para promociones. Si los datos se enviarán a varios Profesionales, la interfaz debe decir “uno o más”. Cuando la transferencia requiera consentimiento, mostrar una elección separada “ACEPTO / NO ACEPTO” y registrar la elección, versión, fecha/hora y finalidad. No agregar al Lead automáticamente a campañas generales.
+5. CRM y DPA
+Al habilitar CRM para Profesionales, requerir aceptación del Acuerdo de Tratamiento de Datos o incorporarlo por referencia contractual clara. Implementar controles de acceso, exportación, eliminación, retención y subencargados. Los datos del CRM no pueden alimentar campañas de ILYROX sin autorización independiente del titular.
+6. Alta de Instructor - clickwrap obligatorio
+
+Guardar instructor_id, versión, Anexo, porcentaje, fecha/hora, IP/identificador técnico y copia/hash de los textos. Si cambia materialmente el porcentaje o el contrato, exigir re-aceptación antes de aplicar el cambio.
+7. Datos del Instructor
+Nombre/razón social
+RFC y constancia fiscal
+país y domicilio fiscal cuando se requiera
+cuenta bancaria o método de pago validado
+contacto de soporte
+aceptación de políticas
+documentos de identidad/representación cuando aplique
+8. Checkout de Cursos
+Antes de pagar mostrar: nombre del Curso, Instructor/proveedor, contenido, precio total, impuestos/cargos, vigencia, modalidad, política de reembolso, soporte, y si es suscripción, periodicidad, monto y fecha de cobro. Guardar aceptación y recibo/transacción.
+9. Suscripciones
+Consentimiento expreso e informado para cobro recurrente.
+Mostrar periodicidad, monto y fecha de cobro antes de contratar.
+Aviso de renovación automática con al menos 5 días naturales de anticipación.
+Permitir cancelar la renovación sin penalización.
+Implementar mecanismo de cancelación inmediata del servicio, suscripción o membresía; si la tienda/procesador controla la suscripción, enlazar o conducir al mecanismo efectivo correspondiente.
+Guardar fecha, canal y resultado de cada cancelación.
+10. Liquidaciones a Instructores
+Implementar ledger por Curso: bruto cobrado, impuestos, store/payment fees, descuentos, afiliación, reembolsos, contracargos, reservas, neto distribuible, 80% Instructor y 20% ILYROX por defecto, más impuestos aplicables a la comisión. Permitir condiciones distintas sólo con aceptación electrónica identificable. Mantener historial inmutable de ajustes.
+11. Fiscal antes de activar ventas
+No lanzar monetización hasta que contador/asesor fiscal defina por escrito: quién emite CFDI al comprador en cada canal, cómo factura ILYROX su comisión, IVA, retenciones, pagos a personas físicas/morales, efectos de App Store/Google Play y conciliación. El contrato permite adaptación, pero la implementación fiscal debe coincidir con la operación real.
+12. Reembolsos, chargebacks y reservas
+Permitir reembolso conforme a condiciones y ley; reflejarlo en el saldo del Instructor. Registrar motivo, evidencia, monto y responsable. Implementar reserva de riesgo configurable y no liberar importes comprometidos por disputas abiertas. Al cerrar una cuenta, conservar saldo reservado según el Contrato.
+13. Propiedad intelectual / notice & takedown
+Página pública /legal/propiedad-intelectual.
+Formulario o correo de aviso con campos mínimos.
+Retiro/inhabilitación y notificación al Usuario.
+Contra-aviso.
+Si el contra-aviso es suficiente: notificar al reclamante original, registrar la fecha exacta de notificación y restaurar/habilitar el contenido salvo que, dentro de un máximo de 15 días hábiles desde esa notificación, el reclamante acredite haber iniciado procedimiento judicial/administrativo, denuncia penal o mecanismo alternativo aplicable.
+Registro de avisos, contenido y reincidencias.
+Medidas razonables para evitar recarga del mismo material cuando proceda.
+Terminación de infractores reincidentes.
+14. IA autónoma
+Mostrar qué hará antes de activar: responder Leads, enviar seguimiento, proponer citas, etc.
+Activación expresa por bloques de acciones de riesgo.
+Pausa/desactivación visible.
+Logs de acción, dato usado, destinatario, canal, hora y resultado.
+Nunca firmar contratos, aceptar ofertas, disponer dinero o reconocer adeudos sin módulo jurídico y autorización específica.
+Consultar opt-out y lista central de bajas antes de cada envío autónomo.
+15. Marketing, WhatsApp y lista de bajas
+Centralizar preferencias y suppressions. Una persona dada de baja no puede volver a entrar por importación, automatización, curso o CRM sin nueva base jurídica. Mantener evidencias de consentimiento y revocación por canal.
+16. Moderación, UGC y seguridad infantil
+Reportar usuario, publicación y chat deben funcionar.
+Bloquear debe impedir interacción futura razonablemente.
+Cola prioritaria para explotación infantil/CSAM.
+Contacto de seguridad activo en seguridad@ilyrox.com.
+Designar internamente a una persona responsable de seguridad infantil y registrar sus datos donde Google Play Console lo requiera. El correo público puede seguir siendo seguridad@ilyrox.com, pero la designación interna no debe quedar vacía antes de publicar/actualizar la app.
+No prometer tiempos de respuesta que el equipo no pueda sostener.
+17. App Store / Google Play
+Revisar reglas vigentes de pagos digitales, creator content, UGC, seguridad infantil, privacidad y tracking antes de cada lanzamiento que cambie Cursos, pagos, IA o SDKs. Mantener App Privacy/Data Safety alineados con el producto real.
+18. Publicación pública
+/legal/terminos
+/legal/privacidad
+/legal/privacidad-simplificado (o bloque equivalente mostrado inline en cada formulario electrónico)
+/legal/comunidad
+/legal/seguridad-infantil
+/legal/comunicaciones
+/legal/compras
+/legal/instructores
+/legal/tratamiento-datos-profesionales
+/legal/propiedad-intelectual
+Todos deben ser accesibles sin iniciar sesión, mostrar versión/fecha y enlazarse desde las pantallas pertinentes. El Contrato de Instructor puede ser público, pero su aceptación debe estar ligada al onboarding del Instructor.
+19. Conservación de evidencia
+Conservar versiones históricas de documentos y consentimientos. Para operaciones o contratos relevantes, evaluar mecanismos de integridad, sellos de tiempo y conservación de mensajes de datos. No sobrescribir versiones aceptadas por usuarios existentes.
+20. Control de cambios
+Toda nueva función que agregue pagos, crédito, datos financieros, geolocalización, IA autónoma, nuevos proveedores, nuevas transferencias de Leads, nuevas categorías de marketing, afiliados o cambios de monetización debe activar una revisión legal y de privacidad antes de producción.

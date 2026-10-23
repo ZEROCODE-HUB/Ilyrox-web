@@ -1,0 +1,22 @@
+ESTÁNDARES DE SEGURIDAD INFANTIL
+Prevención, reporte y respuesta frente a explotación y abuso sexual infantil
+
+
+1. Público objetivo y edad mínima
+ILYROX está destinado exclusivamente a personas mayores de 18 años. Durante el registro se requiere confirmación de mayoría de edad. Si se detecta una cuenta de una persona menor de edad, ILYROX podrá suspenderla, eliminarla y adoptar medidas razonables de protección.
+2. Conductas prohibidas
+Material de abuso sexual infantil (CSAM) o cualquier representación ilícita de explotación sexual de menores.
+Captación, grooming, sextorsión, solicitud o intercambio sexual con menores.
+Contenido que sexualice, explote, amenace o ponga en riesgo a niñas, niños o adolescentes.
+Uso de IA para generar, transformar, sexualizar o simular material de explotación infantil.
+Intentos de compartir, almacenar, vender, enlazar o solicitar ese material mediante perfiles, publicaciones, Cursos, chat o archivos.
+3. Reporte y bloqueo
+ILYROX habilitará dentro de la aplicación mecanismos accesibles para reportar perfiles, publicaciones y conversaciones y para bloquear Usuarios. Los reportes de seguridad infantil tendrán prioridad operativa y podrán escalarse a revisión especializada.
+4. Detección, preservación y actuación
+ILYROX puede utilizar revisión manual, reglas automatizadas y tecnologías de detección compatibles con la ley. Ante indicios razonables podrá retirar o inhabilitar contenido, suspender cuentas, preservar evidencia y limitar funciones. Cuando ILYROX confirme o tenga conocimiento real de material de abuso sexual infantil (CSAM), realizará el retiro correspondiente y efectuará los reportes a NCMEC y/o a la autoridad regional o competente cuando legalmente corresponda.
+5. Privacidad y minimización
+ILYROX no busca recopilar datos de menores para la creación de cuentas. La información asociada a un incidente se limitará a lo razonablemente necesario para seguridad, investigación, obligaciones legales y cooperación válida con autoridades.
+6. Responsabilidad de Usuarios e Instructores
+Usuarios e Instructores no deben publicar ni incorporar en Cursos material que infrinja estos estándares. La falta de conocimiento sobre el origen de un archivo no impide que ILYROX adopte medidas preventivas cuando exista riesgo razonable.
+7. Contacto de seguridad
+Punto de contacto de seguridad infantil de ILYROX: seguridad@ilyrox.com. Soporte: ayuda@ilyrox.com. Teléfono empresarial: +52 81 3679 8047. ILYROX mantendrá una persona responsable designada para atender los requerimientos de las tiendas de aplicaciones y autoridades. Estos estándares se revisan periódicamente y podrán actualizarse para mantener cumplimiento con la normativa y requisitos aplicables.

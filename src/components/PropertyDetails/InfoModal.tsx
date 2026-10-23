@@ -4,6 +4,7 @@ import { Textarea } from "../ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { ContactForm } from "@/types/property";
@@ -19,8 +20,15 @@ import {
   ChevronRight,
   ChevronLeft,
   CheckCircle2,
+  AlertTriangle,
+  Shield,
+  FileText,
+  Users,
+  Mail as MailIcon,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { PrivacyNoticeBlock } from "@/components/legal/PrivacyNoticeBlock";
+import { LegalDocumentModal } from "@/components/auth/LegalDocumentModal";
 
 interface InfoModalProps {
   isOpen: boolean;
@@ -46,6 +54,16 @@ export function InfoModal({ isOpen, onClose, propertyId }: InfoModalProps) {
   });
 
   const [progressTab, setProgressTab] = useState<Step>("budget");
+
+  // Consent state for lead form
+  const [consents, setConsents] = useState({
+    attendRequest: false,
+    transferToProfessionals: true, // default true, user can change to false
+    privacyPolicyRead: false,
+    marketing: false, // NOT pre-checked
+  });
+  const [showLegalModal, setShowLegalModal] = useState(false);
+  const [legalDocToShow, setLegalDocToShow] = useState<"terms" | "privacy" | "contact">("privacy");
 
   const steps: Step[] = ["budget", "timeframe", "comments"];
   const currentStepIndex = steps.indexOf(progressTab);
@@ -119,29 +137,80 @@ export function InfoModal({ isOpen, onClose, propertyId }: InfoModalProps) {
       return;
     }
 
+    // Validate legal consents
+    if (!consents.attendRequest) {
+      toast({
+        variant: "destructive",
+        title: "Consentimiento requerido",
+        description: "Debes autorizar a ILYROX a atender tu solicitud.",
+      });
+      return;
+    }
+    if (consents.transferToProfessionals === undefined) {
+      toast({
+        variant: "destructive",
+        title: "Consentimiento requerido",
+        description: "Debes elegir si aceptas o no la transferencia a profesional(es).",
+      });
+      return;
+    }
+    if (!consents.privacyPolicyRead) {
+      toast({
+        variant: "destructive",
+        title: "Consentimiento requerido",
+        description: "Debes confirmar haber leído el Aviso de Privacidad Simplificado.",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const fullMessage = `Presupuesto: ${contactForm.budget}
 Plazo: ${contactForm.timeframe}
 Comentarios: ${contactForm.comments || "Sin comentarios adicionales"}`;
 
-      const { error } = await supabase.from("solicitudes_info").insert({
-        propiedad_id: propertyId,
-        solicitante_id: user?.id || null,
-        nombre: contactForm.name,
-        telefono: contactForm.phone,
-        email: contactForm.email,
-        mensaje: fullMessage,
-        origen: "Web",
-        estado: "nuevo",
-      });
+      const { data: solicitudData, error } = await supabase
+        .from("solicitudes_info")
+        .insert({
+          propiedad_id: propertyId,
+          solicitante_id: user?.id || null,
+          nombre: contactForm.name,
+          telefono: contactForm.phone,
+          email: contactForm.email,
+          mensaje: fullMessage,
+          origen: "Web",
+          estado: consents.transferToProfessionals ? "nuevo" : "nuevo_sin_transferir",
+          transfer_consent: consents.transferToProfessionals,
+          marketing_consent: consents.marketing,
+        })
+        .select("id")
+        .single();
 
       if (error) throw error;
+
+      // Log consent evidence
+      const solicitudId = solicitudData?.id;
+      if (solicitudId) {
+        await supabase.from("lead_consents").insert({
+          solicitud_id: solicitudId,
+          attend_request: consents.attendRequest,
+          transfer_to_professionals: consents.transferToProfessionals,
+          marketing_consent: consents.marketing,
+          privacy_policy_read: consents.privacyPolicyRead,
+          aviso_version: "v1.1-2026-09-28",
+          ip_hash: null, // Could be populated from edge function/header
+          user_agent: navigator.userAgent,
+          form_context: "property_inquiry",
+          professionals_count: "multiple",
+        });
+      }
 
       toast({
         title: "Solicitud enviada",
         description:
-          "Gracias por tu interés. Uno de nuestros asesores te contactarán pronto.",
+          consents.transferToProfessionals
+            ? "Gracias por tu interés. Uno de nuestros asesores te contactarán pronto."
+            : "Gracias por tu interés. Tu solicitud ha sido recibida (no se transferirá a profesionales por tu elección).",
       });
 
       // Clear only property-specific data (comments)
@@ -149,6 +218,13 @@ Comentarios: ${contactForm.comments || "Sin comentarios adicionales"}`;
         ...prev,
         comments: "",
       }));
+      // Reset consents
+      setConsents({
+        attendRequest: false,
+        transferToProfessionals: true,
+        privacyPolicyRead: false,
+        marketing: false,
+      });
       onClose();
     } catch (error: any) {
       console.error("Error submitting contact form:", error);
@@ -220,12 +296,13 @@ Comentarios: ${contactForm.comments || "Sin comentarios adicionales"}`;
   const direction = currentStepIndex > steps.indexOf(progressTab) ? -1 : 1;
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title="Solicitar información"
-      size="md"
-    >
+    <>
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        title="Solicitar información"
+        size="md"
+      >
       <div className="p-0 flex flex-col h-full max-h-[85vh]">
         {/* Progress and Navigation Header */}
         <div className="px-6 py-2 border-b bg-slate-50/50">
@@ -463,30 +540,94 @@ Comentarios: ${contactForm.comments || "Sin comentarios adicionales"}`;
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="comments"
-                        className="text-slate-700 font-semibold flex items-center gap-2"
-                      >
-                        <MessageSquare className="h-4 w-4 text-primary" />
-                        Comentarios adicionales
-                      </Label>
-                      <Textarea
-                        id="comments"
-                        value={contactForm.comments}
-                        onChange={(e) =>
-                          setContactForm((prev) => ({
-                            ...prev,
-                            comments: e.target.value,
-                          }))
-                        }
-                        placeholder="¿Buscas algo en específico?"
-                        rows={3}
-                        className="border-slate-200 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all resize-none shadow-sm"
-                      />
+                    {/* Aviso de Privacidad y Consentimientos - Lead Form */}
+                    <PrivacyNoticeBlock 
+                      context="lead_form" 
+                      professionalsCount="multiple" 
+                    />
+
+                    {/* Consent Checkboxes */}
+                    <div className="space-y-3 pt-3 border-t border-slate-200">
+                      {/* 1. Atender solicitud - OBLIGATORIO */}
+                      <label className="flex items-start gap-3 cursor-pointer p-3 rounded-xl bg-slate-50 border border-slate-100">
+                        <Checkbox
+                          checked={consents.attendRequest}
+                          onCheckedChange={(v) => setConsents((c) => ({ ...c, attendRequest: v }))}
+                          disabled={isSubmitting}
+                          className="mt-0.5 h-4.5 w-4.5 rounded border-slate-300 text-primary focus:ring-primary"
+                        />
+                        <span className="text-sm text-slate-700">
+                          <strong>Autorizo a ILYROX a atender mi solicitud</strong> *
+                        </span>
+                      </label>
+
+                      {/* 2. Transferencia a profesional - OBLIGATORIO (ACEPTA/NO ACEPTA) */}
+                      <div className="p-3 rounded-xl bg-amber-50 border border-amber-200">
+                        <div className="flex items-center gap-2 mb-2">
+                          <AlertTriangle className="h-4 w-4 text-amber-600" />
+                          <span className="text-sm font-medium text-amber-800">
+                            Transferencia a profesional(es) — Elige una opción:
+                          </span>
+                        </div>
+                        <div className="flex flex-col gap-3">
+                          <label className="flex items-center gap-2 cursor-pointer p-2 rounded-lg bg-white border border-slate-200 hover:border-primary/50 transition-colors">
+                            <input
+                              type="radio"
+                              name="transferConsent"
+                              checked={consents.transferToProfessionals === true}
+                              onChange={() => setConsents((c) => ({ ...c, transferToProfessionals: true }))}
+                              disabled={isSubmitting}
+                              className="h-4 w-4 text-primary border-slate-300 focus:ring-primary"
+                            />
+                            <span className="text-sm text-slate-700">
+                              <span className="text-green-600 font-medium">✓ ACEPTA</span> que ILYROX transfiera mis datos a <strong>uno o más</strong> profesional(es) seleccionado(s) para que atiendan mi solicitud
+                            </span>
+                          </label>
+                          <label className="flex items-center gap-2 cursor-pointer p-2 rounded-lg bg-white border border-slate-200 hover:border-red/50 transition-colors">
+                            <input
+                              type="radio"
+                              name="transferConsent"
+                              checked={consents.transferToProfessionals === false}
+                              onChange={() => setConsents((c) => ({ ...c, transferToProfessionals: false }))}
+                              disabled={isSubmitting}
+                              className="h-4 w-4 text-red-600 border-slate-300 focus:ring-red-500"
+                            />
+                            <span className="text-sm text-slate-700">
+                              <span className="text-red-600 font-medium">✗ NO ACEPTA</span> la transferencia (mis datos no se compartirán con profesionales; ILYROX los usará solo internamente)
+                            </span>
+                          </label>
+                        </div>
+                      </div>
+
+                      {/* 3. Leído aviso - OBLIGATORIO */}
+                      <label className="flex items-start gap-3 cursor-pointer p-3 rounded-xl bg-slate-50 border border-slate-100">
+                        <Checkbox
+                          checked={consents.privacyPolicyRead}
+                          onCheckedChange={(v) => setConsents((c) => ({ ...c, privacyPolicyRead: v }))}
+                          disabled={isSubmitting}
+                          className="mt-0.5 h-4.5 w-4.5 rounded border-slate-300 text-primary focus:ring-primary"
+                        />
+                        <span className="text-sm text-slate-700">
+                          <strong>He leído el Aviso de Privacidad Simplificado</strong> *
+                        </span>
+                      </label>
+
+                      {/* 4. Marketing - OPCIONAL (NO pre-marcado) */}
+                      <label className="flex items-start gap-3 cursor-pointer p-3 rounded-xl bg-slate-50 border border-slate-100">
+                        <Checkbox
+                          checked={consents.marketing}
+                          onCheckedChange={(v) => setConsents((c) => ({ ...c, marketing: v }))}
+                          disabled={isSubmitting}
+                          className="mt-0.5 h-4.5 w-4.5 rounded border-slate-300 text-primary focus:ring-primary"
+                        />
+                        <span className="text-sm text-slate-700">
+                          Deseo recibir promociones, novedades y ofertas (opcional)
+                        </span>
+                      </label>
                     </div>
-                  </div>
+</div>
                 )}
+              
               </motion.div>
             </AnimatePresence>
           </div>
@@ -522,5 +663,12 @@ Comentarios: ${contactForm.comments || "Sin comentarios adicionales"}`;
         </form>
       </div>
     </Modal>
+
+      <LegalDocumentModal
+        isOpen={showLegalModal}
+        onClose={() => setShowLegalModal(false)}
+        initialDocument={legalDocToShow}
+      />
+    </>
   );
 }

@@ -3,18 +3,26 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import authImage from "@/assets/auth-real-estate.jpg";
 import { Login } from "@/components/auth/Login";
 import { Register } from "@/components/auth/Register";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { LegalDocumentModal } from "@/components/auth/LegalDocumentModal";
 
 const Auth = () => {
   const { user, isLoading: isAuthLoading } = useAuth();
   const navigate = useNavigate();
+  const [showLegalModal, setShowLegalModal] = useState(false);
+  const [legalDocToShow, setLegalDocToShow] = useState<"terms" | "privacy">("terms");
 
   useEffect(() => {
     if (user) {
       navigate("/");
     }
   }, [user]);
+
+  const openLegalModal = (doc: "terms" | "privacy") => {
+    setLegalDocToShow(doc);
+    setShowLegalModal(true);
+  };
 
   return (
     <div className="min-h-screen flex">
@@ -89,16 +97,30 @@ const Auth = () => {
 
           <div className="text-center text-sm text-muted-foreground">
             Al continuar, aceptas nuestros{" "}
-            <a href="/terms" className="text-primary hover:underline">
+            <button
+              type="button"
+              onClick={() => openLegalModal("terms")}
+              className="text-primary hover:underline bg-transparent border-none p-0 font-inherit cursor-pointer"
+            >
               Términos de servicio
-            </a>{" "}
+            </button>{" "}
             y{" "}
-            <a href="/privacy" className="text-primary hover:underline">
+            <button
+              type="button"
+              onClick={() => openLegalModal("privacy")}
+              className="text-primary hover:underline bg-transparent border-none p-0 font-inherit cursor-pointer"
+            >
               Política de privacidad
-            </a>
+            </button>
           </div>
         </div>
       </div>
+
+      <LegalDocumentModal
+        isOpen={showLegalModal}
+        onClose={() => setShowLegalModal(false)}
+        initialDocument={legalDocToShow}
+      />
     </div>
   );
 };
