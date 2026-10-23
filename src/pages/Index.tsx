@@ -20,6 +20,7 @@ import { MobileHeader } from "@/components/Header/MobileHeader";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { DesktopResizableLayout } from "@/components/layout/DesktopResizableLayout";
 import { useGoogleMapsApi } from "@/lib/googleMaps";
+import { Footer } from "@/components/Footer";
 
 const Index = () => {
   // Carga global de Google Maps + Places para que el autocomplete de ubicación
@@ -208,6 +209,8 @@ const Index = () => {
           />
         </div>
       </MainTabs>
+
+      <Footer />
 
       <PropertyDetail
         property={selectedProperty}

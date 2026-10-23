@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ESTADOS_MEXICO } from "@/constants/MexLocations/estados";
+import { LegalDocumentModal } from "./LegalDocumentModal";
 
 interface AuthPopupProps {
   isOpen: boolean;
@@ -31,6 +32,15 @@ export function AuthPopup({ isOpen, onClose }: AuthPopupProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showLegalModal, setShowLegalModal] = useState(false);
+  const [legalDocToShow, setLegalDocToShow] = useState<"terms" | "privacy">(
+    "terms",
+  );
+
+  const openLegalModal = (doc: "terms" | "privacy") => {
+    setLegalDocToShow(doc);
+    setShowLegalModal(true);
+  };
 
   const {
     formState,
@@ -82,8 +92,9 @@ export function AuthPopup({ isOpen, onClose }: AuthPopupProps) {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-center mb-4">
             <img
@@ -355,8 +366,35 @@ export function AuthPopup({ isOpen, onClose }: AuthPopupProps) {
                 : "¿Ya tienes cuenta? Inicia sesión"}
             </button>
           </div>
+
+          <p className="text-center text-xs text-muted-foreground pt-1">
+            Al continuar, aceptas nuestros{" "}
+            <button
+              type="button"
+              onClick={() => openLegalModal("terms")}
+              className="text-primary hover:underline font-medium"
+            >
+              Términos y Condiciones
+            </button>{" "}
+            y la{" "}
+            <button
+              type="button"
+              onClick={() => openLegalModal("privacy")}
+              className="text-primary hover:underline font-medium"
+            >
+              Política de Privacidad
+            </button>
+            .
+          </p>
         </form>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+
+      <LegalDocumentModal
+        isOpen={showLegalModal}
+        onClose={() => setShowLegalModal(false)}
+        initialDocument={legalDocToShow}
+      />
+    </>
   );
 }

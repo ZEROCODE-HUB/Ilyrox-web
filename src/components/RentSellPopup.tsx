@@ -26,6 +26,7 @@ import { MUNICIPIOS_ESTADO } from "@/constants/MexLocations/municipios";
 import { COLONIAS_POR_MUNICIPIO } from "@/constants/MexLocations/colonias";
 import { ESTADOS_MEXICO } from "@/constants/MexLocations/estados";
 import { useAuth } from "@/contexts/AuthContext";
+import { LegalDocumentModal } from "@/components/auth/LegalDocumentModal";
 
 interface RentSellPopupProps {
   isOpen: boolean;
@@ -62,6 +63,17 @@ export function RentSellPopup({ isOpen, onClose }: RentSellPopupProps) {
   }, [isOpen, profile]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [showLegalModal, setShowLegalModal] = useState(false);
+  const [legalDocToShow, setLegalDocToShow] = useState<
+    "terms" | "privacy" | "aviso-privacidad-simplificado"
+  >("terms");
+
+  const openLegalModal = (
+    doc: "terms" | "privacy" | "aviso-privacidad-simplificado",
+  ) => {
+    setLegalDocToShow(doc);
+    setShowLegalModal(true);
+  };
 
   const [availableMunicipios, setAvailableMunicipios] = useState<string[]>([]);
   const [availableColonias, setAvailableColonias] = useState<string[]>([]);
@@ -371,6 +383,36 @@ export function RentSellPopup({ isOpen, onClose }: RentSellPopupProps) {
               </div>
             )}
 
+            <div className="rounded-xl bg-slate-50 border border-slate-100 p-3 text-xs text-slate-600">
+              <p>
+                Al enviar tu solicitud, aceptas los{" "}
+                <button
+                  type="button"
+                  onClick={() => openLegalModal("terms")}
+                  className="text-primary hover:underline font-medium"
+                >
+                  Términos y Condiciones
+                </button>{" "}
+                y la{" "}
+                <button
+                  type="button"
+                  onClick={() => openLegalModal("privacy")}
+                  className="text-primary hover:underline font-medium"
+                >
+                  Política de Privacidad
+                </button>
+                . Consulta también el{" "}
+                <button
+                  type="button"
+                  onClick={() => openLegalModal("aviso-privacidad-simplificado")}
+                  className="text-primary hover:underline font-medium"
+                >
+                  Aviso de Privacidad Simplificado
+                </button>
+                .
+              </p>
+            </div>
+
             <div className="flex gap-3 pt-4">
               <Button
                 type="button"
@@ -410,6 +452,12 @@ export function RentSellPopup({ isOpen, onClose }: RentSellPopupProps) {
           </Button>
         </DialogContent>
       </Dialog>
+
+      <LegalDocumentModal
+        isOpen={showLegalModal}
+        onClose={() => setShowLegalModal(false)}
+        initialDocument={legalDocToShow}
+      />
     </>
   );
 }

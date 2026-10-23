@@ -22,7 +22,7 @@ interface LegalDocumentModalProps {
   initialDocument?: LegalDocumentType;
 }
 
-type LegalDocumentType = 
+export type LegalDocumentType = 
   | "terms"
   | "privacy"
   | "community-guidelines"
@@ -281,5 +281,3 @@ export const LegalDocumentModal: React.FC<LegalDocumentModalProps> = ({
     </AnimatePresence>
   );
 };
-
-import { useRef } from "react";
