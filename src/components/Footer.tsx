@@ -138,7 +138,7 @@ export const Footer = () => {
         <div className="pt-8 border-t">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
             <p>© 2025 ilyrox. Todos los derechos reservados.</p>
-            <div className="flex gap-6">
+            <div className="flex flex-wrap justify-center gap-4 md:gap-6">
               <Link
                 to="/terms"
                 className="hover:text-primary transition-colors"
@@ -168,36 +168,6 @@ export const Footer = () => {
                 className="hover:text-primary transition-colors"
               >
                 Preferencias de Contacto
-              </Link>
-              <Link
-                to="/legal/estandares-seguridad-infantil"
-                className="hover:text-primary transition-colors"
-              >
-                Seguridad Infantil
-              </Link>
-              <Link
-                to="/legal/contrato-instructor-creador"
-                className="hover:text-primary transition-colors"
-              >
-                Contrato Instructor
-              </Link>
-              <Link
-                to="/legal/acuerdo-tratamiento-datos"
-                className="hover:text-primary transition-colors"
-              >
-                Tratamiento de Datos
-              </Link>
-              <Link
-                to="/legal/politica-propiedad-intelectual"
-                className="hover:text-primary transition-colors"
-              >
-                Propiedad Intelectual
-              </Link>
-              <Link
-                to="/legal/community-guidelines"
-                className="hover:text-primary transition-colors"
-              >
-                Community Guidelines
               </Link>
             </div>
           </div>

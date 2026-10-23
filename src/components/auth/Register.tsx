@@ -32,7 +32,7 @@ export const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showLegalModal, setShowLegalModal] = useState(false);
-  const [legalDocToShow, setLegalDocToShow] = useState<"terms" | "privacy">("terms");
+  const [legalDocToShow, setLegalDocToShow] = useState<"terms" | "privacy" | "aviso-privacidad-simplificado">("terms");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Legal checkboxes state
@@ -120,7 +120,7 @@ export const Register = () => {
     }
   };
 
-  const openLegalModal = (doc: "terms" | "privacy") => {
+  const openLegalModal = (doc: "terms" | "privacy" | "aviso-privacidad-simplificado") => {
     setLegalDocToShow(doc);
     setShowLegalModal(true);
   };
@@ -350,7 +350,24 @@ export const Register = () => {
           </div>
 
           {/* Aviso de Privacidad Simplificado - Onboarding */}
-          <PrivacyNoticeBlock context="onboarding" />
+          <div className="flex items-start gap-2 p-3 rounded-xl bg-slate-50 border border-slate-100">
+            <Shield className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+            <div className="flex-1 text-sm text-slate-700">
+              <p className="font-medium">
+                Aviso de Privacidad Simplificado
+              </p>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Consulta el aviso resumido en{" "}
+                <span
+                  className="text-primary hover:underline cursor-pointer"
+                  onClick={() => openLegalModal("aviso-privacidad-simplificado")}
+                >
+                  este popup
+                </span>
+                .
+              </p>
+            </div>
+          </div>
 
           {/* Legal Checkboxes & Profile Publicity */}
           <div className="space-y-3 pt-2 border-t border-border/50">
