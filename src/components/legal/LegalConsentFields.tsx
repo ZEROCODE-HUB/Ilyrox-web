@@ -34,26 +34,20 @@ export function LegalConsentFields({ formState, updateField, disabled }: LegalCo
 
   return (
     <>
-      {/* Aviso de Privacidad Simplificado */}
-      <div className="flex items-start gap-2 p-3 rounded-xl bg-slate-50 border border-slate-100">
-        <Shield className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-        <div className="flex-1 text-sm text-slate-700">
-          <p className="font-medium">Aviso de Privacidad Simplificado</p>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Usaremos tus datos para crear y proteger tu cuenta y operar tu perfil.{" "}
-            <button
-              type="button"
-              className={linkClass}
-              onClick={() => setDoc("aviso-privacidad-simplificado")}
-            >
-              Ver aviso
-            </button>{" "}
-            ·{" "}
-            <button type="button" className={linkClass} onClick={() => setDoc("privacy")}>
-              Política de Privacidad completa
-            </button>
-          </p>
-        </div>
+      {/* Aviso de Privacidad Simplificado (compacto) */}
+      <div className="flex items-start gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+        <Shield className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+        <p className="flex-1 text-xs text-slate-600">
+          <span className="font-medium text-slate-700">Aviso de Privacidad Simplificado:</span> usaremos tus datos
+          para crear y proteger tu cuenta y operar tu perfil.{" "}
+          <button type="button" className={linkClass} onClick={() => setDoc("aviso-privacidad-simplificado")}>
+            Ver aviso
+          </button>{" "}
+          ·{" "}
+          <button type="button" className={linkClass} onClick={() => setDoc("privacy")}>
+            Política completa
+          </button>
+        </p>
       </div>
 
       <div className="space-y-3 pt-2 border-t border-border/50">
@@ -119,22 +113,15 @@ export function LegalConsentFields({ formState, updateField, disabled }: LegalCo
         </div>
 
         {/* 4. Información pública (informativo, igual que en la app móvil) */}
-        <div className="flex items-start gap-3 p-3 rounded-xl bg-blue-50 border border-blue-100">
-          <Info className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-          <div className="flex-1 text-sm text-slate-700">
-            <p className="font-medium">Información pública de tu perfil</p>
-            <p className="text-xs text-slate-600 mt-1">
-              Al registrarte, la siguiente información será <strong>visible públicamente</strong> en
-              tu perfil profesional y en el contenido que publiques:
+        <div className="flex items-start gap-2 p-2.5 rounded-xl bg-blue-50 border border-blue-100">
+          <Info className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+          <div className="flex-1 text-xs text-slate-600">
+            <p className="font-medium text-slate-700">Información pública de tu perfil</p>
+            <p className="mt-1">
+              Serán <strong>visibles públicamente</strong>: tu nombre y foto, estado y ocupación, biografía (si la
+              completas), y los inmuebles, publicaciones, reels y reseñas que publiques.
             </p>
-            <ul className="list-disc list-inside text-xs text-slate-600 mt-1.5 space-y-1">
-              <li>Nombre completo y foto de perfil</li>
-              <li>Estado y ocupación</li>
-              <li>Biografía (si la completas)</li>
-              <li>Fichas de inmuebles, publicaciones y reels que publiques (precio, ubicación, fotos, descripción)</li>
-              <li>Reseñas que recibas y des</li>
-            </ul>
-            <p className="text-xs text-slate-500 mt-2">
+            <p className="mt-1">
               Tu teléfono, correo, mensajes privados y datos fiscales <strong>nunca</strong> se publican.
             </p>
           </div>

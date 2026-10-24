@@ -18,14 +18,14 @@ const LEGAL_LINKS = [
 
 export const Footer = () => {
   return (
-    <footer className="relative z-30 w-full shrink-0 border-t bg-background">
-      <div className="bg-muted/30">
+    <footer className="relative z-30 w-full shrink-0 border-t border-slate-200 bg-slate-100">
+      <div className="bg-slate-100">
         <div className="container mx-auto px-4 py-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             {/* Logo y descripción */}
             <div className="space-y-4">
               <Link to="/" className="flex items-center gap-3 group">
-                <img src={logoIcon} alt="ilyrox" className="w-10 h-10 object-contain rounded-lg" />
+                <img src={logoIcon} alt="ilyrox" width={40} height={40} className="w-10 h-10 shrink-0 object-contain rounded-lg bg-white" />
                 <span className="text-xl font-bold bg-gradient-to-r from-[#41c4eb] to-[#41c4eb]/70 bg-clip-text text-transparent">
                   ilyrox
                 </span>
