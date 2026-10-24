@@ -20,7 +20,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ESTADOS_MEXICO } from "@/constants/MexLocations/estados";
-import { LegalDocumentModal } from "./LegalDocumentModal";
+import { LegalConsentFields } from "@/components/legal/LegalConsentFields";
+import logoIcon from "@/assets/logo-3601.png";
 
 interface AuthPopupProps {
   isOpen: boolean;
@@ -32,16 +33,6 @@ export function AuthPopup({ isOpen, onClose }: AuthPopupProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [showLegalModal, setShowLegalModal] = useState(false);
-  const [legalDocToShow, setLegalDocToShow] = useState<"terms" | "privacy">(
-    "terms",
-  );
-
-  const openLegalModal = (doc: "terms" | "privacy") => {
-    setLegalDocToShow(doc);
-    setShowLegalModal(true);
-  };
-
   const {
     formState,
     loading,
@@ -98,9 +89,9 @@ export function AuthPopup({ isOpen, onClose }: AuthPopupProps) {
         <DialogHeader>
           <div className="flex items-center justify-center mb-4">
             <img
-              src="/Logo.jpeg"
-              alt="Logo"
-              className="w-32 h-32 object-contain"
+              src={logoIcon}
+              alt="ilyrox"
+              className="w-20 h-20 object-contain rounded-2xl"
             />
           </div>
           <DialogTitle className="text-center text-2xl font-bold">
@@ -337,6 +328,10 @@ export function AuthPopup({ isOpen, onClose }: AuthPopupProps) {
             </div>
           )}
 
+          {!isLogin && (
+            <LegalConsentFields formState={formState} updateField={updateField} disabled={loading} />
+          )}
+
           <Button
             type="submit"
             className="w-full h-11 bg-primary hover:bg-primary/90 text-white font-medium shadow-md mt-2"
@@ -366,35 +361,9 @@ export function AuthPopup({ isOpen, onClose }: AuthPopupProps) {
                 : "¿Ya tienes cuenta? Inicia sesión"}
             </button>
           </div>
-
-          <p className="text-center text-xs text-muted-foreground pt-1">
-            Al continuar, aceptas nuestros{" "}
-            <button
-              type="button"
-              onClick={() => openLegalModal("terms")}
-              className="text-primary hover:underline font-medium"
-            >
-              Términos y Condiciones
-            </button>{" "}
-            y la{" "}
-            <button
-              type="button"
-              onClick={() => openLegalModal("privacy")}
-              className="text-primary hover:underline font-medium"
-            >
-              Política de Privacidad
-            </button>
-            .
-          </p>
         </form>
         </DialogContent>
       </Dialog>
-
-      <LegalDocumentModal
-        isOpen={showLegalModal}
-        onClose={() => setShowLegalModal(false)}
-        initialDocument={legalDocToShow}
-      />
     </>
   );
 }

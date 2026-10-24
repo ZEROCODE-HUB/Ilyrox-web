@@ -1,96 +1,93 @@
-POLÍTICA DE CONTENIDO Y COMMUNITY GUIDELINES
-(VERSIÓN v1.2 — FINAL PARA PUBLICAR)
+**POLÍTICA DE CONTENIDO Y COMMUNITY GUIDELINES**
 
-Aplicación: Ilyrox
-Sitio web público asociado: www.ilyrox.com
-Titular/Responsable: Edith Priscila Muñiz Cantu
-Contacto para reportes: ayuda@ilyrox.com
-Última actualización: 10-febrero-2026
+Reglas de contenido, conducta, cursos, reseñas, leads y moderación
 
-Estas Community Guidelines forman parte integral de los Términos y Condiciones.
-El uso de la App implica su aceptación.
+| **Aplicación / servicio**         | ILYROX                                                                                                 |
+|-----------------------------------|--------------------------------------------------------------------------------------------------------|
+| **Sitio web**                     | www.ilyrox.com                                                                                         |
+| **Responsable / proveedor**       | ILYROX TECHNOLOGIES, S.A.P.I. DE C.V.                                                                  |
+| **RFC**                           | ITE2608279M7                                                                                           |
+| **Domicilio social**              | Aguascalientes, Aguascalientes, México                                                                 |
+| **Domicilio para notificaciones** | Juan Morales 1319, Col. Hacienda los Morales, San Nicolás de los Garza, Nuevo León, México, C.P. 66495 |
+| **Teléfono empresarial**          | +52 81 3679 8047                                                                                       |
+| **Soporte / reclamaciones**       | ayuda@ilyrox.com                                                                                       |
+| **Privacidad**                    | privacidad@ilyrox.com                                                                                  |
+| **Seguridad**                     | seguridad@ilyrox.com                                                                                   |
+| **Versión**                       | v2.1                                                                                                   |
+| **Última actualización**          | 28 de septiembre de 2026                                                                               |
+| **URL pública prevista**          | https://www.ilyrox.com/legal/comunidad                                                                 |
 
-1. Objetivo de esta política
-   Mantener una plataforma profesional, segura y confiable para el ecosistema inmobiliario.
-   Definir reglas claras de contenido, conducta y moderación, y facultar al Titular para actuar de forma preventiva o correctiva.
+> **Objetivo**  
+> Mantener ILYROX como una red profesional inmobiliaria y educativa segura, confiable y útil, con reglas claras de publicación, reputación, cursos, comunicaciones y moderación.
 
-2. Principios generales
-   La App es una red profesional inmobiliaria.
-   Los usuarios deben actuar con buena fe, veracidad, profesionalismo y respeto.
-   El Titular podrá actuar aun cuando una conducta no esté expresamente listada, si afecta la integridad, seguridad o reputación de la plataforma.
+# 1. Alcance y principios
 
-3. Contenido permitido
-   Se permite, entre otros:
+Estas reglas forman parte de las condiciones de uso de ILYROX. Los Usuarios deben actuar con buena fe, veracidad, profesionalismo y respeto. ILYROX puede intervenir cuando una conducta afecte la integridad, seguridad, legalidad o confianza de la plataforma, aunque el supuesto concreto no aparezca literalmente en esta política.
+
+# 2. Contenido permitido
 
 - Fichas inmobiliarias reales y verificables.
-- Imágenes, videos y textos con derechos o autorización.
-- Información técnica del inmueble (precio, ubicación, estatus).
+
+- Imágenes, videos, textos y Cursos sobre los que exista derecho o autorización.
+
+- Información técnica y profesional veraz.
+
 - Interacciones profesionales y respetuosas.
-- Publicidad interna autorizada para destacar fichas.
 
-La permanencia de contenido en la plataforma no implica validación, aprobación ni garantía por parte del Titular.
-El contenido debe ser veraz y no inducir a error.
+- Publicidad o contenido patrocinado autorizado e identificado cuando corresponda.
 
-4. Contenido prohibido
-   Está prohibido publicar contenido que:
-   a) Sea falso, engañoso o fraudulento.
-   b) Infrinja derechos de terceros.
-   c) Use imágenes o datos sin autorización.
-   d) Revele información sensible de seguridad.
-   e) Incluya lenguaje ofensivo, acoso o discriminación.
-   f) Promueva actividades ilegales o estafas.
-   g) Realice spam, scraping o automatización no autorizada.
-   h) Manipule métricas, reputación o rankings.
-   i) Publique datos personales de clientes sin base legal.
+- Reseñas basadas en experiencias reales.
 
-La lista es enunciativa, no limitativa.
+# 3. Contenido y conductas prohibidas
 
-5. Direcciones y ubicación de inmuebles
-   Se permite publicar direcciones exactas o aproximadas.
-   El usuario declara contar con autorización suficiente.
-   No se permite usar ubicaciones falsas ni información que ponga en riesgo a personas o propiedades.
-   El Titular podrá solicitar verificación, ocultar o retirar contenido cuando exista riesgo o reporte.
+- Información falsa, engañosa, fraudulenta o deliberadamente desactualizada.
 
-6. Uso de imágenes y material audiovisual
-   El usuario debe contar con derechos o autorización.
-   Queda prohibido reutilizar material de terceros sin permiso o inducir a error.
-   El Titular podrá retirar material ante indicios de infracción.
+- Infracción de propiedad intelectual, imagen, privacidad, datos personales, marcas o secretos de terceros.
 
-7. Conducta dentro de la plataforma
-   Se exige trato profesional.
-   No se permite acoso, hostigamiento ni confrontaciones públicas.
-   Los desacuerdos deben canalizarse por medios internos.
+- Publicación de datos de clientes, compradores, ocupantes o Leads sin base jurídica.
 
-8. Reportes, moderación y automatización
-   El Titular no tiene obligación de revisar o validar el contenido antes de su publicación.
-   La moderación puede realizarse de forma manual, automática o mediante sistemas algorítmicos, sin obligación de intervención humana previa.
-   El Titular podrá revisar contenido reportado, solicitar información adicional y aplicar medidas correctivas.
-   No existe obligación de advertencia previa cuando el Titular lo considere necesario.
+- Contenido sexual ilícito, explotación de menores, violencia extrema, amenazas o actividades ilegales.
 
-9. Reincidencia y sanciones
-   El incumplimiento puede resultar en:
+- Acoso, hostigamiento, discriminación, extorsión, suplantación o confrontaciones abusivas.
 
-- advertencias,
-- eliminación de contenido,
-- suspensión temporal,
-- cancelación definitiva de la cuenta.
+- Spam, scraping, extracción masiva, automatización no autorizada, phishing o malware.
 
-Las sanciones pueden aplicarse de forma progresiva o inmediata, a discreción del Titular.
+- Manipulación de métricas, reseñas, recomendaciones, ranking, referidos, Leads, pagos o reembolsos.
 
-10. Transparencia y discrecionalidad
-    El Titular administra la plataforma y aplica estas reglas como condiciones privadas de uso.
-    Las decisiones de moderación no constituyen censura ni discriminación.
-    El Titular no está obligado a justificar públicamente sus decisiones.
+- Reseñas compradas, falsas o condicionadas a incentivos por opinión positiva.
 
-11. Relación con otros documentos
-    Estas Community Guidelines se interpretan junto con:
+- Promesas garantizadas de ingresos, ventas, resultados profesionales o certificaciones inexistentes en Cursos.
 
-- Términos y Condiciones
-- Política de Privacidad
-  En caso de conflicto, prevalecerán los Términos y Condiciones.
+- Clonar, suplantar o utilizar de forma engañosa la voz, imagen o identidad de terceros mediante IA sin autorización aplicable.
 
-12. Cooperación con autoridades
-    El Titular podrá cooperar con autoridades competentes cuando sea legalmente requerido.
+# 4. Inmuebles, direcciones e imágenes
 
-13. Ley aplicable
-    Estas Community Guidelines se interpretan conforme a las leyes de los Estados Unidos Mexicanos.
+El Usuario debe contar con autorización suficiente para publicar una ficha y sus imágenes. La ubicación puede ser exacta o aproximada según la función. No se permite publicar códigos, llaves, contraseñas, cámaras, rutinas de ocupantes ni información que incremente el riesgo de seguridad.
+
+# 5. Cursos e Instructores
+
+El Instructor debe publicar información completa y no engañosa sobre contenido, nivel, duración, acceso, requisitos, resultados razonablemente esperables y cualquier acreditación. Debe contar con derechos sobre videos, música, fotografías, plantillas, marcas y materiales. ILYROX puede solicitar evidencia de titularidad o autorización y retirar o suspender un Curso ante reclamaciones, alta tasa de devoluciones, quejas, fraude o riesgos legales.
+
+# 6. Reseñas y reputación
+
+Las reseñas deben reflejar experiencias genuinas y no pueden utilizarse para hostigar, revelar datos personales, exigir pagos ni manipular reputación. ILYROX puede detectar patrones, solicitar evidencia, ocultar contenido o suspender cuentas. Las invitaciones a reseñar en plataformas externas no deben seleccionar únicamente a usuarios satisfechos cuando las reglas de dicha plataforma lo prohíban.
+
+# 7. Leads, CRM y contacto
+
+Los datos de Leads y contactos se utilizan únicamente para la finalidad informada. Está prohibido revender bases de datos, enriquecerlas para fines ajenos, compartirlas sin autorización o continuar campañas promocionales después de una baja válida.
+
+# 8. IA y automatización
+
+No se permite utilizar IA para suplantar personas, inventar testimonios, fabricar documentos, crear reseñas falsas, evadir controles, discriminar ilícitamente o ejecutar comunicaciones incompatibles con consentimientos y bajas. El Usuario sigue siendo responsable de revisar material generado por las herramientas que active.
+
+# 9. Reportes, moderación y sanciones
+
+ILYROX puede revisar contenido manual o automáticamente y aplicar advertencias, reducción de alcance, desmonetización, eliminación, suspensión, cancelación, retención de evidencia o cooperación con autoridades. No siempre habrá advertencia previa, especialmente ante riesgo grave, fraude, explotación infantil, infracción intelectual o seguridad.
+
+# 10. Propiedad intelectual
+
+Las reclamaciones de derechos de autor se procesan conforme a la Política de Propiedad Intelectual, Avisos y Retiro. La reincidencia puede ocasionar cierre de cuenta.
+
+# 11. Contacto y ley aplicable
+
+Reportes: ayuda@ilyrox.com \| +52 81 3679 8047. Seguridad: seguridad@ilyrox.com. Estas reglas se interpretan conforme a las leyes de los Estados Unidos Mexicanos y junto con los Términos, Política de Privacidad y políticas específicas de ILYROX.

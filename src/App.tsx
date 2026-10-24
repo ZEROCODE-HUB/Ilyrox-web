@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Notifications from "./pages/Notifications";
@@ -81,6 +81,16 @@ const App = () => {
       path: "/legal/community-guidelines",
       element: <LegalDocument title="Community Guidelines" markdownPath="CommunityGuidelines.md" />,
     },
+    // Alias de URL: las usa la app móvil y las que anuncian los documentos (/legal/...). Redirigen a la página real.
+    { path: "/legal/terminos", element: <Navigate to="/terms" replace /> },
+    { path: "/legal/privacidad", element: <Navigate to="/privacy" replace /> },
+    { path: "/community-guidelines", element: <Navigate to="/legal/community-guidelines" replace /> },
+    { path: "/legal/comunidad", element: <Navigate to="/legal/community-guidelines" replace /> },
+    { path: "/child-safety", element: <Navigate to="/legal/estandares-seguridad-infantil" replace /> },
+    { path: "/legal/seguridad-infantil", element: <Navigate to="/legal/estandares-seguridad-infantil" replace /> },
+    { path: "/communications-preferences", element: <Navigate to="/legal/autorizacion-preferencias-contacto" replace /> },
+    { path: "/legal/comunicaciones", element: <Navigate to="/legal/autorizacion-preferencias-contacto" replace /> },
+    { path: "/privacy-simplified", element: <Navigate to="/legal/aviso-privacidad-simplificado" replace /> },
     {
       path: "/programs-families",
       element: <ProgramFamilies />,

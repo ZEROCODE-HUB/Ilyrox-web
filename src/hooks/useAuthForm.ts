@@ -20,6 +20,10 @@ export interface AuthFormState {
   phone: string;
   avatarFile: File | null;
   avatarPreview: string | null;
+  // Aceptaciones legales del registro (sin marcar por defecto)
+  acceptedTerms: boolean;
+  acceptedPrivacy: boolean;
+  acceptedAge: boolean;
 }
 
 const initialFormState: AuthFormState = {
@@ -33,6 +37,9 @@ const initialFormState: AuthFormState = {
   phone: "",
   avatarFile: null,
   avatarPreview: null,
+  acceptedTerms: false,
+  acceptedPrivacy: false,
+  acceptedAge: false,
 };
 
 export function useAuthForm() {
@@ -93,6 +100,19 @@ export function useAuthForm() {
   }, [formState]);
 
   const validateRegister = useCallback(() => {
+    // Aceptaciones legales obligatorias: valen para cualquier formulario que use este hook.
+    if (!formState.acceptedTerms) {
+      toast({ variant: "destructive", title: "Error", description: "Debes aceptar los Términos y Condiciones de ILYROX" });
+      return false;
+    }
+    if (!formState.acceptedPrivacy) {
+      toast({ variant: "destructive", title: "Error", description: "Debes confirmar haber leído la Política de Privacidad" });
+      return false;
+    }
+    if (!formState.acceptedAge) {
+      toast({ variant: "destructive", title: "Error", description: "Debes confirmar que tienes 18 años o más" });
+      return false;
+    }
     if (
       !formState.firstName ||
       !formState.lastNamePaternal ||
@@ -203,6 +223,10 @@ export function useAuthForm() {
             aprobaciones_recibidas: 3,
             estado: formState.estado,
             celular: formState.phone,
+            // Evidencia legal: un trigger de la BD guarda versión, hash y fecha de lo aceptado.
+            accepted_terms: formState.acceptedTerms,
+            accepted_privacy: formState.acceptedPrivacy,
+            accepted_age: formState.acceptedAge,
           },
         },
       });

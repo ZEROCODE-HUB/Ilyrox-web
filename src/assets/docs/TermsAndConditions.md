@@ -1,279 +1,193 @@
-# TÉRMINOS Y CONDICIONES DE USO
+**TÉRMINOS Y CONDICIONES DE USO**
 
-_(VERSIÓN v1.4 — LISTO PARA TIENDAS)_
+App, sitio web, red profesional, leads, cursos, reseñas, pagos y funciones de inteligencia artificial
 
----
+| **Aplicación / servicio**         | ILYROX                                                                                                 |
+|-----------------------------------|--------------------------------------------------------------------------------------------------------|
+| **Sitio web**                     | www.ilyrox.com                                                                                         |
+| **Responsable / proveedor**       | ILYROX TECHNOLOGIES, S.A.P.I. DE C.V.                                                                  |
+| **RFC**                           | ITE2608279M7                                                                                           |
+| **Domicilio social**              | Aguascalientes, Aguascalientes, México                                                                 |
+| **Domicilio para notificaciones** | Juan Morales 1319, Col. Hacienda los Morales, San Nicolás de los Garza, Nuevo León, México, C.P. 66495 |
+| **Teléfono empresarial**          | +52 81 3679 8047                                                                                       |
+| **Soporte / reclamaciones**       | ayuda@ilyrox.com                                                                                       |
+| **Privacidad**                    | privacidad@ilyrox.com                                                                                  |
+| **Seguridad**                     | seguridad@ilyrox.com                                                                                   |
+| **Versión**                       | v2.2                                                                                                   |
+| **Última actualización**          | 28 de septiembre de 2026                                                                               |
+| **URL pública prevista**          | https://www.ilyrox.com/legal/terminos                                                                  |
 
-| Campo                             | Detalle                                                                               |
-| :-------------------------------- | :------------------------------------------------------------------------------------ |
-| **Aplicación**                    | Ilyrox (la “App”)                                                                     |
-| **Sitio web público asociado**    | [www.ilyrox.com](http://www.ilyrox.com) (el “Sitio”)                                  |
-| **Titular/Responsable**           | Edith Priscila Muñiz Cantu (“Titular”)                                                |
-| **Domicilio**                     | Perif. Blvd. Manuel Ávila Camacho 1903, Cd. Satélite, 53100 Naucalpan de Juárez, Méx. |
-| **Contacto legal**                | ayuda@ilyrox.com                                                                      |
-| **Soporte**                       | ayuda@ilyrox.com                                                                      |
-| **Contacto privacidad**           | ayuda@ilyrox.com                                                                      |
-| **Contacto seguridad**            | ayuda@ilyrox.com                                                                      |
-| **URL pública de estos Términos** | ayuda@ilyrox.com                                                                      |
-| **Última actualización**          | 10/febrero/2026                                                                       |
-| **País/mercado objetivo**         | México                                                                                |
+> **Lectura esencial**  
+> ILYROX es una plataforma tecnológica. En cursos de terceros, el Instructor es el creador y proveedor del contenido; ILYROX presta infraestructura, distribución, soporte operativo y, cuando corresponda, facilitación o gestión de cobro. Las responsabilidades que por ley sean irrenunciables no se excluyen por estos Términos.
 
----
+# 1. Aceptación y alcance
 
-## 1. Aceptación
+Al crear una cuenta, acceder o utilizar ILYROX, el Usuario acepta estos Términos, la Política de Privacidad, las Community Guidelines y las políticas o condiciones específicas aplicables a una función, compra o rol. La aceptación podrá recabarse mediante mecanismos electrónicos verificables. Cuando una autorización deba ser expresa, se utilizará una acción afirmativa, como un checkbox no pre-marcado, botón de aceptación o mecanismo equivalente.
 
-Al descargar, instalar, acceder o usar la App y/o el Sitio, aceptas estos Términos y Condiciones (los “Términos”). Si no estás de acuerdo, no uses la App ni el Sitio.
+Las comunicaciones promocionales no son condición para utilizar las funciones básicas y se rigen por la Autorización y Preferencias de Contacto. Los cambios materiales se notificarán por medios razonables; cuando una modificación requiera nueva aceptación o consentimiento, se solicitará antes de aplicarla.
 
-La creación de cuenta requiere aceptación expresa mediante una casilla de verificación (checkbox) no pre-marcada de:
+# 2. Definiciones
 
-1. Estos Términos;
-2. La Política de Privacidad; y
-3. Que el perfil y las fichas serán públicas en la App y en el Sitio.
+- “Usuario”: persona mayor de edad que accede al Sitio, crea una cuenta o utiliza los Servicios.
 
-El Titular puede actualizar estos Términos en cualquier momento. La versión vigente será la publicada en **[URL TÉRMINOS]**. El uso continuado después de cambios implica aceptación.
+- “Profesional”: asesor inmobiliario, inmobiliaria, constructor, arquitecto, Instructor, proveedor u otro participante profesional.
 
-## 2. Definiciones
+- “Instructor” o “Creador”: persona física o moral que registra, ofrece o suministra a través de ILYROX un Curso propio o respecto del cual cuenta con los derechos, licencias y autorizaciones suficientes.
 
-- **“Usuario”:** cualquier persona que crea cuenta o navega en la App/Sitio.
-- **“Contenido”:** toda información cargada o generada por Usuarios (fichas, imágenes, videos, textos, comentarios, mensajes, etc.).
-- **“Ficha”:** publicación de un inmueble con datos técnicos, ubicación/dirección (exacta o aproximada), imágenes y características.
-- **“Servicios”:** funcionalidades de red profesional, publicación de fichas, búsqueda, feed, CRM interno, mensajería y herramientas asociadas.
-- **“Promocionado/Patrocinado”:** contenido destacado dentro de la App mediante herramientas del Titular (sin que implique validación del contenido).
+- “Curso” o “Producto Digital”: contenido educativo o informativo ofrecido mediante ILYROX, incluyendo clases, videos, documentos, sesiones, comunidades, evaluaciones o materiales asociados.
 
-## 3. Elegibilidad (mayores de edad)
+- “Contenido”: fichas, fotografías, videos, textos, comentarios, reseñas, cursos, mensajes, documentos y demás material cargado o generado en ILYROX.
 
-La App y el Sitio están destinados exclusivamente a personas **mayores de 18 años**. Al crear una cuenta declaras y garantizas que tienes 18 años o más.
+- “Lead” o “Prospecto”: persona que solicita información, agenda una cita o realiza una acción que razonablemente indique interés en un inmueble, profesional, Curso o servicio.
 
-Si el Titular detecta o sospecha que un Usuario es menor de edad, podrá suspender o cancelar la cuenta de inmediato.
+- “Servicios”: red profesional, publicación, búsqueda, CRM, mensajería, agenda, leads, cursos, reseñas, publicidad, pagos, analítica, automatización, IA y demás funciones disponibles.
 
-## 4. Registro, cuenta y seguridad
+- “Ingreso Neto Distribuible”: concepto definido en el Contrato de Instructor para liquidaciones de Cursos.
 
-Para acceder a ciertas funciones es obligatorio crear una cuenta. El Usuario se obliga a:
+# 3. Elegibilidad y capacidad
 
-- **a)** proporcionar información veraz y actualizada;
-- **b)** mantener la confidencialidad de su contraseña y credenciales;
-- **c)** notificar de inmediato cualquier uso no autorizado de su cuenta.
+ILYROX está destinado exclusivamente a personas de 18 años o más. Al registrarse, el Usuario declara tener capacidad legal suficiente y proporcionar información veraz. ILYROX podrá solicitar verificación de identidad, representación profesional, datos fiscales o información necesaria para prevenir fraude y cumplir obligaciones legales.
 
-El Titular puede implementar medidas de seguridad, verificación y controles anti-fraude/abuso. El Usuario es responsable de toda actividad realizada desde su cuenta.
+# 4. Registro, cuenta y seguridad
 
-## 5. Naturaleza del servicio: plataforma tecnológica (no asesoría, no corretaje)
+- Mantener credenciales confidenciales y proteger dispositivos y medios de autenticación.
 
-La App/Sitio es una plataforma tecnológica de publicación y networking inmobiliario. El Titular:
+- Actualizar datos de cuenta y fiscales cuando cambien.
 
-- **No es propietario** de los inmuebles publicados (salvo que se indique expresamente);
-- **No garantiza** la existencia, calidad, legalidad, disponibilidad, precio ni condición de los inmuebles;
-- **No participa** como parte en contratos de compraventa, arrendamiento, promesas, apartados o negociaciones entre Usuarios y/o terceros, salvo que el Titular lo indique por escrito en un caso concreto.
+- Notificar accesos no autorizados o incidentes a seguridad@ilyrox.com.
 
-Cualquier decisión, cita, negociación o transacción se realiza bajo **responsabilidad exclusiva** de los Usuarios y/o terceros involucrados.
+- No ceder, alquilar o vender cuentas ni suplantar a otras personas.
 
-El Titular no actúa como mediador, árbitro ni representante de Usuarios en disputas, negociaciones o controversias. Las disputas se resuelven directamente entre las partes involucradas.
+- ILYROX podrá aplicar controles de seguridad, autenticación adicional, prevención de fraude, límites y verificaciones.
 
-## 6. Perfil público y Contenido público (App y Sitio)
+# 5. Naturaleza del servicio inmobiliario
 
-### 6.1 Perfil público por diseño del servicio
+ILYROX es una plataforma tecnológica de publicación, networking y herramientas para profesionales inmobiliarios. Salvo que una oferta indique expresamente lo contrario, ILYROX no es propietario de los inmuebles, no actúa como notario, valuador, institución financiera ni parte de contratos de compraventa, arrendamiento, promesa, apartado, construcción o crédito celebrados entre Usuarios o terceros.
 
-La App funciona como red profesional. Por ello, el perfil del Usuario (incluyendo nombre, teléfono, correo, estado, experiencia y reputación cuando aplique) es público dentro de la App y se publica también en el Sitio.
+Las fichas, precios, disponibilidad, condiciones, documentos y declaraciones de inmuebles son responsabilidad de quien los publica. ILYROX puede realizar controles, reportes o verificaciones, pero su permanencia en la plataforma no equivale a garantía jurídica, técnica, física, financiera o comercial.
 
-### 6.2 Fichas y Contenido público
+# 6. Publicación de perfiles, fichas y contenido
 
-Al publicar una Ficha o Contenido destinado a publicación, el Usuario entiende y acepta que podrá ser visible en la App y replicado en el Sitio abierto al público. El Sitio puede ser indexado por buscadores. Terceros podrían copiar o reutilizar información pública fuera del control del Titular.
+Los perfiles profesionales y el Contenido destinado a publicación pueden mostrarse en la App, en el Sitio, compartirse mediante enlaces e indexarse por buscadores. ILYROX puede utilizar formularios o botones de contacto para evitar exponer innecesariamente teléfonos o correos en texto abierto. El Usuario deberá contar con los derechos y autorizaciones necesarios para publicar información, imágenes, video, ubicación o dirección de inmuebles.
 
-### 6.3 Aceptación expresa (onboarding)
+Queda prohibido publicar códigos de acceso, llaves, contraseñas, cámaras, rutinas de ocupantes, datos sensibles de seguridad o información que aumente injustificadamente el riesgo para personas o bienes.
 
-La creación de cuenta requiere aceptación expresa mediante casilla de verificación (checkbox) no pre-marcada de: (i) estos Términos; (ii) la Política de Privacidad; y (iii) que el perfil y las fichas (incluyendo dirección exacta o aproximada e imágenes) serán públicas en App y Sitio. Si no aceptas, no podrás crear cuenta.
+# 7. Licencia sobre Contenido del Usuario
 
-## 7. Direcciones y ubicación del inmueble
+El Usuario conserva sus derechos sobre el Contenido. Al cargar o publicar Contenido concede a ILYROX una licencia mundial, no exclusiva, gratuita, sublicenciable a proveedores necesarios y limitada a la operación del servicio para alojar, almacenar, reproducir, adaptar técnicamente, distribuir, comunicar públicamente, mostrar, indexar, traducir, generar miniaturas, transcripciones y formatos derivados técnicos, y promocionar ILYROX y el propio Contenido público.
 
-La App permite publicar ubicación y/o dirección del inmueble (exacta o aproximada). El Usuario reconoce y acepta que dicha información será pública en la App y podrá republicarse en el Sitio.
+Esta licencia no autoriza a convertir datos privados del CRM ni mensajes privados en material promocional. ILYROX podrá conservar respaldos, registros o evidencia cuando sea necesario para seguridad, cumplimiento, defensa de reclamaciones o procesos de eliminación.
 
-Al publicar dirección exacta o información de ubicación, el Usuario declara y garantiza que cuenta con autorización suficiente para divulgarla (por ejemplo, del propietario, poseedor o representante autorizado), y que la información es veraz y no vulnera derechos de terceros.
+# 8. Leads, matching y contacto con prospectos
 
-El Titular podrá, a su discreción y sin obligación, ocultar parcialmente la ubicación, solicitar verificación o retirar una Ficha cuando exista reporte, indicio de riesgo, posible infracción, o cuando sea necesario por seguridad, cumplimiento legal o prevención de fraude/abuso.
+ILYROX puede captar Leads mediante el Sitio, App, fichas, campañas, formularios, Cursos, contenido, recomendaciones u otros puntos de contacto. Antes de compartir datos personales con Profesionales, ILYROX aplicará el aviso de privacidad y recabará el consentimiento exigible.
 
-**Queda prohibido** publicar información de acceso o seguridad del inmueble (códigos, llaves, rutas internas, contraseñas, cámaras, etc.) o datos personales de ocupantes no necesarios para la Ficha.
+Los Leads podrán asignarse o recomendarse con base en ubicación, especialidad, disponibilidad, coincidencia, calidad de información, respuesta, reputación, reglas de producto, pruebas de optimización o servicios promocionados identificados. Salvo indicación expresa, un Lead no es exclusivo y no existe garantía de respuesta, cita, cierre, comisión o resultado.
 
-## 8. Licencia sobre el Contenido del Usuario
+ILYROX puede cobrar por generación, asignación, acceso o gestión de oportunidades comerciales. Ese cobro corresponde al servicio tecnológico, de marketing, matching o distribución y no convierte los datos personales en una mercancía autónoma. El Profesional receptor sólo podrá usar los datos para atender la solicitud y para finalidades adicionales cuando cuente con base jurídica válida.
 
-Al cargar, publicar o enviar Contenido, el Usuario otorga al Titular una licencia mundial, no exclusiva, gratuita, sublicenciable y transferible para alojar, almacenar, reproducir, distribuir, comunicar públicamente, mostrar, adaptar (por ejemplo, redimensionar/optimizar), traducir, crear obras derivadas y utilizar dicho Contenido en relación con:
+# 9. CRM y datos de terceros
 
-- **a)** operación de la App/Sitio;
-- **b)** republicación y difusión de Fichas en el Sitio;
-- **c)** seguridad, prevención de fraude/abuso, auditorías y cumplimiento;
-- **d)** generación de estadísticas y estudios de mercado (en forma agregada/anonimizada cuando sea posible);
-- **e)** marketing del servicio (por ejemplo, mostrar capturas o extractos en materiales promocionales, sin divulgar datos del CRM de clientes).
+Cuando un Profesional utilice el CRM para administrar datos de sus propios clientes, deberá haber cumplido sus obligaciones de información y contar con base jurídica suficiente. Las funciones de CRM se sujetan también al Acuerdo de Tratamiento de Datos para Profesionales e Instructores. Los datos privados del CRM no se publican por el solo hecho de almacenarse en ILYROX.
 
-El Usuario declara contar con derechos y autorizaciones necesarios sobre el Contenido (incluyendo imágenes) y asume toda responsabilidad por su publicación.
+# 10. Inteligencia artificial y automatización
 
-## 9. Uso del CRM y datos de terceros (clientes/contactos)
+ILYROX puede ofrecer funciones de IA para clasificar Leads, recomendar propiedades, resumir conversaciones, generar contenido, preparar seguimientos o ejecutar acciones configuradas. Las salidas pueden ser inexactas y el Usuario debe revisar decisiones materiales. ILYROX no autoriza por defecto a un agente de IA a firmar contratos, aceptar ofertas, disponer de fondos, reconocer adeudos o asumir obligaciones jurídicas en nombre del Usuario.
 
-La App puede permitir que Usuarios registren datos de terceros (clientes/contactos) para seguimiento en el CRM.
+Las automatizaciones de comunicación deben respetar preferencias de contacto, bajas, listas de bloqueo y las autorizaciones aplicables. ILYROX podrá registrar acciones, entradas relevantes, destinatarios, canal, hora y resultado para auditoría y seguridad.
 
-- El Usuario declara contar con **base legal/consentimiento** para capturar y utilizar dichos datos en la App.
-- El Usuario se obliga a **no usar el CRM para spam, acoso** o prácticas ilícitas.
-- El Titular **no publica en el Sitio** los datos del CRM de clientes y no los comparte con plataformas publicitarias.
-- El Titular podrá acceder a datos del CRM únicamente en la medida necesaria para soporte, seguridad, prevención de abuso y cumplimiento legal.
+# 11. Reseñas, reputación y recomendaciones
 
-## 10. Reglas de uso, verificación y conducta prohibida
+Las reseñas deben reflejar experiencias auténticas. Se prohíben reseñas falsas, compradas, coordinadas, duplicadas, amenazas para obtener una calificación, incentivos condicionados a opinión positiva y manipulación de reputación o ranking. ILYROX puede moderar, etiquetar, limitar o retirar contenido que infrinja estas reglas.
 
-El Usuario se compromete a usar la App/Sitio conforme a la ley y estos Términos. **Está prohibido:**
+# 12. Cursos de terceros y relación con Instructores
 
-- publicar información falsa, engañosa o fraudulenta;
-- suplantar identidad, usar datos de contacto falsos o de terceros sin autorización;
-- publicar contenido que infrinja derechos de autor, marcas, privacidad o datos personales de terceros;
-- publicar direcciones o datos sensibles de personas sin autorización (distinto de la dirección del inmueble cuando el Usuario esté autorizado a publicarla);
-- acosar, amenazar, difamar o discriminar;
-- extraer datos masivamente (scraping), automatizar accesos o evadir medidas de seguridad;
-- introducir malware, realizar ingeniería inversa, interferir con sistemas o vulnerar cuentas;
-- usar la App/Sitio para actividades ilegales, lavado, estafas o suplantación.
+Cuando un Curso sea creado por un Instructor independiente, el Instructor es el creador y proveedor del contenido y responde por su legalidad, titularidad, exactitud, calidad, publicidad, promesas, materiales, soporte académico y cumplimiento de lo ofrecido. ILYROX proporciona la infraestructura tecnológica, distribución, acceso, soporte operativo y, cuando aplique, facilitación o gestión de cobro y reembolso. Nada de lo anterior elimina obligaciones que la ley imponga directamente a ILYROX.
 
-El Titular podrá solicitar verificación de identidad, representación o autorización de publicación de un inmueble (por ejemplo, para prevenir fraudes). Si el Usuario no coopera o existen señales de riesgo, el Titular podrá limitar funciones, remover contenido o cancelar la cuenta.
+El Instructor otorga a ILYROX el mandato o autorización necesaria para recaudar pagos asociados a sus Cursos y procesar devoluciones o ajustes de conformidad con el Contrato de Instructor y las Condiciones de Compra. Si una oferta identifica a ILYROX como creador o proveedor directo de un Curso propio, ILYROX asumirá esa calidad respecto de dicho Curso.
 
-## 11. Moderación, reportes y remoción de contenido
+El alta como Instructor requiere aceptación electrónica separada del Contrato de Instructor ILYROX y, cuando corresponda, de condiciones económicas específicas. La cuenta de Usuario ordinaria no confiere automáticamente facultades de Instructor.
 
-El Titular podrá (sin obligación) revisar, moderar, bloquear o remover Contenido y/o cuentas:
+# 13. Compras, pagos, suscripciones y reembolsos
 
-- por violaciones a estos Términos;
-- por requerimientos legales o de autoridades;
-- por riesgo de fraude, abuso, seguridad o reputación del servicio.
+Antes de confirmar una compra se mostrará la información material disponible: Curso o servicio, Instructor/proveedor, precio, impuestos cuando correspondan, modalidad, duración o vigencia de acceso, periodicidad si existe suscripción, método de pago y condiciones aplicables de cancelación o reembolso.
 
-Se habilitarán mecanismos de reporte. El Titular podrá solicitar evidencia (por ejemplo, autorización de publicación, propiedad/representación) para mantener una Ficha publicada.
+Cuando exista cobro recurrente, se informarán de forma clara, destacada y accesible la periodicidad, monto y fecha de cobro y se recabará consentimiento expreso e informado. Si el contrato contempla renovación automática, ILYROX notificará al Usuario con al menos cinco días naturales de anticipación, permitirá cancelar la renovación sin penalización e implementará un mecanismo para cancelar el servicio, suscripción o membresía de manera inmediata, sin perjuicio de reglas de tienda o procesador que otorguen mayor protección.
 
-## 12. Visibilidad, ranking, alcance y pruebas
+Las compras de contenido digital realizadas dentro de aplicaciones móviles se procesarán mediante los mecanismos exigidos o permitidos por la tienda correspondiente. Las compras web podrán procesarse mediante proveedores externos. Se aplican además las Condiciones de Compra, Suscripciones y Reembolsos de ILYROX.
 
-El Titular **no garantiza** el orden, visibilidad, alcance, permanencia, impresiones, leads o resultados comerciales de ningún contenido o cuenta. La visibilidad puede variar por:
+# 14. Publicidad, promociones y servicios patrocinados
 
-- calidad y completitud de la información;
-- preferencias de búsqueda de otros usuarios;
-- seguridad, prevención de fraude/abuso;
-- moderación, cumplimiento de políticas y reportes;
-- pruebas A/B, cambios de producto y disponibilidad técnica.
+ILYROX puede ofrecer fichas destacadas, espacios patrocinados, membresías, publicidad, referidos o servicios promocionales. Cuando la naturaleza de la presentación pudiera generar confusión, el contenido pagado se identificará razonablemente. El pago por visibilidad no constituye verificación, recomendación, promesa de leads ni garantía de resultado.
 
-El Titular podrá limitar o pausar contenido por razones de seguridad, cumplimiento o calidad, incluso si previamente fue publicado.
+# 15. Reglas de uso y conductas prohibidas
 
-## 13. Estudios de mercado y uso de datos agregados
+- Publicar información falsa, engañosa o fraudulenta, o inmuebles sin autorización suficiente.
 
-El Titular podrá generar y comercializar estudios de mercado de oferta y demanda basados en información agregada de:
+- Infringir derechos de autor, marcas, imagen, privacidad, datos personales u otros derechos de terceros.
 
-- búsquedas, preferencias, tendencias y actividad dentro de la App;
-- inventario de Fichas, estatus y tiempos en mercado;
-- características de inmuebles por zona/segmento.
+- Acosar, amenazar, discriminar, extorsionar, difamar ilícitamente o promover violencia o actividades ilegales.
 
-El Titular procurará evitar reportes que identifiquen a una persona o a un inmueble específico. Los estudios no constituyen asesoría financiera, fiscal o legal. Las decisiones de inversión o construcción son responsabilidad del comprador del estudio.
+- Publicar, solicitar, facilitar o distribuir material de abuso o explotación sexual infantil o contenido que ponga en riesgo a menores.
 
-## 14. Publicidad interna, servicios futuros y reembolsos
+- Hacer scraping, extracción masiva, automatización no autorizada, reventa de bases de datos o elusión de controles técnicos.
 
-El Titular podrá ofrecer herramientas para destacar Fichas dentro de la App (p. ej., “Promocionado/Patrocinado”). Dicho destaque no implica verificación, garantía o recomendación del inmueble.
+- Introducir malware, acceder a cuentas ajenas, vulnerar sistemas o realizar ingeniería inversa no permitida.
 
-En esta versión, la App **no procesa pagos** dentro de la aplicación. En caso de que el Titular incorpore pagos o servicios de cobro en el futuro (incluyendo paquetes de visualización/destacado u otros), los términos aplicables (precios, facturación, renovación y políticas de reembolso) se informarán previamente y podrán requerir aceptación adicional.
+- Manipular métricas, reseñas, recomendaciones, Leads, ranking, referidos, pagos, devoluciones o sistemas de incentivos.
 
-Salvo disposición obligatoria de ley, los cargos por servicios digitales, destacadas o promociones podrán ser no reembolsables una vez iniciada su prestación, especialmente cuando impliquen difusión/impresiones/visualizaciones ya ejecutadas.
+- Usar ILYROX para spam, phishing, suplantación o contacto después de una baja u oposición válida.
 
-## 15. Servicios de terceros, SDKs y ATT
+- Ofrecer Cursos que prometan resultados garantizados, ingresos ciertos o credenciales oficiales inexistentes, o que incorporen material de terceros sin autorización.
 
-La App puede integrar servicios de terceros (por ejemplo, Meta SDK) para medición de adquisición y atribución, notificaciones, hosting o seguridad.
+# 16. Moderación, reportes, bloqueo y medidas
 
-En iOS, cuando aplique, se solicitará permiso mediante **App Tracking Transparency (ATT)**. Si el Usuario no autoriza, ciertas funciones de medición/atribución pueden limitarse sin afectar el uso básico.
+ILYROX puede utilizar revisión manual, reglas automatizadas, modelos algorítmicos y sistemas de IA para detectar abuso, fraude, infracciones o riesgo. Podrá advertir, reducir alcance, ocultar, desmonetizar, retirar Contenido, limitar funciones, suspender o cancelar cuentas, preservar evidencia o cooperar con autoridades. La medida podrá ser inmediata ante riesgo de seguridad, fraude, explotación de menores, infracción grave, impagos o requerimiento legal.
 
-El tratamiento de datos por terceros se rige por sus propias políticas. Consulta la Política de Privacidad de la App para detalles.
+# 17. Propiedad intelectual y notice & takedown
 
-## 16. Proceso de quejas por derechos de autor y propiedad intelectual (notice & takedown)
+La App, Sitio, marcas, interfaces, diseño, código, bases de datos, documentación y materiales propios pertenecen a ILYROX o a sus licenciantes. Los reportes sobre contenido presuntamente infractor se tramitan conforme a la Política de Propiedad Intelectual, Avisos y Retiro de Contenido, disponible en el Sitio. ILYROX mantiene una política para infractores reincidentes y podrá recibir contra-avisos cuando proceda.
 
-Si consideras que algún Contenido infringe tus derechos (por ejemplo, derechos de autor de fotografías), envía un aviso a **ayuda@ilyrox.com** incluyendo:
+# 18. Disponibilidad, cambios, pruebas y ranking
 
-- **a)** identificación de la obra/elemento protegido;
-- **b)** enlace o identificación del Contenido presuntamente infractor;
-- **c)** explicación del motivo y, cuando aplique, evidencia de titularidad;
-- **d)** tus datos de contacto y declaración bajo protesta de decir verdad.
+ILYROX puede modificar, probar, suspender o retirar funciones por mejora, seguridad, cumplimiento, disponibilidad técnica o razones comerciales. No se garantiza disponibilidad continua, posición específica, visualizaciones, Leads, ventas, rentas, comisiones, posicionamiento ni retorno de inversión.
 
-El Titular podrá retirar o bloquear el Contenido y, cuando corresponda, suspender cuentas reincidentes, en la medida permitida por la ley aplicable.
+# 19. Estudios, analítica y datos agregados
 
-## 17. Propiedad intelectual de la App/Sitio
+ILYROX puede generar y comercializar estadísticas, métricas e información agregada o disociada sobre oferta, demanda, búsquedas, inventario, tendencias, tiempos de mercado, interacción y desempeño, aplicando medidas razonables para evitar identificar a una persona o domicilio específico. Los estudios no constituyen asesoría de inversión, valuación, construcción, fiscal ni legal.
 
-La App, el Sitio, sus marcas, diseño, código, bases de datos (excluyendo Contenido del Usuario), y demás elementos son propiedad del Titular o licenciantes.
-Queda **prohibida** su reproducción, modificación o explotación no autorizada.
-El Usuario conserva titularidad de su Contenido, otorgando la licencia indicada en la sección 8.
+# 20. Servicios de terceros
 
-## 18. Disponibilidad, cambios y mantenimiento
+ILYROX puede integrarse con alojamiento, mapas, mensajería, pagos, calendarios, analítica, IA, redes publicitarias y tiendas de aplicaciones. Dichos terceros aplican sus propios términos y políticas. ILYROX seleccionará y administrará proveedores conforme a la ley y la Política de Privacidad, sin asumir responsabilidad por fallas que no le sean legalmente atribuibles.
 
-El Titular puede modificar, suspender o descontinuar funciones de la App/Sitio por mantenimiento, mejoras, seguridad o razones comerciales.
-No se garantiza disponibilidad ininterrumpida. Puede haber interrupciones por fallas técnicas o causas fuera del control del Titular.
+# 21. Comunicaciones
 
-## 19. Eliminación de Contenido
+ILYROX puede enviar comunicaciones necesarias para cuenta, seguridad, soporte, citas, Leads, compras, facturación, acceso a Cursos o avisos legales. Las promociones, novedades y mensajes comerciales se enviarán conforme a preferencias y consentimientos aplicables. Las bajas promocionales no afectan mensajes estrictamente necesarios para una transacción o solicitud activa.
 
-Cuando un Usuario elimine una Ficha o Contenido desde la App, el Titular dejará de mostrarlo en la App y procurará retirarlo del Sitio dentro de un plazo razonable (por ejemplo, hasta 72 horas), sujeto a procesos técnicos (cachés/CDN, respaldos) y a obligaciones legales.
+# 22. Privacidad y datos personales
 
-El Usuario reconoce que terceros pueden haber copiado o republicado el Contenido y que el Titular no controla ni puede garantizar su eliminación fuera de la App/Sitio (por ejemplo, indexación en buscadores, capturas, caches o republicaciones de terceros).
+El tratamiento de datos se rige por la Política de Privacidad y, cuando proceda, por acuerdos de tratamiento específicos. La aceptación de estos Términos no sustituye consentimientos expresos requeridos para finalidades determinadas, transferencias, datos financieros o patrimoniales ni comunicaciones promocionales.
 
-## 20. Fuerza mayor
+# 23. Limitación de responsabilidad
 
-El Titular no será responsable por incumplimientos o retrasos derivados de caso fortuito o fuerza mayor, incluyendo (sin limitar) fallas de internet, servicios de hosting, proveedores, plataformas de terceros, cortes de energía, actos de autoridad, desastres naturales, conflictos laborales o ciberincidentes generalizados fuera del control razonable del Titular.
+En la máxima medida permitida por la ley, ILYROX no será responsable por decisiones independientes de Usuarios o terceros, información o Contenido publicado por ellos, incumplimientos entre partes, pérdida de oportunidades, actos fuera de la plataforma, servicios de terceros o daños indirectos no atribuibles jurídicamente a ILYROX. Nada de lo anterior excluye responsabilidad irrenunciable, dolo, conducta intencional o cualquier supuesto que la ley prohíba limitar.
 
-## 21. Renuncias y limitación de responsabilidad
+# 24. Indemnidad por conductas del Usuario
 
-La App/Sitio se proporcionan **“tal cual”** y **“según disponibilidad”**. El Titular no garantiza:
+En la medida permitida por la ley, el Usuario responderá frente a ILYROX por reclamaciones de terceros causadas por Contenido, datos, Cursos, inmuebles, comunicaciones, promociones o conductas ilícitas atribuibles al propio Usuario, incluyendo infracción de propiedad intelectual, privacidad, publicidad engañosa o tratamiento indebido de datos. Esta obligación no comprende daños causados por actos atribuibles a ILYROX.
 
-- exactitud, veracidad o completitud del Contenido publicado por Usuarios;
-- resultados comerciales (ventas, rentas, leads);
-- disponibilidad continua ni ausencia de errores.
+# 25. Suspensión y terminación
 
-En la máxima medida permitida por la ley aplicable, el Titular no será responsable por:
+El Usuario puede solicitar eliminación de su cuenta conforme a la Política de Privacidad. ILYROX puede suspender o terminar una cuenta por incumplimiento, fraude, impago, riesgo para terceros, violaciones reiteradas, reclamaciones graves, explotación de menores o requerimiento legal. En el caso de Instructores, podrán aplicarse además reservas, retenciones, continuidad de acceso para compradores existentes y otras medidas previstas en su contrato específico.
 
-- **a)** pérdidas indirectas, lucro cesante, pérdida de datos o reputación;
-- **b)** actos u omisiones de Usuarios o terceros;
-- **c)** transacciones, citas, conflictos o daños derivados de inmuebles publicados;
-- **d)** accesos no autorizados, hackeos o incidentes de seguridad, salvo dolo o culpa grave comprobable.
+# 26. Evidencia electrónica y conservación
 
-En cualquier caso, la responsabilidad total del Titular se limitará al monto máximo permitido por la ley aplicable y, si aplica, al equivalente a lo pagado al Titular por el Usuario en los últimos 12 meses (o cero si no hubo pagos).
+ILYROX podrá conservar registros de aceptación, versión contractual, fecha y hora, identificador de cuenta, IP o identificador técnico proporcional, eventos de compra y demás evidencia electrónica razonable. Podrá emplear mecanismos de integridad, sellado de tiempo o conservación de mensajes de datos cuando resulte apropiado.
 
-## 22. Indemnización
+# 27. Ley aplicable y controversias
 
-El Usuario se obliga a sacar en paz y a salvo e indemnizar al Titular, sus afiliados y colaboradores, ante cualquier reclamación derivada de:
+Estos Términos se rigen por las leyes de los Estados Unidos Mexicanos. En relaciones entre empresas o profesionales, y salvo norma imperativa distinta, las partes se someten a los tribunales competentes de Aguascalientes, Aguascalientes, México. Esta cláusula no limita los derechos irrenunciables de consumidores, titulares de datos ni el acceso a autoridades competentes.
 
-- Contenido publicado por el Usuario;
-- violación de estos Términos o de la ley;
-- infracción de derechos de terceros (incluyendo privacidad, datos personales, derechos de autor);
-- uso indebido del CRM o datos de terceros.
+# 28. Contacto
 
-## 23. Cesión
-
-El Usuario no podrá ceder sus derechos u obligaciones derivados de estos Términos sin autorización previa y por escrito del Titular.
-El Titular podrá ceder, transferir o delegar total o parcialmente estos Términos, así como los derechos y obligaciones relacionados con la App/Sitio, a cualquier tercero (por ejemplo, en caso de venta, fusión, reestructura o transferencia de activos), sin requerir consentimiento del Usuario.
-
-## 24. Integridad del acuerdo y separabilidad
-
-**Integridad del acuerdo:** Estos Términos, junto con la Política de Privacidad y cualquier aviso legal publicado por el Titular, constituyen el acuerdo completo entre el Usuario y el Titular respecto del uso de la App/Sitio, y sustituyen cualquier acuerdo o comunicación previa.
-
-**Separabilidad:** Si alguna disposición de estos Términos se considera inválida o inaplicable, las demás disposiciones permanecerán vigentes en la máxima medida permitida por la ley aplicable.
-
-## 25. Apple/Google — terceros beneficiarios y no responsables
-
-Si descargas la App desde Apple App Store o Google Play, reconoces que:
-
-- **a)** Apple y Google no son parte de estos Términos y no asumen responsabilidad por la App o el Contenido;
-- **b)** cualquier reclamación relacionada con la App debe dirigirse al Titular, no a Apple o Google;
-- **c)** Apple y Google pueden ser terceros beneficiarios de estos Términos en la medida aplicable y pueden hacerlos valer frente al Usuario.
-
-## 26. Terminación
-
-El Titular puede suspender o cancelar cuentas y/o remover Contenido en cualquier momento por violaciones, riesgos o requerimientos legales.
-El Usuario puede solicitar baja/eliminación conforme a la Política de Privacidad. Contenido público puede persistir en caches/índices de terceros.
-Las secciones por su naturaleza que deban sobrevivir (licencias, limitación, indemnización, jurisdicción) continuarán vigentes.
-
-## 27. Notificaciones y comunicaciones
-
-El Titular puede enviar comunicaciones operativas (seguridad, cambios, avisos importantes) al correo/medio registrado.
-Las comunicaciones promocionales, cuando existan, podrán gestionarse conforme a la Política de Privacidad y configuraciones disponibles en la App (si aplica).
-
-## 28. Ley aplicable y jurisdicción
-
-Estos Términos se rigen por las leyes de los **Estados Unidos Mexicanos**.
-Cualquier controversia se someterá a los tribunales competentes de **[CIUDAD/ESTADO]**, México, renunciando a cualquier otro fuero que pudiera corresponder, en la medida permitida por la ley aplicable.
-
-## 29. Soporte y Contacto
-
-| Canal               | Correo                                                                  |
-| :------------------ | :---------------------------------------------------------------------- |
-| **Soporte**         | ayuda@ilyrox.com _(tiempo objetivo de respuesta: hasta 5 días hábiles)_ |
-| **Dudas legales**   | ayuda@ilyrox.com                                                        |
-| **Privacidad/ARCO** | ayuda@ilyrox.com                                                        |
-| **Seguridad**       | ayuda@ilyrox.com                                                        |
+Soporte y reclamaciones: ayuda@ilyrox.com \| Teléfono empresarial: +52 81 3679 8047. Privacidad: privacidad@ilyrox.com. Seguridad: seguridad@ilyrox.com. Domicilio para notificaciones: Juan Morales 1319, Col. Hacienda los Morales, San Nicolás de los Garza, Nuevo León, México, C.P. 66495.

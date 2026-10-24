@@ -6,6 +6,7 @@ import { ChevronLeft, Loader2 } from "lucide-react";
 import logo360 from "@/assets/logo-360.png";
 import { Link } from "react-router-dom";
 import { upperWord } from "@/utils/upperWord";
+import { Footer } from "@/components/Footer";
 
 const PropertyPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -92,10 +93,7 @@ const PropertyPage = () => {
         </div>
       </main>
 
-      {/* Footer minimalista */}
-      <footer className="mt-16 text-center text-slate-400 text-sm">
-        <p>© 2026 360 Propiedades - Todos los derechos reservados</p>
-      </footer>
+      <Footer />
     </div>
   );
 };

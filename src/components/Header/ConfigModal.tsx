@@ -362,31 +362,6 @@ export const ConfigModal = ({
               label="Autorización y Preferencias de Contacto" 
               onClick={openLegalModal} 
             />
-            <LegalDocButton 
-              doc="aviso-privacidad-simplificado" 
-              label="Aviso de Privacidad Simplificado" 
-              onClick={openLegalModal} 
-            />
-            <LegalDocButton 
-              doc="condiciones-compra-suscripciones-reembolsos" 
-              label="Condiciones de Compra y Reembolsos" 
-              onClick={openLegalModal} 
-            />
-            <LegalDocButton 
-              doc="contrato-instructor-creador" 
-              label="Contrato de Instructor Creador" 
-              onClick={openLegalModal} 
-            />
-            <LegalDocButton 
-              doc="acuerdo-tratamiento-datos" 
-              label="Acuerdo de Tratamiento de Datos" 
-              onClick={openLegalModal} 
-            />
-            <LegalDocButton 
-              doc="politica-propiedad-intelectual" 
-              label="Política de Propiedad Intelectual" 
-              onClick={openLegalModal} 
-            />
           </div>
         </div>
       </div>

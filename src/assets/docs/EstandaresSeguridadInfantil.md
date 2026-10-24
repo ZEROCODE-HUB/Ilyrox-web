@@ -1,43 +1,57 @@
-# Estándares de Seguridad Infantil
+**ESTÁNDARES DE SEGURIDAD INFANTIL**
 
-_(VERSIÓN v2.2)_
+Prevención, reporte y respuesta frente a explotación y abuso sexual infantil
 
----
+| **Aplicación / servicio**         | ILYROX                                                                                                 |
+|-----------------------------------|--------------------------------------------------------------------------------------------------------|
+| **Sitio web**                     | www.ilyrox.com                                                                                         |
+| **Responsable / proveedor**       | ILYROX TECHNOLOGIES, S.A.P.I. DE C.V.                                                                  |
+| **RFC**                           | ITE2608279M7                                                                                           |
+| **Domicilio social**              | Aguascalientes, Aguascalientes, México                                                                 |
+| **Domicilio para notificaciones** | Juan Morales 1319, Col. Hacienda los Morales, San Nicolás de los Garza, Nuevo León, México, C.P. 66495 |
+| **Teléfono empresarial**          | +52 81 3679 8047                                                                                       |
+| **Soporte / reclamaciones**       | ayuda@ilyrox.com                                                                                       |
+| **Privacidad**                    | privacidad@ilyrox.com                                                                                  |
+| **Seguridad**                     | seguridad@ilyrox.com                                                                                   |
+| **Versión**                       | v2.2                                                                                                   |
+| **Última actualización**          | 28 de septiembre de 2026                                                                               |
+| **URL pública prevista**          | https://www.ilyrox.com/legal/seguridad-infantil                                                        |
 
-## 1. Principio fundamental
-Ilyrox es una plataforma **exclusiva para mayores de 18 años**. No está dirigida a menores ni recaba intencionadamente datos de menores.
+> **Tolerancia cero**  
+> ILYROX es un servicio profesional exclusivo para mayores de 18 años y mantiene tolerancia cero frente a material o conductas de abuso y explotación sexual infantil.
 
-## 2. Verificación de edad
-- Al registrarte declaras ser **mayor de 18 años**
-- Si detectamos o sospechamos que un usuario es menor: **suspensión/cancelación inmediata** de la cuenta
+# 1. Público objetivo y edad mínima
 
-## 3. Contenido que involucra menores
-**Está prohibido** publicar:
-- Imágenes de menores en fichas o perfiles
-- Datos personales de menores (nombres, edades, escuelas, ubicaciones)
-- Información que permita identificar o localizar a menores
+ILYROX está destinado exclusivamente a personas mayores de 18 años. Durante el registro se requiere confirmación de mayoría de edad. Si se detecta una cuenta de una persona menor de edad, ILYROX podrá suspenderla, eliminarla y adoptar medidas razonables de protección.
 
-## 4. Reportes de contenido con menores
-Cualquier usuario puede reportar contenido que involucre menores a ayuda@ilyrox.com. Actuaremos con **prioridad máxima**:
-- Retiro inmediato del contenido
-- Investigación y reporte a autoridades si procede
-- Bloqueo/cancelación de la cuenta responsable
+# 2. Conductas prohibidas
 
-## 5. Colaboración con autoridades
-Cooperamos con **Fiscalías, DIF, Policía Cibernética** y autoridades competentes ante cualquier indicio de riesgo para menores.
+- Material de abuso sexual infantil (CSAM) o cualquier representación ilícita de explotación sexual de menores.
 
-## 6. Responsabilidad del usuario
-Eres responsable del contenido que publicas. Publicar imágenes/datos de menores sin autorización de padres/tutores es **violación grave** de estos estándares y de la ley.
+- Captación, grooming, sextorsión, solicitud o intercambio sexual con menores.
 
-## 7. Medidas técnicas
-- Moderación automática y manual de imágenes
-- Filtros de detección de contenido sensible
-- Canales de reporte accesibles y visibles
+- Contenido que sexualice, explote, amenace o ponga en riesgo a niñas, niños o adolescentes.
 
-## 8. Contacto de seguridad infantil
-Reportes urgentes: **seguridad@ilyrox.com** (asunto: "MENOR - URGENTE")
-También: ayuda@ilyrox.com
+- Uso de IA para generar, transformar, sexualizar o simular material de explotación infantil.
 
----
+- Intentos de compartir, almacenar, vender, enlazar o solicitar ese material mediante perfiles, publicaciones, Cursos, chat o archivos.
 
-*Última actualización: 28/sep/2026*
+# 3. Reporte y bloqueo
+
+ILYROX habilitará dentro de la aplicación mecanismos accesibles para reportar perfiles, publicaciones y conversaciones y para bloquear Usuarios. Los reportes de seguridad infantil tendrán prioridad operativa y podrán escalarse a revisión especializada.
+
+# 4. Detección, preservación y actuación
+
+ILYROX puede utilizar revisión manual, reglas automatizadas y tecnologías de detección compatibles con la ley. Ante indicios razonables podrá retirar o inhabilitar contenido, suspender cuentas, preservar evidencia y limitar funciones. Cuando ILYROX confirme o tenga conocimiento real de material de abuso sexual infantil (CSAM), realizará el retiro correspondiente y efectuará los reportes a NCMEC y/o a la autoridad regional o competente cuando legalmente corresponda.
+
+# 5. Privacidad y minimización
+
+ILYROX no busca recopilar datos de menores para la creación de cuentas. La información asociada a un incidente se limitará a lo razonablemente necesario para seguridad, investigación, obligaciones legales y cooperación válida con autoridades.
+
+# 6. Responsabilidad de Usuarios e Instructores
+
+Usuarios e Instructores no deben publicar ni incorporar en Cursos material que infrinja estos estándares. La falta de conocimiento sobre el origen de un archivo no impide que ILYROX adopte medidas preventivas cuando exista riesgo razonable.
+
+# 7. Contacto de seguridad
+
+Punto de contacto de seguridad infantil de ILYROX: seguridad@ilyrox.com. Soporte: ayuda@ilyrox.com. Teléfono empresarial: +52 81 3679 8047. ILYROX mantendrá una persona responsable designada para atender los requerimientos de las tiendas de aplicaciones y autoridades. Estos estándares se revisan periódicamente y podrán actualizarse para mantener cumplimiento con la normativa y requisitos aplicables.
